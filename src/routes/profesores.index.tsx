@@ -34,7 +34,10 @@ function CoachesPage() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim().length < 2) return toast.error("Introduce el nombre del profesor");
+    if (name.trim().length < 2) {
+      toast.error("Introduce el nombre del profesor");
+      return;
+    }
     addCoach({ name: name.trim(), phone: phone.trim(), email: email.trim(), specialty: specialty.trim() });
     toast.success("Profesor registrado");
     setOpen(false);
