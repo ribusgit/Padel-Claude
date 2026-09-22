@@ -10,7 +10,10 @@ import {
   type Coach,
   type ClassSession,
   type ProgressNote,
+  type CourtBooking,
+  type MediaItem,
 } from "./padel";
+import { deleteMediaFile, saveMediaFile } from "./media-db";
 
 const STORAGE_KEY = "escuela-padel-data-v1";
 
@@ -28,10 +31,23 @@ interface StoreApi {
   deleteClass: (id: string) => void;
   markAttendance: (classId: string, studentId: string, present: boolean) => void;
   setPaid: (studentId: string, paid: boolean) => void;
+  addBooking: (b: Omit<CourtBooking, "id">) => CourtBooking;
+  deleteBooking: (id: string) => void;
+  addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<MediaItem>;
+  updateMedia: (id: string, patch: Partial<MediaItem>) => void;
+  deleteMedia: (id: string) => void;
   resetDemo: () => void;
 }
 
-const StoreContext = createContext<StoreApi | null>(null);
+/**
+ * El contexto se guarda en globalThis para que siga siendo el mismo objeto
+ * aunque el módulo se vuelva a evaluar (recargas en caliente del desarrollo o
+ * duplicados del grafo de módulos). Si no, useStore no encuentra el proveedor.
+ */
+const globalRef = globalThis as typeof globalThis & {
+  __padelStoreContext?: ReturnType<typeof createContext<StoreApi | null>>;
+};
+const StoreContext = (globalRef.__padelStoreContext ??= createContext<StoreApi | null>(null));
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppData>(() => seedData());
@@ -41,7 +57,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setData(JSON.parse(raw) as AppData);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<AppData>;
+        const base = seedData();
+        setData({
+          students: parsed.students ?? base.students,
+          coaches: parsed.coaches ?? base.coaches,
+          classes: parsed.classes ?? base.classes,
+          payments: parsed.payments ?? base.payments,
+          bookings: parsed.bookings ?? base.bookings,
+          media: parsed.media ?? [],
+        });
+      }
     } catch {
       /* ignore corrupt storage */
     }
@@ -156,6 +183,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ),
           };
         }),
+      addBooking: (input) => {
+        const booking: CourtBooking = { ...input, id: uid("b") };
+        update((d) => ({ ...d, bookings: [...d.bookings, booking] }));
+        return booking;
+      },
+      deleteBooking: (id) => update((d) => ({ ...d, bookings: d.bookings.filter((b) => b.id !== id) })),
+      addMedia: async (input, file) => {
+        const item: MediaItem = { ...input, id: uid("m"), createdAt: new Date().toISOString() };
+        await saveMediaFile(item.id, file);
+        update((d) => ({ ...d, media: [item, ...d.media] }));
+        return item;
+      },
+      updateMedia: (id, patch) =>
+        update((d) => ({ ...d, media: d.media.map((m) => (m.id === id ? { ...m, ...patch } : m)) })),
+      deleteMedia: (id) => {
+        void deleteMediaFile(id);
+        update((d) => ({ ...d, media: d.media.filter((m) => m.id !== id) }));
+      },
       resetDemo: () => {
         window.localStorage.removeItem(STORAGE_KEY);
         setData(seedData());

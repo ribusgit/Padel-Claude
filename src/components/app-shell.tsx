@@ -1,12 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, CalendarDays, GraduationCap, Wallet, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, GraduationCap, Wallet, LandPlot, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const NAV: { to: "/" | "/alumnos" | "/calendario" | "/profesores" | "/pagos"; label: string; icon: LucideIcon }[] = [
+const NAV: { to: "/" | "/alumnos" | "/calendario" | "/reservas" | "/profesores" | "/pagos"; label: string; icon: LucideIcon }[] = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
+  { to: "/reservas", label: "Pistas", icon: LandPlot },
   { to: "/profesores", label: "Profesores", icon: GraduationCap },
   { to: "/pagos", label: "Pagos", icon: Wallet },
 ];
@@ -65,19 +66,19 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Mobile bottom nav */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-sidebar/95 backdrop-blur md:hidden">
-        <ul className="grid grid-cols-5">
+        <ul className="grid grid-cols-6">
           {NAV.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <Link
                 to={to}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors",
+                  "flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors",
                   isActive(to) ? "text-primary" : "text-muted-foreground",
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-7 w-11 items-center justify-center rounded-full transition-colors",
+                    "flex h-7 w-9 items-center justify-center rounded-full transition-colors",
                     isActive(to) && "bg-primary/15",
                   )}
                 >
@@ -99,8 +100,8 @@ export function PageHeader({
   action,
 }: {
   title: string;
-  subtitle?: string;
-  action?: ReactNode;
+  subtitle?: string | undefined;
+  action?: ReactNode | undefined;
 }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">

@@ -5,13 +5,16 @@ import { es } from "date-fns/locale";
 import { ArrowLeft, Phone, Mail, CalendarCheck, Check, X, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
 import { LevelBadge, PaymentBadge, Avatar, EmptyState } from "@/components/padel-ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StudentMedia } from "@/components/student-media";
+import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { LEVEL_OPTIONS, LEVEL_LABELS, PLAN_LABELS, formatLevel, levelCategory, todayKey } from "@/lib/padel";
+import { LEVEL_OPTIONS, LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, formatLevel, levelCategory, todayKey } from "@/lib/padel";
 
 export const Route = createFileRoute("/alumnos/$id")({
   head: () => ({
@@ -67,6 +70,18 @@ function StudentDetail() {
               <PaymentBadge status={student.paymentStatus} />
             </div>
           </div>
+          <WhatsAppButton
+            message={{
+              to: student.name,
+              phone: student.phone,
+              kind: student.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
+              body:
+                student.paymentStatus === "pendiente"
+                  ? paymentReminder(student.name, PLAN_PRICES[student.plan], format(new Date(), "MMMM", { locale: es }))
+                  : generalReminder(student.name),
+            }}
+            label="Notificar"
+          />
         </div>
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm md:grid-cols-4">
           <div>
@@ -116,7 +131,17 @@ function StudentDetail() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <Tabs defaultValue="resumen" className="mt-6">
+        <TabsList className="w-full">
+          <TabsTrigger value="resumen" className="flex-1">Seguimiento</TabsTrigger>
+          <TabsTrigger value="multimedia" className="flex-1">Análisis Multimedia</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="multimedia" className="mt-4">
+          <StudentMedia student={student} />
+        </TabsContent>
+
+        <TabsContent value="resumen" className="mt-4 grid gap-6 lg:grid-cols-2">
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Historial de asistencia</h2>
@@ -186,7 +211,8 @@ function StudentDetail() {
             </ul>
           )}
         </section>
-      </div>
+        </TabsContent>
+      </Tabs>
     </>
   );
 }

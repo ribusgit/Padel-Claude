@@ -3,12 +3,15 @@ import { useMemo, useState } from "react";
 import { Search, UserPlus, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { LevelBadge, PaymentBadge, Avatar, EmptyState } from "@/components/padel-ui";
+import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { StudentDialog } from "@/components/student-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { LEVEL_LABELS, PLAN_LABELS, levelCategory, type LevelCategory } from "@/lib/padel";
+import { LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, levelCategory, type LevelCategory } from "@/lib/padel";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 export const Route = createFileRoute("/alumnos/")({
   head: () => ({
@@ -80,7 +83,22 @@ function StudentsPage() {
       ) : (
         <ul className="space-y-2">
           {list.map((s) => (
-            <li key={s.id}>
+            <li key={s.id} className="relative">
+              <div className="absolute right-3 top-1/2 z-10 -translate-y-1/2 md:right-12">
+                <WhatsAppButton
+                  iconOnly
+                  label={`Enviar recordatorio a ${s.name}`}
+                  message={{
+                    to: s.name,
+                    phone: s.phone,
+                    kind: s.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
+                    body:
+                      s.paymentStatus === "pendiente"
+                        ? paymentReminder(s.name, PLAN_PRICES[s.plan], format(new Date(), "MMMM", { locale: es }))
+                        : generalReminder(s.name),
+                  }}
+                />
+              </div>
               <Link
                 to="/alumnos/$id"
                 params={{ id: s.id }}
@@ -101,7 +119,8 @@ function StudentsPage() {
                   <LevelBadge level={s.level} />
                   <PaymentBadge status={s.paymentStatus} />
                 </div>
-                <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                <span className="w-9 shrink-0" />
+                <ChevronRight className="hidden size-4 shrink-0 text-muted-foreground md:block" />
               </Link>
             </li>
           ))}

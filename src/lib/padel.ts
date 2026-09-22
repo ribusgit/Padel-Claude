@@ -60,15 +60,74 @@ export interface Payment {
   paidAt?: string | undefined;
 }
 
+export type BookingType = "clase" | "alquiler";
+
+export interface CourtBooking {
+  id: string;
+  court: number;
+  date: string; // yyyy-MM-dd
+  start: string; // HH:mm
+  end: string; // HH:mm
+  type: BookingType;
+  name: string;
+  phone?: string | undefined;
+  notes?: string | undefined;
+}
+
+export type MediaKind = "foto" | "video";
+
+export interface MediaItem {
+  id: string;
+  studentId: string;
+  kind: MediaKind;
+  title: string;
+  comment: string;
+  createdAt: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  coachId?: string | undefined;
+}
+
 export interface AppData {
   students: Student[];
   coaches: Coach[];
   classes: ClassSession[];
   payments: Payment[];
+  bookings: CourtBooking[];
+  media: MediaItem[];
 }
 
 export const COURTS = [1, 2, 3, 4];
 export const MAX_STUDENTS_PER_CLASS = 4;
+
+/** Franjas horarias del cuadrante de pistas (09:00 – 22:00). */
+export const COURT_HOURS = Array.from({ length: 14 }, (_, i) => `${String(9 + i).padStart(2, "0")}:00`);
+
+export const BOOKING_LABELS: Record<BookingType, string> = {
+  clase: "Clase de la escuela",
+  alquiler: "Alquiler libre",
+};
+
+export function timeToMin(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  return (h ?? 0) * 60 + (m ?? 0);
+}
+
+export function minToTime(min: number) {
+  const h = Math.floor(min / 60) % 24;
+  const m = min % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+export function classEndTime(time: string, durationMin: number) {
+  return minToTime(timeToMin(time) + durationMin);
+}
+
+/** ¿Se solapan dos intervalos horarios? */
+export function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+  return timeToMin(aStart) < timeToMin(bEnd) && timeToMin(bStart) < timeToMin(aEnd);
+}
 
 export const PLAN_LABELS: Record<Plan, string> = {
   "1x": "1 clase/semana",
@@ -202,5 +261,11 @@ export function seedData(): AppData {
     paidAt: s.paymentStatus === "pagado" ? d(-3) : undefined,
   }));
 
-  return { students, coaches, classes, payments };
+  const bookings: CourtBooking[] = [
+    { id: "b1", court: 4, date: d(0), start: "11:00", end: "12:30", type: "alquiler", name: "Grupo de Sergio Ramos", phone: "677 123 456" },
+    { id: "b2", court: 3, date: d(0), start: "17:00", end: "18:00", type: "clase", name: "Clase de tecnificación", notes: "Bloqueada para grupo de competición" },
+    { id: "b3", court: 2, date: d(1), start: "20:00", end: "21:30", type: "alquiler", name: "Ana y Miguel", phone: "688 987 654" },
+  ];
+
+  return { students, coaches, classes, payments, bookings, media: [] };
 }

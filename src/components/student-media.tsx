@@ -1,0 +1,297 @@
+import { useEffect, useRef, useState } from "react";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+import { Camera, FileVideo, ImagePlus, Pencil, Save, Trash2, Upload, Video } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { EmptyState } from "@/components/padel-ui";
+import { WhatsAppButton, mediaReminder } from "@/components/whatsapp-dialog";
+import { getMediaFile } from "@/lib/media-db";
+import { useStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
+import type { MediaItem, Student } from "@/lib/padel";
+
+const MAX_SIZE = 80 * 1024 * 1024; // 80 MB por archivo
+
+function MediaPreview({ item }: { item: MediaItem }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    let cancelled = false;
+    void getMediaFile(item.id).then((blob) => {
+      if (cancelled || !blob) return;
+      objectUrl = URL.createObjectURL(blob);
+      setUrl(objectUrl);
+    });
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [item.id]);
+
+  if (!url) {
+    return (
+      <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+        {item.kind === "video" ? <FileVideo className="size-6" /> : <ImagePlus className="size-6" />}
+      </div>
+    );
+  }
+
+  return item.kind === "video" ? (
+    <video src={url} controls playsInline className="aspect-video w-full rounded-xl bg-black object-contain" />
+  ) : (
+    <img src={url} alt={item.title} className="aspect-video w-full rounded-xl bg-black object-contain" />
+  );
+}
+
+function MediaCard({ item, student }: { item: MediaItem; student: Student }) {
+  const { updateMedia, deleteMedia } = useStore();
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(item.title);
+  const [comment, setComment] = useState(item.comment);
+
+  return (
+    <li className="overflow-hidden rounded-2xl border border-border bg-card">
+      <MediaPreview item={item} />
+      <div className="p-3">
+        {editing ? (
+          <div className="space-y-2">
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-10" maxLength={80} placeholder="Título" />
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="min-h-20"
+              maxLength={400}
+              placeholder="Comentarios técnicos o deberes"
+            />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                className="flex-1"
+                onClick={() => {
+                  updateMedia(item.id, { title: title.trim() || "Sin título", comment: comment.trim() });
+                  setEditing(false);
+                  toast.success("Análisis actualizado");
+                }}
+              >
+                <Save /> Guardar
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancelar</Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-start gap-2">
+              <span className={cn("mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary")}>
+                {item.kind === "video" ? <Video className="size-3.5" /> : <ImagePlus className="size-3.5" />}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold leading-tight">{item.title}</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {format(parseISO(item.createdAt), "d MMM yyyy · HH:mm", { locale: es })} ·{" "}
+                  {(item.size / (1024 * 1024)).toFixed(1)} MB
+                </p>
+              </div>
+            </div>
+            {item.comment && <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.comment}</p>}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
+                <Pencil /> Editar
+              </Button>
+              <WhatsAppButton
+                message={{
+                  to: student.name,
+                  phone: student.phone,
+                  kind: "Nuevo análisis de técnica",
+                  body: mediaReminder(student.name, item.title, item.comment),
+                }}
+                label="Notificar"
+              />
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label="Eliminar archivo"
+                className="ml-auto text-muted-foreground hover:text-destructive"
+                onClick={() => {
+                  deleteMedia(item.id);
+                  toast.success("Archivo eliminado");
+                }}
+              >
+                <Trash2 />
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </li>
+  );
+}
+
+export function StudentMedia({ student }: { student: Student }) {
+  const { data, addMedia } = useStore();
+  const items = data.media.filter((m) => m.studentId === student.id);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const cameraInput = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [pending, setPending] = useState<{ file: File; kind: "foto" | "video" } | null>(null);
+  const [title, setTitle] = useState("");
+  const [comment, setComment] = useState("");
+
+  const take = (files: FileList | null) => {
+    const file = files?.[0];
+    if (!file) return;
+    const isVideo = file.type.startsWith("video/");
+    const isImage = file.type.startsWith("image/");
+    if (!isVideo && !isImage) {
+      toast.error("Solo se admiten fotos y vídeos");
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      toast.error("El archivo supera los 80 MB. Graba un vídeo más corto.");
+      return;
+    }
+    setPending({ file, kind: isVideo ? "video" : "foto" });
+    setTitle("");
+    setComment("");
+  };
+
+  const save = async () => {
+    if (!pending) return;
+    setUploading(true);
+    try {
+      await addMedia(
+        {
+          studentId: student.id,
+          kind: pending.kind,
+          title: title.trim() || pending.file.name,
+          comment: comment.trim(),
+          fileName: pending.file.name,
+          mimeType: pending.file.type,
+          size: pending.file.size,
+        },
+        pending.file,
+      );
+      toast.success("Archivo subido a la ficha del alumno");
+      setPending(null);
+      setTitle("");
+      setComment("");
+    } catch {
+      toast.error("No se ha podido guardar el archivo en este dispositivo");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Zona de subida */}
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          take(e.dataTransfer.files);
+        }}
+        className={cn(
+          "rounded-2xl border-2 border-dashed p-5 text-center transition-colors",
+          dragging ? "border-primary bg-primary/10" : "border-border bg-card",
+        )}
+      >
+        <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+          <Upload className="size-5" />
+        </span>
+        <p className="mt-3 font-display font-semibold">Sube fotos o vídeos de técnica</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Arrastra el archivo aquí, o graba el golpe con el móvil en la pista y súbelo al instante.
+        </p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center">
+          <Button className="h-12 sm:h-10" onClick={() => cameraInput.current?.click()}>
+            <Camera /> Grabar ahora
+          </Button>
+          <Button variant="secondary" className="h-12 sm:h-10" onClick={() => fileInput.current?.click()}>
+            <ImagePlus /> Elegir archivo
+          </Button>
+        </div>
+        <input
+          ref={cameraInput}
+          type="file"
+          accept="video/*,image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => take(e.target.files)}
+        />
+        <input
+          ref={fileInput}
+          type="file"
+          accept="video/*,image/*"
+          className="hidden"
+          onChange={(e) => take(e.target.files)}
+        />
+      </div>
+
+      {/* Formulario del archivo pendiente */}
+      {pending && (
+        <div className="rounded-2xl border border-primary/40 bg-card p-4">
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            {pending.kind === "video" ? <Video className="size-4 text-primary" /> : <ImagePlus className="size-4 text-primary" />}
+            <span className="truncate">{pending.file.name}</span>
+            <span className="ml-auto shrink-0 text-xs font-normal text-muted-foreground">
+              {(pending.file.size / (1024 * 1024)).toFixed(1)} MB
+            </span>
+          </p>
+          <div className="mt-3 space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="m-title">Título</Label>
+              <Input
+                id="m-title"
+                className="h-11"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                maxLength={80}
+                placeholder="Ej. Corrección de empuñadura en la volea"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="m-comment">Comentarios técnicos o deberes</Label>
+              <Textarea
+                id="m-comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                maxLength={400}
+                className="min-h-24"
+                placeholder="Ej. Abre demasiado la pala en la bandeja. Practicar 20 bandejas con el codo alto."
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button className="h-12 flex-1" disabled={uploading} onClick={() => void save()}>
+                <Save /> {uploading ? "Guardando…" : "Guardar análisis"}
+              </Button>
+              <Button variant="ghost" className="h-12" onClick={() => setPending(null)}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {items.length === 0 ? (
+        <EmptyState title="Sin material multimedia" description="Sube el primer vídeo o foto de técnica de este alumno." />
+      ) : (
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {items.map((m) => (
+            <MediaCard key={m.id} item={m} student={student} />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

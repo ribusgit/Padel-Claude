@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/app-shell";
 import { StatCard, LevelBadge, Avatar, EmptyState } from "@/components/padel-ui";
 import { StudentDialog } from "@/components/student-dialog";
 import { ClassDialog } from "@/components/class-dialog";
+import { BookingDialog } from "@/components/booking-dialog";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { COURTS, todayKey } from "@/lib/padel";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { data } = useStore();
+  const { data, hydrated } = useStore();
   const today = todayKey();
   const activeStudents = data.students.filter((s) => s.active);
   const todayClasses = data.classes
@@ -36,7 +37,7 @@ function Dashboard() {
     <>
       <PageHeader
         title="Panel de control"
-        subtitle={format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+        subtitle={hydrated ? format(new Date(), "EEEE, d 'de' MMMM", { locale: es }) : undefined}
       />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
@@ -46,7 +47,7 @@ function Dashboard() {
         <StatCard label="Pagos pendientes" value={pending.length} icon={AlertCircle} tone={pending.length ? "warning" : "default"} hint={pending.length ? "requieren atención" : "todo al día"} />
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <StudentDialog
           trigger={
             <Button size="lg" className="h-14 justify-start rounded-2xl text-base">
@@ -58,6 +59,13 @@ function Dashboard() {
           trigger={
             <Button size="lg" variant="secondary" className="h-14 justify-start rounded-2xl text-base">
               <CalendarPlus className="!size-5" /> Registrar una clase
+            </Button>
+          }
+        />
+        <BookingDialog
+          trigger={
+            <Button size="lg" variant="secondary" className="h-14 justify-start rounded-2xl text-base">
+              <LandPlot className="!size-5" /> Reservar una pista
             </Button>
           }
         />
