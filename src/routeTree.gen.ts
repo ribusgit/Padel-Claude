@@ -14,6 +14,7 @@ import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as AlumnosIndexRouteImport } from './routes/alumnos.index'
 import { Route as AlumnosIdRouteImport } from './routes/alumnos.$id'
 import { Route as ProfesoresIndexRouteImport } from './routes/profesores.index'
+import { Route as ProfesoresIdRouteImport } from './routes/profesores.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,11 +41,17 @@ const ProfesoresIndexRoute = ProfesoresIndexRouteImport.update({
   path: '/profesores/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfesoresIdRoute = ProfesoresIdRouteImport.update({
+  id: '/profesores/$id',
+  path: '/profesores/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/alumnos/$id': typeof AlumnosIdRoute
+  '/profesores/$id': typeof ProfesoresIdRoute
   '/alumnos/': typeof AlumnosIndexRoute
   '/profesores/': typeof ProfesoresIndexRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/alumnos/$id': typeof AlumnosIdRoute
+  '/profesores/$id': typeof ProfesoresIdRoute
   '/alumnos': typeof AlumnosIndexRoute
   '/profesores': typeof ProfesoresIndexRoute
 }
@@ -60,19 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/alumnos/$id': typeof AlumnosIdRoute
+  '/profesores/$id': typeof ProfesoresIdRoute
   '/alumnos/': typeof AlumnosIndexRoute
   '/profesores/': typeof ProfesoresIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calendario' | '/alumnos/$id' | '/alumnos/' | '/profesores/'
+  fullPaths:
+    | '/'
+    | '/calendario'
+    | '/alumnos/$id'
+    | '/profesores/$id'
+    | '/alumnos/'
+    | '/profesores/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendario' | '/alumnos/$id' | '/alumnos' | '/profesores'
+  to:
+    | '/'
+    | '/calendario'
+    | '/alumnos/$id'
+    | '/profesores/$id'
+    | '/alumnos'
+    | '/profesores'
   id:
     | '__root__'
     | '/'
     | '/calendario'
     | '/alumnos/$id'
+    | '/profesores/$id'
     | '/alumnos/'
     | '/profesores/'
   fileRoutesById: FileRoutesById
@@ -81,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalendarioRoute: typeof CalendarioRoute
   AlumnosIdRoute: typeof AlumnosIdRoute
+  ProfesoresIdRoute: typeof ProfesoresIdRoute
   AlumnosIndexRoute: typeof AlumnosIndexRoute
   ProfesoresIndexRoute: typeof ProfesoresIndexRoute
 }
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfesoresIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profesores/$id': {
+      id: '/profesores/$id'
+      path: '/profesores/$id'
+      fullPath: '/profesores/$id'
+      preLoaderRoute: typeof ProfesoresIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -129,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalendarioRoute: CalendarioRoute,
   AlumnosIdRoute: AlumnosIdRoute,
+  ProfesoresIdRoute: ProfesoresIdRoute,
   AlumnosIndexRoute: AlumnosIndexRoute,
   ProfesoresIndexRoute: ProfesoresIndexRoute,
 }
