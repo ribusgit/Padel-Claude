@@ -1,0 +1,263 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { addDays, format, isSameDay, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+import { CalendarPlus, ChevronLeft, ChevronRight, Lock, Plus, Trash2, Users } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "@/components/app-shell";
+import { BookingDialog } from "@/components/booking-dialog";
+import { WhatsAppButton, generalReminder } from "@/components/whatsapp-dialog";
+import { EmptyState } from "@/components/padel-ui";
+import { Button } from "@/components/ui/button";
+import { useStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
+import {
+  BOOKING_LABELS,
+  COURT_HOURS,
+  COURTS,
+  classEndTime,
+  overlaps,
+  timeToMin,
+  todayKey,
+} from "@/lib/padel";
+
+export const Route = createFileRoute("/reservas")({
+  head: () => ({
+    meta: [
+      { title: "Reservas de pistas — Escuela de Pádel" },
+      { name: "description", content: "Cuadrante horario de las pistas: clases de la escuela y alquiler libre, sin duplicidades." },
+      { property: "og:title", content: "Reservas de pistas — Escuela de Pádel" },
+      { property: "og:description", content: "Cuadrante horario de las pistas: clases de la escuela y alquiler libre, sin duplicidades." },
+    ],
+  }),
+  component: BookingsPage,
+});
+
+type Slot =
+  | { kind: "libre" }
+  | { kind: "clase-calendario"; id: string; label: string; sub: string; start: string; end: string }
+  | { kind: "reserva"; id: string; label: string; sub: string; type: "clase" | "alquiler"; start: string; end: string; phone?: string | undefined };
+
+function BookingsPage() {
+  const { data, deleteBooking, hydrated } = useStore();
+  const [dayOffset, setDayOffset] = useState(0);
+  const [slotTarget, setSlotTarget] = useState<{ court: number; start: string } | null>(null);
+
+  const selected = addDays(new Date(), dayOffset);
+  const dateKey = format(selected, "yyyy-MM-dd");
+
+  const dayClasses = useMemo(() => data.classes.filter((c) => c.date === dateKey), [data.classes, dateKey]);
+  const dayBookings = useMemo(() => data.bookings.filter((b) => b.date === dateKey), [data.bookings, dateKey]);
+
+  const slotFor = (court: number, hour: string): Slot => {
+    const hourEnd = classEndTime(hour, 60);
+    const cls = dayClasses.find(
+      (c) => c.court === court && overlaps(hour, hourEnd, c.time, classEndTime(c.time, c.durationMin)),
+    );
+    if (cls) {
+      const coach = data.coaches.find((x) => x.id === cls.coachId);
+      return {
+        kind: "clase-calendario",
+        id: cls.id,
+        label: "Clase de la escuela",
+        sub: `${coach?.name ?? "Profesor"} · ${cls.studentIds.length}/4`,
+        start: cls.time,
+        end: classEndTime(cls.time, cls.durationMin),
+      };
+    }
+    const bk = dayBookings.find((b) => b.court === court && overlaps(hour, hourEnd, b.start, b.end));
+    if (bk) {
+      return {
+        kind: "reserva",
+        id: bk.id,
+        label: bk.name,
+        sub: BOOKING_LABELS[bk.type],
+        type: bk.type,
+        start: bk.start,
+        end: bk.end,
+        phone: bk.phone,
+      };
+    }
+    return { kind: "libre" };
+  };
+
+  const occupiedSlots = COURTS.reduce(
+    (n, court) => n + COURT_HOURS.filter((h) => slotFor(court, h).kind !== "libre").length,
+    0,
+  );
+  const totalSlots = COURTS.length * COURT_HOURS.length;
+
+  const agenda = [
+    ...dayClasses.map((c) => ({
+      id: c.id,
+      court: c.court,
+      start: c.time,
+      end: classEndTime(c.time, c.durationMin),
+      title: "Clase de la escuela",
+      sub: data.coaches.find((x) => x.id === c.coachId)?.name ?? "Profesor",
+      removable: false as const,
+      phone: undefined as string | undefined,
+    })),
+    ...dayBookings.map((b) => ({
+      id: b.id,
+      court: b.court,
+      start: b.start,
+      end: b.end,
+      title: b.name,
+      sub: BOOKING_LABELS[b.type],
+      removable: true as const,
+      phone: b.phone,
+    })),
+  ].sort((a, b) => timeToMin(a.start) - timeToMin(b.start) || a.court - b.court);
+
+  return (
+    <>
+      <PageHeader
+        title="Reservas de pistas"
+        subtitle={hydrated ? `${occupiedSlots} de ${totalSlots} franjas ocupadas` : undefined}
+        action={
+          <BookingDialog
+            defaultDate={dateKey}
+            trigger={
+              <Button>
+                <CalendarPlus /> Nueva reserva
+              </Button>
+            }
+          />
+        }
+      />
+
+      {/* Selector de día */}
+      <div className="rounded-2xl border border-border bg-card p-3">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="icon" aria-label="Día anterior" onClick={() => setDayOffset((d) => d - 1)}>
+            <ChevronLeft />
+          </Button>
+          <p className="font-display text-sm font-semibold first-letter:uppercase">
+            {format(selected, "EEEE d 'de' MMMM", { locale: es })}
+            {isSameDay(selected, parseISO(todayKey())) && <span className="ml-2 text-primary">hoy</span>}
+          </p>
+          <Button variant="ghost" size="icon" aria-label="Día siguiente" onClick={() => setDayOffset((d) => d + 1)}>
+            <ChevronRight />
+          </Button>
+        </div>
+      </div>
+
+      {/* Cuadrante */}
+      <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
+        <div className="min-w-[540px]">
+          <div
+            className="grid border-b border-border bg-secondary/60 text-xs font-semibold"
+            style={{ gridTemplateColumns: `64px repeat(${COURTS.length}, minmax(0,1fr))` }}
+          >
+            <span className="px-2 py-2.5 text-muted-foreground">Hora</span>
+            {COURTS.map((c) => (
+              <span key={c} className="border-l border-border px-2 py-2.5 text-center">Pista {c}</span>
+            ))}
+          </div>
+          {COURT_HOURS.map((hour) => (
+            <div
+              key={hour}
+              className="grid border-b border-border last:border-0"
+              style={{ gridTemplateColumns: `64px repeat(${COURTS.length}, minmax(0,1fr))` }}
+            >
+              <span className="flex items-center px-2 py-1 font-mono text-xs text-muted-foreground">{hour}</span>
+              {COURTS.map((court) => {
+                const slot = slotFor(court, hour);
+                if (slot.kind === "libre") {
+                  return (
+                    <button
+                      key={court}
+                      onClick={() => setSlotTarget({ court, start: hour })}
+                      className="group flex min-h-14 items-center justify-center border-l border-border text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                      aria-label={`Reservar pista ${court} a las ${hour}`}
+                    >
+                      <Plus className="size-4 opacity-40 transition-opacity group-hover:opacity-100" />
+                    </button>
+                  );
+                }
+                const isSchool = slot.kind === "clase-calendario" || slot.type === "clase";
+                return (
+                  <div
+                    key={court}
+                    className={cn(
+                      "min-h-14 border-l border-border p-1.5 text-left",
+                      isSchool ? "bg-primary/15" : "bg-warning/15",
+                    )}
+                  >
+                    <p className={cn("flex items-center gap-1 text-[11px] font-bold leading-tight", isSchool ? "text-primary" : "text-warning")}>
+                      {isSchool ? <Users className="size-3 shrink-0" /> : <Lock className="size-3 shrink-0" />}
+                      <span className="truncate">Ocupada</span>
+                    </p>
+                    <p className="truncate text-[11px] leading-tight text-foreground">{slot.label}</p>
+                    <p className="truncate text-[10px] leading-tight text-muted-foreground">
+                      {slot.start}–{slot.end}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1.5"><span className="size-3 rounded bg-primary/40" /> Clase de la escuela</span>
+        <span className="flex items-center gap-1.5"><span className="size-3 rounded bg-warning/40" /> Alquiler libre</span>
+        <span className="flex items-center gap-1.5"><span className="size-3 rounded border border-border" /> Libre · pulsa para reservar</span>
+      </div>
+
+      {/* Agenda del día */}
+      <h2 className="mb-3 mt-7 text-lg font-semibold">Reservas del día</h2>
+      {agenda.length === 0 ? (
+        <EmptyState title="Ninguna pista reservada" description="Pulsa una franja libre del cuadrante para reservar." />
+      ) : (
+        <ul className="space-y-2">
+          {agenda.map((a) => (
+            <li key={a.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
+              <div className="flex w-16 shrink-0 flex-col items-center rounded-xl bg-secondary py-1.5 font-display">
+                <span className="text-sm font-bold">{a.start}</span>
+                <span className="text-[10px] text-muted-foreground">{a.end}</span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">{a.title}</p>
+                <p className="truncate text-xs text-muted-foreground">Pista {a.court} · {a.sub}</p>
+              </div>
+              {a.phone && (
+                <WhatsAppButton
+                  iconOnly
+                  label={`Avisar a ${a.title}`}
+                  message={{ to: a.title, phone: a.phone, kind: "Recordatorio de reserva", body: generalReminder(a.title) }}
+                />
+              )}
+              {a.removable ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Eliminar reserva"
+                  onClick={() => {
+                    deleteBooking(a.id);
+                    toast.success("Reserva eliminada");
+                  }}
+                >
+                  <Trash2 />
+                </Button>
+              ) : (
+                <span className="rounded-full bg-primary/15 px-2.5 py-1 text-[11px] font-semibold text-primary">Calendario</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <BookingDialog
+        defaultDate={dateKey}
+        {...(slotTarget ? { defaultCourt: slotTarget.court, defaultStart: slotTarget.start } : {})}
+        open={slotTarget !== null}
+        onOpenChange={(v) => {
+          if (!v) setSlotTarget(null);
+        }}
+      />
+    </>
+  );
+}
