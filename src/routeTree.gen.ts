@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CalendarioRouteImport } from './routes/calendario'
+import { Route as PagosRouteImport } from './routes/pagos'
+import { Route as AlumnosIndexRouteImport } from './routes/alumnos.index'
+import { Route as AlumnosIdRouteImport } from './routes/alumnos.$id'
+import { Route as ProfesoresIndexRouteImport } from './routes/profesores.index'
+import { Route as ProfesoresIdRouteImport } from './routes/profesores.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalendarioRoute = CalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagosRoute = PagosRouteImport.update({
+  id: '/pagos',
+  path: '/pagos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlumnosIndexRoute = AlumnosIndexRouteImport.update({
+  id: '/alumnos/',
+  path: '/alumnos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlumnosIdRoute = AlumnosIdRouteImport.update({
+  id: '/alumnos/$id',
+  path: '/alumnos/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfesoresIndexRoute = ProfesoresIndexRouteImport.update({
+  id: '/profesores/',
+  path: '/profesores/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfesoresIdRoute = ProfesoresIdRouteImport.update({
+  id: '/profesores/$id',
+  path: '/profesores/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
+  '/pagos': typeof PagosRoute
+  '/alumnos/$id': typeof AlumnosIdRoute
+  '/profesores/$id': typeof ProfesoresIdRoute
+  '/alumnos/': typeof AlumnosIndexRoute
+  '/profesores/': typeof ProfesoresIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
+  '/pagos': typeof PagosRoute
+  '/alumnos/$id': typeof AlumnosIdRoute
+  '/profesores/$id': typeof ProfesoresIdRoute
+  '/alumnos': typeof AlumnosIndexRoute
+  '/profesores': typeof ProfesoresIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
+  '/pagos': typeof PagosRoute
+  '/alumnos/$id': typeof AlumnosIdRoute
+  '/profesores/$id': typeof ProfesoresIdRoute
+  '/alumnos/': typeof AlumnosIndexRoute
+  '/profesores/': typeof ProfesoresIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/calendario'
+    | '/pagos'
+    | '/alumnos/$id'
+    | '/profesores/$id'
+    | '/alumnos/'
+    | '/profesores/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/calendario'
+    | '/pagos'
+    | '/alumnos/$id'
+    | '/profesores/$id'
+    | '/alumnos'
+    | '/profesores'
+  id:
+    | '__root__'
+    | '/'
+    | '/calendario'
+    | '/pagos'
+    | '/alumnos/$id'
+    | '/profesores/$id'
+    | '/alumnos/'
+    | '/profesores/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CalendarioRoute: typeof CalendarioRoute
+  PagosRoute: typeof PagosRoute
+  AlumnosIdRoute: typeof AlumnosIdRoute
+  ProfesoresIdRoute: typeof ProfesoresIdRoute
+  AlumnosIndexRoute: typeof AlumnosIndexRoute
+  ProfesoresIndexRoute: typeof ProfesoresIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/calendario': {
+      id: '/calendario'
+      path: '/calendario'
+      fullPath: '/calendario'
+      preLoaderRoute: typeof CalendarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pagos': {
+      id: '/pagos'
+      path: '/pagos'
+      fullPath: '/pagos'
+      preLoaderRoute: typeof PagosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alumnos/': {
+      id: '/alumnos/'
+      path: '/alumnos'
+      fullPath: '/alumnos/'
+      preLoaderRoute: typeof AlumnosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alumnos/$id': {
+      id: '/alumnos/$id'
+      path: '/alumnos/$id'
+      fullPath: '/alumnos/$id'
+      preLoaderRoute: typeof AlumnosIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profesores/': {
+      id: '/profesores/'
+      path: '/profesores'
+      fullPath: '/profesores/'
+      preLoaderRoute: typeof ProfesoresIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profesores/$id': {
+      id: '/profesores/$id'
+      path: '/profesores/$id'
+      fullPath: '/profesores/$id'
+      preLoaderRoute: typeof ProfesoresIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalendarioRoute: CalendarioRoute,
+  PagosRoute: PagosRoute,
+  AlumnosIdRoute: AlumnosIdRoute,
+  ProfesoresIdRoute: ProfesoresIdRoute,
+  AlumnosIndexRoute: AlumnosIndexRoute,
+  ProfesoresIndexRoute: ProfesoresIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

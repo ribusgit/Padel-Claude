@@ -1,24 +1,135 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { Users, CalendarDays, LandPlot, AlertCircle, UserPlus, CalendarPlus, ChevronRight, Clock } from "lucide-react";
+import { PageHeader } from "@/components/app-shell";
+import { StatCard, LevelBadge, Avatar, EmptyState } from "@/components/padel-ui";
+import { StudentDialog } from "@/components/student-dialog";
+import { ClassDialog } from "@/components/class-dialog";
+import { Button } from "@/components/ui/button";
+import { useStore } from "@/lib/store";
+import { COURTS, todayKey } from "@/lib/padel";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Panel de control — Escuela de Pádel" },
+      { name: "description", content: "Resumen diario de alumnos, clases, pistas y pagos de tu escuela de pádel." },
+      { property: "og:title", content: "Panel de control — Escuela de Pádel" },
+      { property: "og:description", content: "Resumen diario de alumnos, clases, pistas y pagos de tu escuela de pádel." },
+    ],
+  }),
+  component: Dashboard,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Dashboard() {
+  const { data } = useStore();
+  const today = todayKey();
+  const activeStudents = data.students.filter((s) => s.active);
+  const todayClasses = data.classes
+    .filter((c) => c.date === today)
+    .sort((a, b) => a.time.localeCompare(b.time));
+  const busyCourts = new Set(todayClasses.map((c) => c.court)).size;
+  const pending = activeStudents.filter((s) => s.paymentStatus === "pendiente");
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
+    <>
+      <PageHeader
+        title="Panel de control"
+        subtitle={format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
       />
-    </div>
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <StatCard label="Alumnos activos" value={activeStudents.length} icon={Users} tone="primary" hint="en la escuela" />
+        <StatCard label="Clases hoy" value={todayClasses.length} icon={CalendarDays} hint={todayClasses[0] ? `primera a las ${todayClasses[0].time}` : "sin clases"} />
+        <StatCard label="Pistas ocupadas" value={`${busyCourts}/${COURTS.length}`} icon={LandPlot} hint="hoy" />
+        <StatCard label="Pagos pendientes" value={pending.length} icon={AlertCircle} tone={pending.length ? "warning" : "default"} hint={pending.length ? "requieren atención" : "todo al día"} />
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <StudentDialog
+          trigger={
+            <Button size="lg" className="h-14 justify-start rounded-2xl text-base">
+              <UserPlus className="!size-5" /> Añadir nuevo alumno
+            </Button>
+          }
+        />
+        <ClassDialog
+          trigger={
+            <Button size="lg" variant="secondary" className="h-14 justify-start rounded-2xl text-base">
+              <CalendarPlus className="!size-5" /> Registrar una clase
+            </Button>
+          }
+        />
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-5">
+        <section className="lg:col-span-3">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Clases de hoy</h2>
+            <Link to="/calendario" className="flex items-center text-sm text-primary">
+              Ver calendario <ChevronRight className="size-4" />
+            </Link>
+          </div>
+          {todayClasses.length === 0 ? (
+            <EmptyState title="No hay clases programadas hoy" description="Usa «Registrar una clase» para añadir una." />
+          ) : (
+            <ul className="space-y-2">
+              {todayClasses.map((c) => {
+                const coach = data.coaches.find((x) => x.id === c.coachId);
+                return (
+                  <li key={c.id} className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
+                    <div className="flex flex-col items-center rounded-xl bg-secondary px-3 py-2 font-display">
+                      <Clock className="mb-0.5 size-3.5 text-muted-foreground" />
+                      <span className="text-sm font-bold">{c.time}</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold">Pista {c.court}</p>
+                        <LevelBadge category={c.level} />
+                      </div>
+                      <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                        {coach?.name ?? "Sin profesor"} · {c.studentIds.length}/4 alumnos
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        <section className="lg:col-span-2">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Pagos pendientes</h2>
+            <Link to="/pagos" className="flex items-center text-sm text-primary">
+              Ver todos <ChevronRight className="size-4" />
+            </Link>
+          </div>
+          {pending.length === 0 ? (
+            <EmptyState title="Todos los alumnos al día" />
+          ) : (
+            <ul className="space-y-2">
+              {pending.map((s) => (
+                <li key={s.id}>
+                  <Link
+                    to="/alumnos/$id"
+                    params={{ id: s.id }}
+                    className="flex items-center gap-3 rounded-2xl border border-warning/30 bg-card p-3 transition-colors hover:bg-accent"
+                  >
+                    <Avatar name={s.name} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{s.name}</p>
+                      <p className="text-xs text-muted-foreground">{s.phone}</p>
+                    </div>
+                    <span className="text-xs font-semibold text-warning">Pendiente</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </>
   );
 }
