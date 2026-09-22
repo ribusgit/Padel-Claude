@@ -38,7 +38,7 @@ function CoachesPage() {
       toast.error("Introduce el nombre del profesor");
       return;
     }
-    addCoach({ name: name.trim(), phone: phone.trim(), email: email.trim(), specialty: specialty.trim() });
+    void addCoach({ name: name.trim(), phone: phone.trim(), email: email.trim(), specialty: specialty.trim() });
     toast.success("Profesor registrado");
     setOpen(false);
     setName(""); setPhone(""); setEmail(""); setSpecialty("");

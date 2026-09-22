@@ -236,7 +236,7 @@ function BookingsPage() {
                   size="icon"
                   aria-label="Eliminar reserva"
                   onClick={() => {
-                    deleteBooking(a.id);
+                    void deleteBooking(a.id);
                     toast.success("Reserva eliminada");
                   }}
                 >

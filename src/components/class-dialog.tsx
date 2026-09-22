@@ -55,7 +55,7 @@ export function ClassDialog({ trigger, defaultDate }: { trigger: ReactNode; defa
       toast.error(`La pista ${court} ya está ocupada a las ${time}`);
       return;
     }
-    addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds });
+    void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds });
     toast.success("Clase programada");
     setOpen(false);
     setStudentIds([]);

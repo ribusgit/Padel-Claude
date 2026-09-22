@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState } from "@/components/padel-ui";
 import { WhatsAppButton, mediaReminder } from "@/components/whatsapp-dialog";
-import { getMediaFile } from "@/lib/media-db";
+import { mediaPathOf } from "@/lib/store";
+import { signedMediaUrl } from "@/lib/media-storage";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { MediaItem, Student } from "@/lib/padel";
@@ -20,16 +21,16 @@ function MediaPreview({ item }: { item: MediaItem }) {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    let objectUrl: string | null = null;
     let cancelled = false;
-    void getMediaFile(item.id).then((blob) => {
-      if (cancelled || !blob) return;
-      objectUrl = URL.createObjectURL(blob);
-      setUrl(objectUrl);
-    });
+    const path = mediaPathOf(item.id);
+    if (!path) return;
+    void signedMediaUrl(path)
+      .then((signed) => {
+        if (!cancelled) setUrl(signed);
+      })
+      .catch(() => undefined);
     return () => {
       cancelled = true;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [item.id]);
 
@@ -73,7 +74,7 @@ function MediaCard({ item, student }: { item: MediaItem; student: Student }) {
                 size="sm"
                 className="flex-1"
                 onClick={() => {
-                  updateMedia(item.id, { title: title.trim() || "Sin título", comment: comment.trim() });
+                  void updateMedia(item.id, { title: title.trim() || "Sin título", comment: comment.trim() });
                   setEditing(false);
                   toast.success("Análisis actualizado");
                 }}
@@ -117,7 +118,7 @@ function MediaCard({ item, student }: { item: MediaItem; student: Student }) {
                 aria-label="Eliminar archivo"
                 className="ml-auto text-muted-foreground hover:text-destructive"
                 onClick={() => {
-                  deleteMedia(item.id);
+                  void deleteMedia(item.id);
                   toast.success("Archivo eliminado");
                 }}
               >
@@ -181,7 +182,7 @@ export function StudentMedia({ student }: { student: Student }) {
       setTitle("");
       setComment("");
     } catch {
-      toast.error("No se ha podido guardar el archivo en este dispositivo");
+      toast.error("No se ha podido guardar el archivo");
     } finally {
       setUploading(false);
     }

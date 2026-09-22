@@ -190,7 +190,7 @@ function CalendarPage() {
                   </div>
                   <button
                     onClick={() => {
-                      deleteClass(c.id);
+                      void deleteClass(c.id);
                       toast.success("Clase eliminada");
                     }}
                     className="flex w-11 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"

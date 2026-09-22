@@ -49,7 +49,7 @@ function StudentDetail() {
       toast.error("Escribe una nota antes de guardar");
       return;
     }
-    addNote(student.id, { date: todayKey(), coachId, text: note.trim().slice(0, 500) });
+    void addNote(student.id, { date: todayKey(), coachId, text: note.trim().slice(0, 500) });
     setNote("");
     toast.success("Nota de progreso guardada");
   };
@@ -105,7 +105,7 @@ function StudentDetail() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Nivel de pádel</Label>
-            <Select value={String(student.level)} onValueChange={(v) => updateStudent(student.id, { level: Number(v) })}>
+            <Select value={String(student.level)} onValueChange={(v) => void updateStudent(student.id, { level: Number(v) })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {LEVEL_OPTIONS.map((l) => (
@@ -121,7 +121,7 @@ function StudentDetail() {
               className="w-full"
               onClick={() => {
                 const paid = student.paymentStatus !== "pagado";
-                setPaid(student.id, paid);
+                void setPaid(student.id, paid);
                 toast.success(paid ? "Marcado como pagado" : "Marcado como pendiente");
               }}
             >

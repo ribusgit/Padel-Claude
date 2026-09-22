@@ -82,7 +82,7 @@ function CoachView() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => {
-                                markAttendance(c.id, s.id, true);
+                                void markAttendance(c.id, s.id, true);
                                 toast.success(`${s.name.split(" ")[0]} presente`);
                               }}
                               aria-label="Marcar presente"
@@ -96,7 +96,7 @@ function CoachView() {
                               <Check className="size-5" />
                             </button>
                             <button
-                              onClick={() => markAttendance(c.id, s.id, false)}
+                              onClick={() => void markAttendance(c.id, s.id, false)}
                               aria-label="Marcar ausente"
                               className={cn(
                                 "flex size-12 items-center justify-center rounded-xl border transition-colors",

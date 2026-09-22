@@ -27,13 +27,13 @@ export function StudentDialog({ trigger, onCreated }: { trigger: ReactNode; onCr
   const [plan, setPlan] = useState<Plan>("1x");
   const [payment, setPayment] = useState<PaymentStatus>("pendiente");
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim().length < 2) {
       toast.error("Introduce el nombre completo del alumno");
       return;
     }
-    const s = addStudent({
+    const s = await addStudent({
       name: name.trim(),
       phone: phone.trim(),
       email: email.trim(),
@@ -57,7 +57,7 @@ export function StudentDialog({ trigger, onCreated }: { trigger: ReactNode; onCr
         <DialogHeader>
           <DialogTitle>Nuevo alumno</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
+        <form onSubmit={(e) => void submit(e)} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="name">Nombre completo</Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ana García" maxLength={80} required />

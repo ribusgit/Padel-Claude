@@ -105,7 +105,7 @@ function PaymentsPage() {
                   size="icon"
                   aria-label="Deshacer pago"
                   onClick={() => {
-                    setPaid(s.id, false);
+                    void setPaid(s.id, false);
                     toast("Pago revertido");
                   }}
                 >
@@ -115,7 +115,7 @@ function PaymentsPage() {
                 <Button
                   size="sm"
                   onClick={() => {
-                    setPaid(s.id, true);
+                    void setPaid(s.id, true);
                     toast.success(`${s.name} marcado como pagado`);
                   }}
                 >

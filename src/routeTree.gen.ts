@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
+import { Route as AuthenticatedMisClasesRouteImport } from './routes/_authenticated/mis-clases'
 import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authenticated/_admin/pagos'
 import { Route as AuthenticatedAdminReservasRouteImport } from './routes/_authenticated/_admin/reservas'
 import { Route as AuthenticatedAlumnosIndexRouteImport } from './routes/_authenticated/alumnos.index'
@@ -42,6 +43,11 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
 const AuthenticatedCalendarioRoute = AuthenticatedCalendarioRouteImport.update({
   id: '/calendario',
   path: '/calendario',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMisClasesRoute = AuthenticatedMisClasesRouteImport.update({
+  id: '/mis-clases',
+  path: '/mis-clases',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminPagosRoute = AuthenticatedAdminPagosRouteImport.update({
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
+  '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/': typeof AuthenticatedIndexRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
+  '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
+  '/_authenticated/mis-clases': typeof AuthenticatedMisClasesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_admin/pagos': typeof AuthenticatedAdminPagosRoute
   '/_authenticated/_admin/reservas': typeof AuthenticatedAdminReservasRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/calendario'
+    | '/mis-clases'
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/'
     | '/calendario'
+    | '/mis-clases'
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/_admin'
     | '/_authenticated/calendario'
+    | '/_authenticated/mis-clases'
     | '/_authenticated/'
     | '/_authenticated/_admin/pagos'
     | '/_authenticated/_admin/reservas'
@@ -193,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/calendario'
       fullPath: '/calendario'
       preLoaderRoute: typeof AuthenticatedCalendarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mis-clases': {
+      id: '/_authenticated/mis-clases'
+      path: '/mis-clases'
+      fullPath: '/mis-clases'
+      preLoaderRoute: typeof AuthenticatedMisClasesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/_admin/pagos': {
@@ -264,6 +283,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
+  AuthenticatedMisClasesRoute: typeof AuthenticatedMisClasesRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAlumnosIdRoute: typeof AuthenticatedAlumnosIdRoute
   AuthenticatedAlumnosIndexRoute: typeof AuthenticatedAlumnosIndexRoute
@@ -272,6 +292,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
+  AuthenticatedMisClasesRoute: AuthenticatedMisClasesRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAlumnosIdRoute: AuthenticatedAlumnosIdRoute,
   AuthenticatedAlumnosIndexRoute: AuthenticatedAlumnosIndexRoute,
