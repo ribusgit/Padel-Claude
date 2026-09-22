@@ -13,7 +13,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LEVEL_LABELS, MAX_STUDENTS_PER_CLASS, type LevelCategory } from "@/lib/padel";
 
-export const Route = createFileRoute("/calendario")({
+export const Route = createFileRoute("/_authenticated/calendario")({
   head: () => ({
     meta: [
       { title: "Calendario de clases — Escuela de Pádel" },

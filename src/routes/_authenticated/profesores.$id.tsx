@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { todayKey } from "@/lib/padel";
 
-export const Route = createFileRoute("/profesores/$id")({
+export const Route = createFileRoute("/_authenticated/profesores/$id")({
   head: () => ({
     meta: [
       { title: "Vista de pista — Escuela de Pádel" },

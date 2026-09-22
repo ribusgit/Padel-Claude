@@ -1,0 +1,40 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(72),
+  fullName: z.string().min(2).max(80),
+  coachId: z.string().uuid(),
+});
+
+/** Crea la cuenta de acceso de un profesor. Solo para administradores. */
+export const createCoachAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => schema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("is_admin");
+    if (!isAdmin) throw new Error("Solo un administrador puede crear cuentas de profesor");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true,
+      user_metadata: { full_name: data.fullName },
+    });
+    if (error || !created.user) throw new Error(error?.message ?? "No se pudo crear la cuenta");
+
+    const userId = created.user.id;
+    const { error: pErr } = await supabaseAdmin
+      .from("profiles")
+      .upsert({ id: userId, full_name: data.fullName, coach_id: data.coachId });
+    if (pErr) throw new Error(pErr.message);
+    const { error: rErr } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: userId, role: "coach" }, { onConflict: "user_id,role" });
+    if (rErr) throw new Error(rErr.message);
+
+    return { ok: true as const, userId };
+  });

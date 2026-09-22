@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useStore } from "@/lib/store";
 import { todayKey } from "@/lib/padel";
 
-export const Route = createFileRoute("/profesores/")({
+export const Route = createFileRoute("/_authenticated/_admin/profesores/")({
   head: () => ({
     meta: [
       { title: "Profesores — Escuela de Pádel" },

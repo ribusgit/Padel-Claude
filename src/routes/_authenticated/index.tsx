@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { COURTS, todayKey } from "@/lib/padel";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Panel de control — Escuela de Pádel" },

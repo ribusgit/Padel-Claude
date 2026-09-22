@@ -16,7 +16,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LEVEL_OPTIONS, LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, formatLevel, levelCategory, todayKey } from "@/lib/padel";
 
-export const Route = createFileRoute("/alumnos/$id")({
+export const Route = createFileRoute("/_authenticated/alumnos/$id")({
   head: () => ({
     meta: [
       { title: "Ficha de alumno — Escuela de Pádel" },

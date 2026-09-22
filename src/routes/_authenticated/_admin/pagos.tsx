@@ -12,7 +12,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { PLAN_LABELS, PLAN_PRICES, monthKey } from "@/lib/padel";
 
-export const Route = createFileRoute("/pagos")({
+export const Route = createFileRoute("/_authenticated/_admin/pagos")({
   head: () => ({
     meta: [
       { title: "Pagos y mensualidades — Escuela de Pádel" },
