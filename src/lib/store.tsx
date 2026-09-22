@@ -28,6 +28,11 @@ interface StoreApi {
   deleteClass: (id: string) => void;
   markAttendance: (classId: string, studentId: string, present: boolean) => void;
   setPaid: (studentId: string, paid: boolean) => void;
+  addBooking: (b: Omit<CourtBooking, "id">) => CourtBooking;
+  deleteBooking: (id: string) => void;
+  addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<MediaItem>;
+  updateMedia: (id: string, patch: Partial<MediaItem>) => void;
+  deleteMedia: (id: string) => void;
   resetDemo: () => void;
 }
 
