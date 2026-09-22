@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 function Dashboard() {
-  const { data, hydrated } = useStore();
+  const { data, hydrated, isAdmin } = useStore();
   const today = todayKey();
   const activeStudents = data.students.filter((s) => s.active);
   const todayClasses = data.classes
@@ -44,10 +44,10 @@ function Dashboard() {
         <StatCard label="Alumnos activos" value={activeStudents.length} icon={Users} tone="primary" hint="en la escuela" />
         <StatCard label="Clases hoy" value={todayClasses.length} icon={CalendarDays} hint={todayClasses[0] ? `primera a las ${todayClasses[0].time}` : "sin clases"} />
         <StatCard label="Pistas ocupadas" value={`${busyCourts}/${COURTS.length}`} icon={LandPlot} hint="hoy" />
-        <StatCard label="Pagos pendientes" value={pending.length} icon={AlertCircle} tone={pending.length ? "warning" : "default"} hint={pending.length ? "requieren atención" : "todo al día"} />
+        {isAdmin && <StatCard label="Pagos pendientes" value={pending.length} icon={AlertCircle} tone={pending.length ? "warning" : "default"} hint={pending.length ? "requieren atención" : "todo al día"} />}
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      {isAdmin && <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <StudentDialog
           trigger={
             <Button size="lg" className="h-14 justify-start rounded-2xl text-base">
@@ -69,14 +69,15 @@ function Dashboard() {
             </Button>
           }
         />
-      </div>
+      </div>}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         <section className="lg:col-span-3">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Clases de hoy</h2>
-            <Link to="/calendario" className="flex items-center text-sm text-primary">
-              Ver calendario <ChevronRight className="size-4" />
+            <Link to={isAdmin ? "/calendario" : "/mis-clases"} className="flex items-center text-sm text-primary">
+              {isAdmin ? "Ver calendario" : "Mis clases"} <ChevronRight className="size-4" />
+              <ChevronRight className="size-4" />
             </Link>
           </div>
           {todayClasses.length === 0 ? (
@@ -107,7 +108,7 @@ function Dashboard() {
           )}
         </section>
 
-        <section className="lg:col-span-2">
+        {isAdmin && <section className="lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Pagos pendientes</h2>
             <Link to="/pagos" className="flex items-center text-sm text-primary">
@@ -136,7 +137,7 @@ function Dashboard() {
               ))}
             </ul>
           )}
-        </section>
+        </section>}
       </div>
     </>
   );
