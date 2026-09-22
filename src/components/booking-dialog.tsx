@@ -23,14 +23,23 @@ export function BookingDialog({
   defaultDate,
   defaultCourt,
   defaultStart,
+  open: openProp,
+  onOpenChange,
 }: {
-  trigger: ReactNode;
+  trigger?: ReactNode;
   defaultDate?: string;
   defaultCourt?: number;
   defaultStart?: string;
+  open?: boolean;
+  onOpenChange?: (v: boolean) => void;
 }) {
   const { data, addBooking } = useStore();
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (v: boolean) => {
+    setOpenState(v);
+    onOpenChange?.(v);
+  };
   const [type, setType] = useState<BookingType>("alquiler");
   const [date, setDate] = useState(defaultDate ?? todayKey());
   const [court, setCourt] = useState(String(defaultCourt ?? 1));
@@ -99,7 +108,7 @@ export function BookingDialog({
         if (v) reset();
       }}
     >
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Reservar pista</DialogTitle>
