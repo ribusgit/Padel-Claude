@@ -6,6 +6,7 @@ import { CheckCircle2, Clock3, Euro, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { StatCard, Avatar, EmptyState } from "@/components/padel-ui";
+import { WhatsAppButton, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/pagos")({
 type Tab = "todos" | "pendiente" | "pagado";
 
 function PaymentsPage() {
-  const { data, setPaid } = useStore();
+  const { data, setPaid, hydrated } = useStore();
   const [tab, setTab] = useState<Tab>("todos");
   const month = monthKey();
 
@@ -44,7 +45,7 @@ function PaymentsPage() {
 
   return (
     <>
-      <PageHeader title="Pagos" subtitle={`Mensualidad de ${format(new Date(), "MMMM yyyy", { locale: es })}`} />
+      <PageHeader title="Pagos" subtitle={hydrated ? `Mensualidad de ${format(new Date(), "MMMM yyyy", { locale: es })}` : undefined} />
 
       <div className="grid grid-cols-3 gap-3">
         <StatCard label="Cobrado" value={`${collected} €`} icon={CheckCircle2} tone="primary" />
@@ -86,6 +87,18 @@ function PaymentsPage() {
               <div className="text-right">
                 <p className={cn("font-display text-lg font-bold", paid ? "text-success" : "text-warning")}>{amount} €</p>
               </div>
+              {!paid && (
+                <WhatsAppButton
+                  iconOnly
+                  label={`Enviar recordatorio de pago a ${s.name}`}
+                  message={{
+                    to: s.name,
+                    phone: s.phone,
+                    kind: "Recordatorio de pago",
+                    body: paymentReminder(s.name, amount, format(new Date(), "MMMM", { locale: es })),
+                  }}
+                />
+              )}
               {paid ? (
                 <Button
                   variant="ghost"

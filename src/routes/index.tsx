@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { data } = useStore();
+  const { data, hydrated } = useStore();
   const today = todayKey();
   const activeStudents = data.students.filter((s) => s.active);
   const todayClasses = data.classes
@@ -36,7 +36,7 @@ function Dashboard() {
     <>
       <PageHeader
         title="Panel de control"
-        subtitle={format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+        subtitle={hydrated ? format(new Date(), "EEEE, d 'de' MMMM", { locale: es }) : undefined}
       />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
