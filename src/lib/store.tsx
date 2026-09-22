@@ -164,6 +164,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ),
           };
         }),
+      addBooking: (input) => {
+        const booking: CourtBooking = { ...input, id: uid("b") };
+        update((d) => ({ ...d, bookings: [...d.bookings, booking] }));
+        return booking;
+      },
+      deleteBooking: (id) => update((d) => ({ ...d, bookings: d.bookings.filter((b) => b.id !== id) })),
+      addMedia: async (input, file) => {
+        const item: MediaItem = { ...input, id: uid("m"), createdAt: new Date().toISOString() };
+        await saveMediaFile(item.id, file);
+        update((d) => ({ ...d, media: [item, ...d.media] }));
+        return item;
+      },
+      updateMedia: (id, patch) =>
+        update((d) => ({ ...d, media: d.media.map((m) => (m.id === id ? { ...m, ...patch } : m)) })),
+      deleteMedia: (id) => {
+        void deleteMediaFile(id);
+        update((d) => ({ ...d, media: d.media.filter((m) => m.id !== id) }));
+      },
       resetDemo: () => {
         window.localStorage.removeItem(STORAGE_KEY);
         setData(seedData());
