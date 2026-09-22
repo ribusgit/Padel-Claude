@@ -57,7 +57,7 @@ export interface Payment {
   month: string; // yyyy-MM
   amount: number;
   paid: boolean;
-  paidAt?: string;
+  paidAt?: string | undefined;
 }
 
 export interface AppData {
