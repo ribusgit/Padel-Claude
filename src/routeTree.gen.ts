@@ -15,8 +15,8 @@ import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminReservasRouteImport } from './routes/_authenticated/_admin/reservas'
 import { Route as AuthenticatedAlumnosIndexRouteImport } from './routes/_authenticated/alumnos.index'
 import { Route as AuthenticatedAlumnosIdRouteImport } from './routes/_authenticated/alumnos.$id'
-import { Route as AuthenticatedProfesoresIdRouteImport } from './routes/_authenticated/profesores.$id'
 import { Route as AuthenticatedAdminProfesoresIndexRouteImport } from './routes/_authenticated/_admin/profesores.index'
+import { Route as AuthenticatedAdminProfesoresIdRouteImport } from './routes/_authenticated/_admin/profesores.$id'
 
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/_authenticated/',
@@ -50,16 +50,16 @@ const AuthenticatedAlumnosIdRoute = AuthenticatedAlumnosIdRouteImport.update({
   path: '/alumnos/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProfesoresIdRoute =
-  AuthenticatedProfesoresIdRouteImport.update({
-    id: '/_authenticated/profesores/$id',
-    path: '/profesores/$id',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const AuthenticatedAdminProfesoresIndexRoute =
   AuthenticatedAdminProfesoresIndexRouteImport.update({
     id: '/_authenticated/_admin/profesores/',
     path: '/profesores/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAdminProfesoresIdRoute =
+  AuthenticatedAdminProfesoresIdRouteImport.update({
+    id: '/_authenticated/_admin/profesores/$id',
+    path: '/profesores/$id',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -69,8 +69,8 @@ export interface FileRoutesByFullPath {
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
-  '/profesores/$id': typeof AuthenticatedProfesoresIdRoute
   '/alumnos/': typeof AuthenticatedAlumnosIndexRoute
+  '/profesores/$id': typeof AuthenticatedAdminProfesoresIdRoute
   '/profesores/': typeof AuthenticatedAdminProfesoresIndexRoute
 }
 export interface FileRoutesByTo {
@@ -79,8 +79,8 @@ export interface FileRoutesByTo {
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
-  '/profesores/$id': typeof AuthenticatedProfesoresIdRoute
   '/alumnos': typeof AuthenticatedAlumnosIndexRoute
+  '/profesores/$id': typeof AuthenticatedAdminProfesoresIdRoute
   '/profesores': typeof AuthenticatedAdminProfesoresIndexRoute
 }
 export interface FileRoutesById {
@@ -90,8 +90,8 @@ export interface FileRoutesById {
   '/_authenticated/_admin/pagos': typeof AuthenticatedAdminPagosRoute
   '/_authenticated/_admin/reservas': typeof AuthenticatedAdminReservasRoute
   '/_authenticated/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
-  '/_authenticated/profesores/$id': typeof AuthenticatedProfesoresIdRoute
   '/_authenticated/alumnos/': typeof AuthenticatedAlumnosIndexRoute
+  '/_authenticated/_admin/profesores/$id': typeof AuthenticatedAdminProfesoresIdRoute
   '/_authenticated/_admin/profesores/': typeof AuthenticatedAdminProfesoresIndexRoute
 }
 export interface FileRouteTypes {
@@ -102,8 +102,8 @@ export interface FileRouteTypes {
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
-    | '/profesores/$id'
     | '/alumnos/'
+    | '/profesores/$id'
     | '/profesores/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -112,8 +112,8 @@ export interface FileRouteTypes {
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
-    | '/profesores/$id'
     | '/alumnos'
+    | '/profesores/$id'
     | '/profesores'
   id:
     | '__root__'
@@ -122,8 +122,8 @@ export interface FileRouteTypes {
     | '/_authenticated/_admin/pagos'
     | '/_authenticated/_admin/reservas'
     | '/_authenticated/alumnos/$id'
-    | '/_authenticated/profesores/$id'
     | '/_authenticated/alumnos/'
+    | '/_authenticated/_admin/profesores/$id'
     | '/_authenticated/_admin/profesores/'
   fileRoutesById: FileRoutesById
 }
@@ -133,8 +133,8 @@ export interface RootRouteChildren {
   AuthenticatedAdminPagosRoute: typeof AuthenticatedAdminPagosRoute
   AuthenticatedAdminReservasRoute: typeof AuthenticatedAdminReservasRoute
   AuthenticatedAlumnosIdRoute: typeof AuthenticatedAlumnosIdRoute
-  AuthenticatedProfesoresIdRoute: typeof AuthenticatedProfesoresIdRoute
   AuthenticatedAlumnosIndexRoute: typeof AuthenticatedAlumnosIndexRoute
+  AuthenticatedAdminProfesoresIdRoute: typeof AuthenticatedAdminProfesoresIdRoute
   AuthenticatedAdminProfesoresIndexRoute: typeof AuthenticatedAdminProfesoresIndexRoute
 }
 
@@ -182,18 +182,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlumnosIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/profesores/$id': {
-      id: '/_authenticated/profesores/$id'
-      path: '/profesores/$id'
-      fullPath: '/profesores/$id'
-      preLoaderRoute: typeof AuthenticatedProfesoresIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/_admin/profesores/': {
       id: '/_authenticated/_admin/profesores/'
       path: '/profesores'
       fullPath: '/profesores/'
       preLoaderRoute: typeof AuthenticatedAdminProfesoresIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_admin/profesores/$id': {
+      id: '/_authenticated/_admin/profesores/$id'
+      path: '/profesores/$id'
+      fullPath: '/profesores/$id'
+      preLoaderRoute: typeof AuthenticatedAdminProfesoresIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -205,8 +205,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedAdminPagosRoute: AuthenticatedAdminPagosRoute,
   AuthenticatedAdminReservasRoute: AuthenticatedAdminReservasRoute,
   AuthenticatedAlumnosIdRoute: AuthenticatedAlumnosIdRoute,
-  AuthenticatedProfesoresIdRoute: AuthenticatedProfesoresIdRoute,
   AuthenticatedAlumnosIndexRoute: AuthenticatedAlumnosIndexRoute,
+  AuthenticatedAdminProfesoresIdRoute: AuthenticatedAdminProfesoresIdRoute,
   AuthenticatedAdminProfesoresIndexRoute:
     AuthenticatedAdminProfesoresIndexRoute,
 }
