@@ -6,6 +6,7 @@ import { CalendarPlus, ChevronLeft, ChevronRight, Trash2, Users } from "lucide-r
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { LevelBadge, EmptyState } from "@/components/padel-ui";
+import { WhatsAppButton, classReminder } from "@/components/whatsapp-dialog";
 import { ClassDialog } from "@/components/class-dialog";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
@@ -161,14 +162,29 @@ function CalendarPage() {
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {students.length === 0 && <span className="text-xs text-muted-foreground">Sin alumnos inscritos</span>}
                       {students.map((s) => (
-                        <Link
-                          key={s!.id}
-                          to="/alumnos/$id"
-                          params={{ id: s!.id }}
-                          className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium hover:bg-accent"
-                        >
-                          {s!.name}
-                        </Link>
+                        <span key={s!.id} className="flex items-center gap-0.5 rounded-full bg-secondary pl-2.5 text-xs font-medium">
+                          <Link to="/alumnos/$id" params={{ id: s!.id }} className="py-1 hover:underline">
+                            {s!.name}
+                          </Link>
+                          <WhatsAppButton
+                            iconOnly
+                            variant="ghost"
+                            className="size-7 rounded-full"
+                            label={`Enviar recordatorio de clase a ${s!.name}`}
+                            message={{
+                              to: s!.name,
+                              phone: s!.phone,
+                              kind: "Recordatorio de clase",
+                              body: classReminder(
+                                s!.name,
+                                c.time,
+                                c.court,
+                                coach?.name ?? "tu profesor",
+                                format(parseISO(c.date), "EEEE d 'de' MMMM", { locale: es }),
+                              ),
+                            }}
+                          />
+                        </span>
                       ))}
                     </div>
                   </div>
