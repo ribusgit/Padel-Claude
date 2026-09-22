@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/alumnos/")({
 type Filter = "todos" | LevelCategory;
 
 function StudentsPage() {
-  const { data } = useStore();
+  const { data, isAdmin } = useStore();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("todos");
 
@@ -47,13 +47,15 @@ function StudentsPage() {
         title="Alumnos"
         subtitle={`${data.students.filter((s) => s.active).length} alumnos activos`}
         action={
-          <StudentDialog
-            trigger={
-              <Button>
-                <UserPlus /> Nuevo alumno
-              </Button>
-            }
-          />
+          isAdmin ? (
+            <StudentDialog
+              trigger={
+                <Button>
+                  <UserPlus /> Nuevo alumno
+                </Button>
+              }
+            />
+          ) : undefined
         }
       />
 
