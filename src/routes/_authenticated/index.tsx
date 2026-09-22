@@ -77,7 +77,6 @@ function Dashboard() {
             <h2 className="text-lg font-semibold">Clases de hoy</h2>
             <Link to={isAdmin ? "/calendario" : "/mis-clases"} className="flex items-center text-sm text-primary">
               {isAdmin ? "Ver calendario" : "Mis clases"} <ChevronRight className="size-4" />
-              <ChevronRight className="size-4" />
             </Link>
           </div>
           {todayClasses.length === 0 ? (
