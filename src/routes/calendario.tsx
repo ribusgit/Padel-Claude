@@ -122,7 +122,7 @@ function CalendarPage() {
         ))}
       </div>
 
-      <h2 className="mb-3 mt-5 text-lg font-semibold capitalize">
+      <h2 className="mb-3 mt-5 text-lg font-semibold first-letter:uppercase">
         {format(selected, "EEEE d 'de' MMMM", { locale: es })}
       </h2>
 

@@ -43,7 +43,7 @@ function CoachView() {
         <div>
           <p className="text-xs uppercase tracking-widest text-primary">Vista de pista</p>
           <h1 className="text-2xl font-bold">{coach.name}</h1>
-          <p className="text-sm capitalize text-muted-foreground">{format(new Date(), "EEEE d 'de' MMMM", { locale: es })}</p>
+          <p className="text-sm first-letter:uppercase text-muted-foreground">{format(new Date(), "EEEE d 'de' MMMM", { locale: es })}</p>
         </div>
       </div>
 
