@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { removeMediaFile, uploadMediaFile } from "./media-storage";
 import {
   todayKey,
@@ -227,7 +228,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
       },
       updateStudent: async (id, patch) => {
-        const payload: Record<string, unknown> = {};
+        const payload: Database["public"]["Tables"]["students"]["Update"] = {};
         if (patch.name !== undefined) payload["name"] = patch.name;
         if (patch.phone !== undefined) payload["phone"] = patch.phone;
         if (patch.email !== undefined) payload["email"] = patch.email;
@@ -274,7 +275,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         await refresh();
       },
       updateClass: async (id, patch) => {
-        const payload: Record<string, unknown> = {};
+        const payload: Database["public"]["Tables"]["classes"]["Update"] = {};
         if (patch.date !== undefined) payload["date"] = patch.date;
         if (patch.time !== undefined) payload["time"] = patch.time;
         if (patch.durationMin !== undefined) payload["duration_min"] = patch.durationMin;
@@ -371,7 +372,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         await refresh();
       },
       updateMedia: async (id, patch) => {
-        const payload: Record<string, unknown> = {};
+        const payload: Database["public"]["Tables"]["media"]["Update"] = {};
         if (patch.title !== undefined) payload["title"] = patch.title;
         if (patch.comment !== undefined) payload["comment"] = patch.comment;
         const { error } = await supabase.from("media").update(payload).eq("id", id);
