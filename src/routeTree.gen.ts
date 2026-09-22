@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as AlumnosIndexRouteImport } from './routes/alumnos.index'
 import { Route as AlumnosIdRouteImport } from './routes/alumnos.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarioRoute = CalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AlumnosIndexRoute = AlumnosIndexRouteImport.update({
@@ -31,30 +37,34 @@ const AlumnosIdRoute = AlumnosIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
   '/alumnos/$id': typeof AlumnosIdRoute
   '/alumnos/': typeof AlumnosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
   '/alumnos/$id': typeof AlumnosIdRoute
   '/alumnos': typeof AlumnosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
   '/alumnos/$id': typeof AlumnosIdRoute
   '/alumnos/': typeof AlumnosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alumnos/$id' | '/alumnos/'
+  fullPaths: '/' | '/calendario' | '/alumnos/$id' | '/alumnos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alumnos/$id' | '/alumnos'
-  id: '__root__' | '/' | '/alumnos/$id' | '/alumnos/'
+  to: '/' | '/calendario' | '/alumnos/$id' | '/alumnos'
+  id: '__root__' | '/' | '/calendario' | '/alumnos/$id' | '/alumnos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CalendarioRoute: typeof CalendarioRoute
   AlumnosIdRoute: typeof AlumnosIdRoute
   AlumnosIndexRoute: typeof AlumnosIndexRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendario': {
+      id: '/calendario'
+      path: '/calendario'
+      fullPath: '/calendario'
+      preLoaderRoute: typeof CalendarioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alumnos/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalendarioRoute: CalendarioRoute,
   AlumnosIdRoute: AlumnosIdRoute,
   AlumnosIndexRoute: AlumnosIndexRoute,
 }
