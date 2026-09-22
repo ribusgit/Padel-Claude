@@ -1,15 +1,36 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, CalendarDays, GraduationCap, Wallet, LandPlot, type LucideIcon } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  LayoutDashboard,
+  Users,
+  CalendarDays,
+  GraduationCap,
+  Wallet,
+  LandPlot,
+  LogOut,
+  Clipboard,
+  type LucideIcon,
+} from "lucide-react";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/lib/store";
 
-const NAV: { to: "/" | "/alumnos" | "/calendario" | "/reservas" | "/profesores" | "/pagos"; label: string; icon: LucideIcon }[] = [
+type NavTo = "/" | "/alumnos" | "/calendario" | "/reservas" | "/profesores" | "/pagos" | "/mis-clases";
+type NavItem = { to: NavTo; label: string; icon: LucideIcon };
+
+const ADMIN_NAV: NavItem[] = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
   { to: "/reservas", label: "Pistas", icon: LandPlot },
   { to: "/profesores", label: "Profesores", icon: GraduationCap },
   { to: "/pagos", label: "Pagos", icon: Wallet },
+];
+
+const COACH_NAV: NavItem[] = [
+  { to: "/", label: "Panel", icon: LayoutDashboard },
+  { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
+  { to: "/alumnos", label: "Alumnos", icon: Users },
 ];
 
 function Logo() {
@@ -28,15 +49,26 @@ function Logo() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { role, isAdmin, userName, email, signOut } = useStore();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
+  const nav = isAdmin ? ADMIN_NAV : COACH_NAV;
+
+  const handleSignOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await signOut();
+    void navigate({ to: "/auth", replace: true });
+  };
 
   return (
     <div className="min-h-screen court-grid">
-      {/* Desktop sidebar */}
+      {/* Barra lateral en escritorio */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 md:flex">
         <Logo />
         <nav className="mt-8 flex flex-col gap-1">
-          {NAV.map(({ to, label, icon: Icon }) => (
+          {nav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
@@ -52,22 +84,40 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <p className="mt-auto text-xs text-muted-foreground">Temporada 2026/27</p>
+        <div className="mt-auto space-y-2 border-t border-sidebar-border pt-4">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{userName || email}</p>
+            <p className="text-[11px] uppercase tracking-widest text-primary">
+              {role === "admin" ? "Administrador" : role === "coach" ? "Profesor" : "Sin permisos"}
+            </p>
+          </div>
+          <button
+            onClick={() => void handleSignOut()}
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          >
+            <LogOut className="size-4" /> Salir
+          </button>
+        </div>
       </aside>
 
-      {/* Mobile top bar */}
+      {/* Barra superior en móvil */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-background/80 px-4 py-3 backdrop-blur md:hidden">
         <Logo />
+        <button
+          onClick={() => void handleSignOut()}
+          aria-label="Salir"
+          className="flex size-10 items-center justify-center rounded-xl bg-secondary text-muted-foreground"
+        >
+          <LogOut className="size-4" />
+        </button>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-5 md:pl-68 md:pr-8 md:pt-8 md:pb-12">
-        {children}
-      </main>
+      <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-5 md:pl-68 md:pr-8 md:pt-8 md:pb-12">{children}</main>
 
-      {/* Mobile bottom nav */}
+      {/* Navegación inferior en móvil */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-sidebar/95 backdrop-blur md:hidden">
-        <ul className="grid grid-cols-6">
-          {NAV.map(({ to, label, icon: Icon }) => (
+        <ul className={cn("grid", nav.length === 3 ? "grid-cols-3" : "grid-cols-6")}>
+          {nav.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <Link
                 to={to}

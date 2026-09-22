@@ -21,7 +21,7 @@ import {
   todayKey,
 } from "@/lib/padel";
 
-export const Route = createFileRoute("/reservas")({
+export const Route = createFileRoute("/_authenticated/_admin/reservas")({
   head: () => ({
     meta: [
       { title: "Reservas de pistas — Escuela de Pádel" },
@@ -236,7 +236,7 @@ function BookingsPage() {
                   size="icon"
                   aria-label="Eliminar reserva"
                   onClick={() => {
-                    deleteBooking(a.id);
+                    void deleteBooking(a.id);
                     toast.success("Reserva eliminada");
                   }}
                 >

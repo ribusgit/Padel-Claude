@@ -16,7 +16,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LEVEL_OPTIONS, LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, formatLevel, levelCategory, todayKey } from "@/lib/padel";
 
-export const Route = createFileRoute("/alumnos/$id")({
+export const Route = createFileRoute("/_authenticated/alumnos/$id")({
   head: () => ({
     meta: [
       { title: "Ficha de alumno — Escuela de Pádel" },
@@ -33,10 +33,10 @@ const fmt = (d: string) => format(parseISO(d), "d MMM yyyy", { locale: es });
 
 function StudentDetail() {
   const { id } = Route.useParams();
-  const { data, updateStudent, addNote, setPaid } = useStore();
+  const { data, updateStudent, addNote, setPaid, isAdmin, coachId } = useStore();
   const student = data.students.find((s) => s.id === id);
   const [note, setNote] = useState("");
-  const [coachId, setCoachId] = useState(data.coaches[0]?.id ?? "");
+  const [noteCoachId, setNoteCoachId] = useState(coachId ?? data.coaches[0]?.id ?? "");
 
   if (!student) throw notFound();
 
@@ -49,7 +49,7 @@ function StudentDetail() {
       toast.error("Escribe una nota antes de guardar");
       return;
     }
-    addNote(student.id, { date: todayKey(), coachId, text: note.trim().slice(0, 500) });
+    void addNote(student.id, { date: todayKey(), coachId: noteCoachId, text: note.trim().slice(0, 500) });
     setNote("");
     toast.success("Nota de progreso guardada");
   };
@@ -102,10 +102,10 @@ function StudentDetail() {
           </div>
         </dl>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        {isAdmin && <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Nivel de pádel</Label>
-            <Select value={String(student.level)} onValueChange={(v) => updateStudent(student.id, { level: Number(v) })}>
+            <Select value={String(student.level)} onValueChange={(v) => void updateStudent(student.id, { level: Number(v) })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {LEVEL_OPTIONS.map((l) => (
@@ -121,14 +121,14 @@ function StudentDetail() {
               className="w-full"
               onClick={() => {
                 const paid = student.paymentStatus !== "pagado";
-                setPaid(student.id, paid);
+                void setPaid(student.id, paid);
                 toast.success(paid ? "Marcado como pagado" : "Marcado como pendiente");
               }}
             >
               {student.paymentStatus === "pagado" ? "Marcar como pendiente" : "Marcar como pagado"}
             </Button>
           </div>
-        </div>
+        </div>}
       </div>
 
       <Tabs defaultValue="resumen" className="mt-6">
@@ -182,7 +182,7 @@ function StudentDetail() {
               className="min-h-20"
             />
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-              <Select value={coachId} onValueChange={setCoachId}>
+              <Select value={noteCoachId} onValueChange={setNoteCoachId}>
                 <SelectTrigger className="sm:w-52"><SelectValue placeholder="Profesor" /></SelectTrigger>
                 <SelectContent>
                   {data.coaches.map((c) => (

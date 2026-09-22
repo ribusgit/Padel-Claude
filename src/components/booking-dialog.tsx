@@ -85,7 +85,7 @@ export function BookingDialog({
       toast.error(`La pista ${c} ya está reservada en esa franja`);
       return;
     }
-    addBooking({
+    void addBooking({
       court: c,
       date,
       start,

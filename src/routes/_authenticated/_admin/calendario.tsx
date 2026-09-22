@@ -13,7 +13,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LEVEL_LABELS, MAX_STUDENTS_PER_CLASS, type LevelCategory } from "@/lib/padel";
 
-export const Route = createFileRoute("/calendario")({
+export const Route = createFileRoute("/_authenticated/_admin/calendario")({
   head: () => ({
     meta: [
       { title: "Calendario de clases — Escuela de Pádel" },
@@ -190,7 +190,7 @@ function CalendarPage() {
                   </div>
                   <button
                     onClick={() => {
-                      deleteClass(c.id);
+                      void deleteClass(c.id);
                       toast.success("Clase eliminada");
                     }}
                     className="flex w-11 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
