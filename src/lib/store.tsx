@@ -39,7 +39,15 @@ interface StoreApi {
   resetDemo: () => void;
 }
 
-const StoreContext = createContext<StoreApi | null>(null);
+/**
+ * El contexto se guarda en globalThis para que siga siendo el mismo objeto
+ * aunque el módulo se vuelva a evaluar (recargas en caliente del desarrollo o
+ * duplicados del grafo de módulos). Si no, useStore no encuentra el proveedor.
+ */
+const globalRef = globalThis as typeof globalThis & {
+  __padelStoreContext?: ReturnType<typeof createContext<StoreApi | null>>;
+};
+const StoreContext = (globalRef.__padelStoreContext ??= createContext<StoreApi | null>(null));
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppData>(() => seedData());
