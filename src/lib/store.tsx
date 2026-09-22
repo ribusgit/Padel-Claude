@@ -49,7 +49,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setData(JSON.parse(raw) as AppData);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<AppData>;
+        const base = seedData();
+        setData({
+          students: parsed.students ?? base.students,
+          coaches: parsed.coaches ?? base.coaches,
+          classes: parsed.classes ?? base.classes,
+          payments: parsed.payments ?? base.payments,
+          bookings: parsed.bookings ?? base.bookings,
+          media: parsed.media ?? [],
+        });
+      }
     } catch {
       /* ignore corrupt storage */
     }
