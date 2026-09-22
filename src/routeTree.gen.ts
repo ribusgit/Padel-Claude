@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as PagosRouteImport } from './routes/pagos'
+import { Route as ReservasRouteImport } from './routes/reservas'
 import { Route as AlumnosIndexRouteImport } from './routes/alumnos.index'
 import { Route as AlumnosIdRouteImport } from './routes/alumnos.$id'
 import { Route as ProfesoresIndexRouteImport } from './routes/profesores.index'
@@ -30,6 +31,11 @@ const CalendarioRoute = CalendarioRouteImport.update({
 const PagosRoute = PagosRouteImport.update({
   id: '/pagos',
   path: '/pagos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservasRoute = ReservasRouteImport.update({
+  id: '/reservas',
+  path: '/reservas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AlumnosIndexRoute = AlumnosIndexRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/pagos': typeof PagosRoute
+  '/reservas': typeof ReservasRoute
   '/alumnos/$id': typeof AlumnosIdRoute
   '/profesores/$id': typeof ProfesoresIdRoute
   '/alumnos/': typeof AlumnosIndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/pagos': typeof PagosRoute
+  '/reservas': typeof ReservasRoute
   '/alumnos/$id': typeof AlumnosIdRoute
   '/profesores/$id': typeof ProfesoresIdRoute
   '/alumnos': typeof AlumnosIndexRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/pagos': typeof PagosRoute
+  '/reservas': typeof ReservasRoute
   '/alumnos/$id': typeof AlumnosIdRoute
   '/profesores/$id': typeof ProfesoresIdRoute
   '/alumnos/': typeof AlumnosIndexRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calendario'
     | '/pagos'
+    | '/reservas'
     | '/alumnos/$id'
     | '/profesores/$id'
     | '/alumnos/'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calendario'
     | '/pagos'
+    | '/reservas'
     | '/alumnos/$id'
     | '/profesores/$id'
     | '/alumnos'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calendario'
     | '/pagos'
+    | '/reservas'
     | '/alumnos/$id'
     | '/profesores/$id'
     | '/alumnos/'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalendarioRoute: typeof CalendarioRoute
   PagosRoute: typeof PagosRoute
+  ReservasRoute: typeof ReservasRoute
   AlumnosIdRoute: typeof AlumnosIdRoute
   ProfesoresIdRoute: typeof ProfesoresIdRoute
   AlumnosIndexRoute: typeof AlumnosIndexRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/pagos'
       fullPath: '/pagos'
       preLoaderRoute: typeof PagosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reservas': {
+      id: '/reservas'
+      path: '/reservas'
+      fullPath: '/reservas'
+      preLoaderRoute: typeof ReservasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alumnos/': {
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalendarioRoute: CalendarioRoute,
   PagosRoute: PagosRoute,
+  ReservasRoute: ReservasRoute,
   AlumnosIdRoute: AlumnosIdRoute,
   ProfesoresIdRoute: ProfesoresIdRoute,
   AlumnosIndexRoute: AlumnosIndexRoute,
