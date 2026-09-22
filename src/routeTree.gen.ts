@@ -9,7 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
 import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authenticated/_admin/pagos'
 import { Route as AuthenticatedAdminReservasRouteImport } from './routes/_authenticated/_admin/reservas'
@@ -18,54 +21,68 @@ import { Route as AuthenticatedAlumnosIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminProfesoresIndexRouteImport } from './routes/_authenticated/_admin/profesores.index'
 import { Route as AuthenticatedAdminProfesoresIdRouteImport } from './routes/_authenticated/_admin/profesores.$id'
 
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/_authenticated/',
-  path: '/',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCalendarioRoute = AuthenticatedCalendarioRouteImport.update({
-  id: '/_authenticated/calendario',
+  id: '/calendario',
   path: '/calendario',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminPagosRoute = AuthenticatedAdminPagosRouteImport.update({
-  id: '/_authenticated/_admin/pagos',
+  id: '/pagos',
   path: '/pagos',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
 const AuthenticatedAdminReservasRoute =
   AuthenticatedAdminReservasRouteImport.update({
-    id: '/_authenticated/_admin/reservas',
+    id: '/reservas',
     path: '/reservas',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAlumnosIndexRoute =
   AuthenticatedAlumnosIndexRouteImport.update({
-    id: '/_authenticated/alumnos/',
+    id: '/alumnos/',
     path: '/alumnos/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAlumnosIdRoute = AuthenticatedAlumnosIdRouteImport.update({
-  id: '/_authenticated/alumnos/$id',
+  id: '/alumnos/$id',
   path: '/alumnos/$id',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminProfesoresIndexRoute =
   AuthenticatedAdminProfesoresIndexRouteImport.update({
-    id: '/_authenticated/_admin/profesores/',
+    id: '/profesores/',
     path: '/profesores/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminProfesoresIdRoute =
   AuthenticatedAdminProfesoresIdRouteImport.update({
-    id: '/_authenticated/_admin/profesores/$id',
+    id: '/profesores/$id',
     path: '/profesores/$id',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/calendario': typeof AuthenticatedCalendarioRoute
   '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/calendario': typeof AuthenticatedCalendarioRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
@@ -74,8 +91,9 @@ export interface FileRoutesByFullPath {
   '/profesores/': typeof AuthenticatedAdminProfesoresIndexRoute
 }
 export interface FileRoutesByTo {
-  '/calendario': typeof AuthenticatedCalendarioRoute
+  '/auth': typeof AuthRoute
   '/': typeof AuthenticatedIndexRoute
+  '/calendario': typeof AuthenticatedCalendarioRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
@@ -85,6 +103,9 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_admin/pagos': typeof AuthenticatedAdminPagosRoute
@@ -97,8 +118,9 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/calendario'
     | '/'
+    | '/auth'
+    | '/calendario'
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
@@ -107,8 +129,9 @@ export interface FileRouteTypes {
     | '/profesores/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/calendario'
+    | '/auth'
     | '/'
+    | '/calendario'
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
@@ -117,6 +140,9 @@ export interface FileRouteTypes {
     | '/profesores'
   id:
     | '__root__'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/_admin'
     | '/_authenticated/calendario'
     | '/_authenticated/'
     | '/_authenticated/_admin/pagos'
@@ -128,87 +154,135 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedAdminPagosRoute: typeof AuthenticatedAdminPagosRoute
-  AuthenticatedAdminReservasRoute: typeof AuthenticatedAdminReservasRoute
-  AuthenticatedAlumnosIdRoute: typeof AuthenticatedAlumnosIdRoute
-  AuthenticatedAlumnosIndexRoute: typeof AuthenticatedAlumnosIndexRoute
-  AuthenticatedAdminProfesoresIdRoute: typeof AuthenticatedAdminProfesoresIdRoute
-  AuthenticatedAdminProfesoresIndexRoute: typeof AuthenticatedAdminProfesoresIndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/_admin': {
+      id: '/_authenticated/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/calendario': {
       id: '/_authenticated/calendario'
       path: '/calendario'
       fullPath: '/calendario'
       preLoaderRoute: typeof AuthenticatedCalendarioRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/_admin/pagos': {
       id: '/_authenticated/_admin/pagos'
       path: '/pagos'
       fullPath: '/pagos'
       preLoaderRoute: typeof AuthenticatedAdminPagosRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/_admin/reservas': {
       id: '/_authenticated/_admin/reservas'
       path: '/reservas'
       fullPath: '/reservas'
       preLoaderRoute: typeof AuthenticatedAdminReservasRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/alumnos/': {
       id: '/_authenticated/alumnos/'
       path: '/alumnos'
       fullPath: '/alumnos/'
       preLoaderRoute: typeof AuthenticatedAlumnosIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/alumnos/$id': {
       id: '/_authenticated/alumnos/$id'
       path: '/alumnos/$id'
       fullPath: '/alumnos/$id'
       preLoaderRoute: typeof AuthenticatedAlumnosIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/_admin/profesores/': {
       id: '/_authenticated/_admin/profesores/'
       path: '/profesores'
       fullPath: '/profesores/'
       preLoaderRoute: typeof AuthenticatedAdminProfesoresIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/_admin/profesores/$id': {
       id: '/_authenticated/_admin/profesores/$id'
       path: '/profesores/$id'
       fullPath: '/profesores/$id'
       preLoaderRoute: typeof AuthenticatedAdminProfesoresIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminPagosRoute: typeof AuthenticatedAdminPagosRoute
+  AuthenticatedAdminReservasRoute: typeof AuthenticatedAdminReservasRoute
+  AuthenticatedAdminProfesoresIdRoute: typeof AuthenticatedAdminProfesoresIdRoute
+  AuthenticatedAdminProfesoresIndexRoute: typeof AuthenticatedAdminProfesoresIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminPagosRoute: AuthenticatedAdminPagosRoute,
+    AuthenticatedAdminReservasRoute: AuthenticatedAdminReservasRoute,
+    AuthenticatedAdminProfesoresIdRoute: AuthenticatedAdminProfesoresIdRoute,
+    AuthenticatedAdminProfesoresIndexRoute:
+      AuthenticatedAdminProfesoresIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAlumnosIdRoute: typeof AuthenticatedAlumnosIdRoute
+  AuthenticatedAlumnosIndexRoute: typeof AuthenticatedAlumnosIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedAdminPagosRoute: AuthenticatedAdminPagosRoute,
-  AuthenticatedAdminReservasRoute: AuthenticatedAdminReservasRoute,
   AuthenticatedAlumnosIdRoute: AuthenticatedAlumnosIdRoute,
   AuthenticatedAlumnosIndexRoute: AuthenticatedAlumnosIndexRoute,
-  AuthenticatedAdminProfesoresIdRoute: AuthenticatedAdminProfesoresIdRoute,
-  AuthenticatedAdminProfesoresIndexRoute:
-    AuthenticatedAdminProfesoresIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
