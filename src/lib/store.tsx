@@ -10,7 +10,10 @@ import {
   type Coach,
   type ClassSession,
   type ProgressNote,
+  type CourtBooking,
+  type MediaItem,
 } from "./padel";
+import { deleteMediaFile, saveMediaFile } from "./media-db";
 
 const STORAGE_KEY = "escuela-padel-data-v1";
 
