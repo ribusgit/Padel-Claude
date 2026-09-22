@@ -261,5 +261,11 @@ export function seedData(): AppData {
     paidAt: s.paymentStatus === "pagado" ? d(-3) : undefined,
   }));
 
-  return { students, coaches, classes, payments };
+  const bookings: CourtBooking[] = [
+    { id: "b1", court: 4, date: d(0), start: "11:00", end: "12:30", type: "alquiler", name: "Grupo de Sergio Ramos", phone: "677 123 456" },
+    { id: "b2", court: 3, date: d(0), start: "17:00", end: "18:00", type: "clase", name: "Clase de tecnificación", notes: "Bloqueada para grupo de competición" },
+    { id: "b3", court: 2, date: d(1), start: "20:00", end: "21:30", type: "alquiler", name: "Ana y Miguel", phone: "688 987 654" },
+  ];
+
+  return { students, coaches, classes, payments, bookings, media: [] };
 }
