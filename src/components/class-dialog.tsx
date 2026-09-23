@@ -18,12 +18,22 @@ import {
   type LevelCategory,
 } from "@/lib/padel";
 
-export function ClassDialog({ trigger, defaultDate }: { trigger: ReactNode; defaultDate?: string }) {
+export function ClassDialog({
+  trigger,
+  defaultDate,
+  defaultTime,
+  defaultCourt,
+}: {
+  trigger: ReactNode;
+  defaultDate?: string;
+  defaultTime?: string;
+  defaultCourt?: number;
+}) {
   const { data, addClass } = useStore();
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(defaultDate ?? todayKey());
-  const [time, setTime] = useState("18:00");
-  const [court, setCourt] = useState("1");
+  const [time, setTime] = useState(defaultTime ?? "18:00");
+  const [court, setCourt] = useState(defaultCourt ? String(defaultCourt) : "1");
   const [coachId, setCoachId] = useState(data.coaches[0]?.id ?? "");
   const [level, setLevel] = useState<LevelCategory>("intermedio");
   const [studentIds, setStudentIds] = useState<string[]>([]);
@@ -67,6 +77,8 @@ export function ClassDialog({ trigger, defaultDate }: { trigger: ReactNode; defa
       onOpenChange={(o) => {
         setOpen(o);
         if (o && defaultDate) setDate(defaultDate);
+        if (o && defaultTime) setTime(defaultTime);
+        if (o && defaultCourt) setCourt(String(defaultCourt));
       }}
     >
       <DialogTrigger asChild>{trigger}</DialogTrigger>

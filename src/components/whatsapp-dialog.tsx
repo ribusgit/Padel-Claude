@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Check, Copy, ExternalLink, Send } from "lucide-react";
+import { Check, Copy, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -99,24 +99,23 @@ export function WhatsAppPreviewDialog({
           >
             <Copy /> Copiar
           </Button>
-          <Button asChild variant="secondary" className="sm:flex-1">
-            <a href={waLink} target="_blank" rel="noreferrer">
-              <ExternalLink /> Abrir WhatsApp
-            </a>
-          </Button>
           <Button
-            className="sm:flex-1"
+            asChild
+            className="sm:flex-[2]"
             onClick={() => {
               setSent(true);
-              toast.success(`Recordatorio enviado a ${message?.to ?? "el alumno"} (simulado)`);
-              onOpenChange(false);
+              toast.success(`Abriendo WhatsApp para ${message?.to ?? "el alumno"}…`);
             }}
           >
-            {sent ? <Check /> : <Send />} Enviar
+            <a href={waLink} target="_blank" rel="noreferrer">
+              {sent ? <Check /> : <Send />} Enviar por WhatsApp
+            </a>
           </Button>
         </div>
         <p className="text-center text-[11px] text-muted-foreground">
-          Envío simulado: no se manda ningún mensaje real.
+          {message?.phone
+            ? `Se abrirá WhatsApp con el mensaje listo para ${message.to} (${message.phone}).`
+            : "Este alumno no tiene teléfono registrado: se abrirá WhatsApp sin destinatario."}
         </p>
       </DialogContent>
     </Dialog>

@@ -9,6 +9,7 @@ import { StudentDialog } from "@/components/student-dialog";
 import { ClassDialog } from "@/components/class-dialog";
 import { BookingDialog } from "@/components/booking-dialog";
 import { Button } from "@/components/ui/button";
+import { CoachHome } from "@/components/coach-home";
 import { useStore } from "@/lib/store";
 import { COURTS, todayKey } from "@/lib/padel";
 
@@ -25,7 +26,8 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 function Dashboard() {
-  const { data, hydrated, isAdmin } = useStore();
+  const { data, hydrated, isAdmin, role } = useStore();
+  if (hydrated && role === "coach") return <CoachHome />;
   const today = todayKey();
   const activeStudents = data.students.filter((s) => s.active);
   const todayClasses = data.classes

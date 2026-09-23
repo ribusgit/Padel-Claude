@@ -16,6 +16,7 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMisClasesRouteImport } from './routes/_authenticated/mis-clases'
 import { Route as AuthenticatedPizarraRouteImport } from './routes/_authenticated/pizarra'
 import { Route as AuthenticatedAdminCalendarioRouteImport } from './routes/_authenticated/_admin/calendario'
+import { Route as AuthenticatedAdminHorariosRouteImport } from './routes/_authenticated/_admin/horarios'
 import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authenticated/_admin/pagos'
 import { Route as AuthenticatedAdminReservasRouteImport } from './routes/_authenticated/_admin/reservas'
 import { Route as AuthenticatedAlumnosIndexRouteImport } from './routes/_authenticated/alumnos.index'
@@ -55,6 +56,12 @@ const AuthenticatedAdminCalendarioRoute =
   AuthenticatedAdminCalendarioRouteImport.update({
     id: '/calendario',
     path: '/calendario',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminHorariosRoute =
+  AuthenticatedAdminHorariosRouteImport.update({
+    id: '/horarios',
+    path: '/horarios',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminPagosRoute = AuthenticatedAdminPagosRouteImport.update({
@@ -98,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/pizarra': typeof AuthenticatedPizarraRoute
   '/calendario': typeof AuthenticatedAdminCalendarioRoute
+  '/horarios': typeof AuthenticatedAdminHorariosRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
@@ -111,6 +119,7 @@ export interface FileRoutesByTo {
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/pizarra': typeof AuthenticatedPizarraRoute
   '/calendario': typeof AuthenticatedAdminCalendarioRoute
+  '/horarios': typeof AuthenticatedAdminHorariosRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
   '/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
@@ -127,6 +136,7 @@ export interface FileRoutesById {
   '/_authenticated/pizarra': typeof AuthenticatedPizarraRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_admin/calendario': typeof AuthenticatedAdminCalendarioRoute
+  '/_authenticated/_admin/horarios': typeof AuthenticatedAdminHorariosRoute
   '/_authenticated/_admin/pagos': typeof AuthenticatedAdminPagosRoute
   '/_authenticated/_admin/reservas': typeof AuthenticatedAdminReservasRoute
   '/_authenticated/alumnos/$id': typeof AuthenticatedAlumnosIdRoute
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/mis-clases'
     | '/pizarra'
     | '/calendario'
+    | '/horarios'
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/mis-clases'
     | '/pizarra'
     | '/calendario'
+    | '/horarios'
     | '/pagos'
     | '/reservas'
     | '/alumnos/$id'
@@ -170,6 +182,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pizarra'
     | '/_authenticated/'
     | '/_authenticated/_admin/calendario'
+    | '/_authenticated/_admin/horarios'
     | '/_authenticated/_admin/pagos'
     | '/_authenticated/_admin/reservas'
     | '/_authenticated/alumnos/$id'
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCalendarioRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/_admin/horarios': {
+      id: '/_authenticated/_admin/horarios'
+      path: '/horarios'
+      fullPath: '/horarios'
+      preLoaderRoute: typeof AuthenticatedAdminHorariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/_admin/pagos': {
       id: '/_authenticated/_admin/pagos'
       path: '/pagos'
@@ -281,6 +301,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminCalendarioRoute: typeof AuthenticatedAdminCalendarioRoute
+  AuthenticatedAdminHorariosRoute: typeof AuthenticatedAdminHorariosRoute
   AuthenticatedAdminPagosRoute: typeof AuthenticatedAdminPagosRoute
   AuthenticatedAdminReservasRoute: typeof AuthenticatedAdminReservasRoute
   AuthenticatedAdminProfesoresIdRoute: typeof AuthenticatedAdminProfesoresIdRoute
@@ -290,6 +311,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminCalendarioRoute: AuthenticatedAdminCalendarioRoute,
+    AuthenticatedAdminHorariosRoute: AuthenticatedAdminHorariosRoute,
     AuthenticatedAdminPagosRoute: AuthenticatedAdminPagosRoute,
     AuthenticatedAdminReservasRoute: AuthenticatedAdminReservasRoute,
     AuthenticatedAdminProfesoresIdRoute: AuthenticatedAdminProfesoresIdRoute,

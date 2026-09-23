@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Users,
   CalendarDays,
+  CalendarClock,
   GraduationCap,
   Wallet,
   LandPlot,
@@ -20,6 +21,7 @@ type NavTo =
   | "/"
   | "/alumnos"
   | "/calendario"
+  | "/horarios"
   | "/reservas"
   | "/profesores"
   | "/pagos"
@@ -31,6 +33,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
+  { to: "/horarios", label: "Horarios", icon: CalendarClock },
   { to: "/reservas", label: "Pistas", icon: LandPlot },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
   { to: "/profesores", label: "Profesores", icon: GraduationCap },
@@ -38,7 +41,7 @@ const ADMIN_NAV: NavItem[] = [
 ];
 
 const COACH_NAV: NavItem[] = [
-  { to: "/", label: "Panel", icon: LayoutDashboard },
+  { to: "/", label: "Inicio", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
