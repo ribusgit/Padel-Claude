@@ -104,7 +104,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCoachId(profileRes.data?.coach_id ?? null);
     setUserName(profileRes.data?.full_name ?? user.email ?? "");
 
-    const [students, coaches, classes, attendance, notes, payments, bookings, media] = await Promise.all([
+    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours] = await Promise.all([
       supabase.from("students").select("*").order("name"),
       supabase.from("coaches").select("*").order("name"),
       supabase.from("classes").select("*"),
@@ -113,6 +113,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       supabase.from("payments").select("*"),
       supabase.from("bookings").select("*"),
       supabase.from("media").select("*").order("created_at", { ascending: false }),
+      supabase.from("club_hours").select("*"),
     ]);
 
     mediaPaths.clear();
@@ -186,6 +187,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         size: Number(m.size),
         coachId: m.coach_id ?? undefined,
       })),
+      clubHours: DEFAULT_CLUB_HOURS.map((d) => {
+        const row = (clubHours.data ?? []).find((h) => h.weekday === d.weekday);
+        return row ? { weekday: row.weekday, open: row.open_time, close: row.close_time, closed: row.closed } : d;
+      }),
     });
     setHydrated(true);
     setLoading(false);
