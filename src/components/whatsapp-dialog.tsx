@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { logWhatsAppSent } from "@/lib/whatsapp-log";
 import { cn } from "@/lib/utils";
 
 /** Icono de WhatsApp (inline para no depender de otra librería). */
