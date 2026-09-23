@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { Camera, FileVideo, ImagePlus, Pencil, Save, Trash2, Upload, Video } from "lucide-react";
+import { Camera, FileVideo, ImagePlus, Pencil, Save, Sparkles, Trash2, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
