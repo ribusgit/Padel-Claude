@@ -228,3 +228,84 @@ function StudentDetail() {
     </>
   );
 }
+
+/** Avatar del alumno con botón para subir, cambiar o quitar la foto (solo administrador). */
+function StudentPhotoButton({ student }: { student: Student }) {
+  const { isAdmin, setStudentPhoto } = useStore();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  const onFile = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("El archivo debe ser una imagen");
+      return;
+    }
+    setBusy(true);
+    try {
+      const resized = await resizePhoto(file);
+      await setStudentPhoto(student.id, resized);
+      toast.success("Foto actualizada");
+    } catch {
+      toast.error("No se pudo guardar la foto");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const removePhoto = async () => {
+    setBusy(true);
+    try {
+      await setStudentPhoto(student.id, null);
+      toast.success("Foto eliminada");
+    } catch {
+      toast.error("No se pudo eliminar la foto");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!isAdmin) return <StudentAvatar name={student.name} photoPath={student.photoPath} className="size-14 text-lg" />;
+
+  return (
+    <div className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={busy}
+        className="group relative block cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={student.photoPath ? "Cambiar foto del alumno" : "Añadir foto del alumno"}
+      >
+        <StudentAvatar
+          name={student.name}
+          photoPath={student.photoPath}
+          className={cn("size-14 text-lg", busy && "opacity-50")}
+        />
+        <span className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full border border-border bg-primary text-primary-foreground shadow">
+          <Camera className="size-3.5" />
+        </span>
+      </button>
+      {student.photoPath && (
+        <button
+          type="button"
+          onClick={() => void removePhoto()}
+          disabled={busy}
+          className="absolute -left-1 -top-1 flex size-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow hover:text-destructive"
+          aria-label="Quitar foto"
+        >
+          <Trash2 className="size-3" />
+        </button>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          void onFile(e.target.files?.[0]);
+          e.target.value = "";
+        }}
+      />
+    </div>
+  );
+}
