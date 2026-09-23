@@ -137,10 +137,11 @@ function StudentDetail() {
       </div>
 
       <Tabs defaultValue="resumen" className="mt-6">
-        <TabsList className="w-full">
-          <TabsTrigger value="resumen" className="flex-1">Seguimiento</TabsTrigger>
-          <TabsTrigger value="multimedia" className="flex-1">Análisis Multimedia</TabsTrigger>
-          <TabsTrigger value="pizarra" className="flex-1">Pizarra</TabsTrigger>
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
+          <TabsTrigger value="resumen">Seguimiento</TabsTrigger>
+          <TabsTrigger value="multimedia">Análisis Multimedia</TabsTrigger>
+          <TabsTrigger value="pizarra">Pizarra</TabsTrigger>
+          <TabsTrigger value="contenidos">Vídeos de técnica</TabsTrigger>
         </TabsList>
 
         <TabsContent value="multimedia" className="mt-4">
@@ -150,6 +151,11 @@ function StudentDetail() {
         <TabsContent value="pizarra" className="mt-4">
           <StudentWhiteboard student={student} />
         </TabsContent>
+
+        <TabsContent value="contenidos" className="mt-4">
+          <VideoSearch student={student} />
+        </TabsContent>
+
 
         <TabsContent value="resumen" className="mt-4 space-y-6">
         <ProgressSummary studentId={student.id} studentName={student.name} />
