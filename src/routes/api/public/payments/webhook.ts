@@ -36,12 +36,12 @@ async function handleTransactionCompleted(data: any) {
   if (existing) {
     await supabase
       .from("payments")
-      .update({ paid: true, paid_at: paidAt, ...(amount > 0 ? { amount } : {}) })
+      .update({ paid: true, paid_at: paidAt, method: "tarjeta", ...(amount > 0 ? { amount } : {}) })
       .eq("id", existing['id'] as string);
   } else {
     await supabase
       .from("payments")
-      .insert({ student_id: studentId, month, amount, paid: true, paid_at: paidAt });
+      .insert({ student_id: studentId, month, amount, paid: true, paid_at: paidAt, method: "tarjeta" });
   }
 
   await supabase.from("students").update({ payment_status: "pagado" }).eq("id", studentId);

@@ -107,7 +107,7 @@ function StudentsPage() {
                     kind: s.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
                     body:
                       s.paymentStatus === "pendiente"
-                        ? paymentReminder(s.name, PLAN_PRICES[s.plan], format(new Date(), "MMMM", { locale: es }))
+                        ? paymentReminder(s.name, data.feePlans[s.plan], format(new Date(), "MMMM", { locale: es }))
                         : generalReminder(s.name),
                   }}
                 />

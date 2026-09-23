@@ -19,7 +19,7 @@ import { framesFromFile } from "@/lib/technique-frames";
 import { analyzeTechnique } from "@/lib/technique-analysis.functions";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { MediaItem, Student } from "@/lib/padel";
+import { TECHNIQUE_REPORT_MARK, type MediaItem, type Student } from "@/lib/padel";
 
 const MAX_SIZE = 80 * 1024 * 1024; // 80 MB por archivo
 
@@ -190,7 +190,7 @@ export function StudentMedia({ student }: { student: Student }) {
         toast.error(res.message || "No se ha podido generar el informe automático");
         return;
       }
-      const body = note ? `${note}\n\n${res.analysis}` : res.analysis;
+      const body = note ? `${note}\n\n${TECHNIQUE_REPORT_MARK}\n${res.analysis}` : `${TECHNIQUE_REPORT_MARK}\n${res.analysis}`;
       await updateMedia(mediaId, { comment: body.slice(0, 4000) });
       toast.success("Informe de técnica generado automáticamente");
     } catch (error) {

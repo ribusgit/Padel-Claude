@@ -14,6 +14,8 @@ import { StudentWhiteboard } from "@/components/student-whiteboard";
 import { VideoSearch } from "@/components/video-search";
 import { DeleteStudentButton } from "@/components/delete-student-button";
 import { PayFeeButton } from "@/components/pay-fee-button";
+import { StudentAccessDialog } from "@/components/student-access-dialog";
+import { BizumDialog } from "@/components/bizum-dialog";
 
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
@@ -42,12 +44,17 @@ const fmt = (d: string) => format(parseISO(d), "d MMM yyyy", { locale: es });
 
 function StudentDetail() {
   const { id } = Route.useParams();
-  const { data, updateStudent, addNote, setPaid, isAdmin, coachId } = useStore();
+  const { data, loading, updateStudent, addNote, setPaid, isAdmin, coachId } = useStore();
   const student = data.students.find((s) => s.id === id);
   const [note, setNote] = useState("");
   const [noteCoachId, setNoteCoachId] = useState(coachId ?? data.coaches[0]?.id ?? "");
 
-  if (!student) throw notFound();
+  if (!student) {
+    if (loading) {
+      return <p className="py-16 text-center text-sm text-muted-foreground">Cargando la ficha…</p>;
+    }
+    throw notFound();
+  }
 
   const attendance = [...student.attendance].sort((a, b) => b.date.localeCompare(a.date));
   const presentCount = attendance.filter((a) => a.present).length;
@@ -95,11 +102,15 @@ function StudentDetail() {
                 kind: student.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
                 body:
                   student.paymentStatus === "pendiente"
-                    ? paymentReminder(student.name, PLAN_PRICES[student.plan], format(new Date(), "MMMM", { locale: es }))
+                    ? paymentReminder(student.name, data.feePlans[student.plan], format(new Date(), "MMMM", { locale: es }))
                     : generalReminder(student.name),
               }}
               label="Notificar"
             />
+            {student.paymentStatus === "pendiente" && (
+              <BizumDialog canConfirm studentId={student.id} studentName={student.name} amount={data.feePlans[student.plan]} />
+            )}
+            {isAdmin && <StudentAccessDialog student={student} />}
             <DeleteStudentButton student={student} redirectToList />
           </div>
 

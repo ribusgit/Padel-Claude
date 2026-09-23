@@ -2,7 +2,10 @@ import { CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { usePaddleCheckout } from "@/hooks/use-paddle-checkout";
-import { PLAN_PRICES, monthKey, type Plan } from "@/lib/padel";
+import { getPaddleEnvironment } from "@/lib/paddle";
+import { monthKey, type Plan } from "@/lib/padel";
+import { useStore } from "@/lib/store";
+import { ensureFeePrice } from "@/utils/payments.functions";
 
 const PRICE_IDS: Record<Plan, string> = {
   "1x": "cuota_1x",
@@ -15,22 +18,33 @@ interface PayFeeButtonProps {
   studentName: string;
   plan: Plan;
   email?: string;
+  /** Mes a cobrar (yyyy-MM); por defecto el mes en curso. */
+  month?: string;
   iconOnly?: boolean;
   className?: string;
 }
 
-/** Abre el pago en línea de la cuota del mes en curso del alumno. */
-export function PayFeeButton({ studentId, studentName, plan, email, iconOnly, className }: PayFeeButtonProps) {
+/** Abre el pago en línea de la cuota del alumno con la tarifa editable actual. */
+export function PayFeeButton({ studentId, studentName, plan, email, month, iconOnly, className }: PayFeeButtonProps) {
   const { openCheckout, loading } = usePaddleCheckout();
-  const amount = PLAN_PRICES[plan];
+  const { data } = useStore();
+  const amount = data.feePlans[plan];
+  const targetMonth = month ?? monthKey();
 
   const pay = () => {
-    void openCheckout({
-      priceId: PRICE_IDS[plan],
-      ...(email ? { customerEmail: email } : {}),
-      customData: { studentId, month: monthKey(), studentName },
-      successUrl: `${window.location.origin}/alumnos/${studentId}?pago=ok`,
-    }).catch(() => toast.error("No se pudo abrir el pago. Inténtalo de nuevo."));
+    void (async () => {
+      // Garantiza que el cobro usa la tarifa editable actual, no la original.
+      const paddlePriceId = await ensureFeePrice({
+        data: { priceId: PRICE_IDS[plan], amountEur: amount, environment: getPaddleEnvironment() },
+      });
+      await openCheckout({
+        priceId: PRICE_IDS[plan],
+        paddlePriceId,
+        ...(email ? { customerEmail: email } : {}),
+        customData: { studentId, month: targetMonth, studentName },
+        successUrl: `${window.location.origin}/alumnos/${studentId}?pago=ok`,
+      });
+    })().catch(() => toast.error("No se pudo abrir el pago. Inténtalo de nuevo."));
   };
 
   return (

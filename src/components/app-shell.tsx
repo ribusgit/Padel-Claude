@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Package,
   PenTool,
+  Sparkles,
 
   type LucideIcon,
 } from "lucide-react";
@@ -32,6 +33,7 @@ type NavTo =
   | "/material"
   | "/mis-clases"
   | "/mensajes"
+  | "/informes"
   | "/pizarra";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
@@ -46,6 +48,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/pagos", label: "Pagos", icon: Wallet },
   { to: "/material", label: "Material", icon: Package },
   { to: "/mensajes", label: "Mensajes", icon: MessageCircle },
+  { to: "/informes", label: "Informes", icon: Sparkles },
 ];
 
 
@@ -55,6 +58,8 @@ const COACH_NAV: NavItem[] = [
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];
+
+const STUDENT_NAV: NavItem[] = [{ to: "/", label: "Mi portal", icon: Wallet }];
 
 function Logo() {
   return (
@@ -76,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
-  const nav = isAdmin ? ADMIN_NAV : COACH_NAV;
+  const nav = isAdmin ? ADMIN_NAV : role === "coach" ? COACH_NAV : STUDENT_NAV;
 
   const handleSignOut = async () => {
     await queryClient.cancelQueries();
@@ -112,7 +117,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{userName || email}</p>
             <p className="text-[11px] uppercase tracking-widest text-primary">
-              {role === "admin" ? "Administrador" : role === "coach" ? "Profesor" : "Sin permisos"}
+              {role === "admin" ? "Administrador" : role === "coach" ? "Profesor" : role === "alumno" ? "Alumno" : "Sin permisos"}
             </p>
           </div>
           <button

@@ -20,12 +20,13 @@ import {
   type LevelCategory,
   type Plan,
   type PaymentStatus,
+  type PaymentMethod,
   type BookingType,
   type MediaKind,
 
 } from "./padel";
 
-export type Role = "admin" | "coach";
+export type Role = "admin" | "coach" | "alumno";
 
 const EMPTY: AppData = {
   students: [],
@@ -37,6 +38,8 @@ const EMPTY: AppData = {
   clubHours: DEFAULT_CLUB_HOURS,
   materials: [],
   materialBudgets: [],
+  feePlans: PLAN_PRICES,
+  bizumPhone: "",
 };
 
 
@@ -47,6 +50,8 @@ interface StoreApi {
   role: Role | null;
   isAdmin: boolean;
   coachId: string | null;
+  /** Ficha de alumno vinculada a la cuenta (rol "alumno"). */
+  studentId: string | null;
   userName: string;
   email: string;
   refresh: () => Promise<void>;
@@ -62,7 +67,9 @@ interface StoreApi {
   updateClass: (id: string, patch: Partial<ClassSession>) => Promise<void>;
   deleteClass: (id: string) => Promise<void>;
   markAttendance: (classId: string, studentId: string, present: boolean) => Promise<void>;
-  setPaid: (studentId: string, paid: boolean) => Promise<void>;
+  setPaid: (studentId: string, paid: boolean, method?: PaymentMethod) => Promise<void>;
+  setPlanFee: (plan: Plan, amount: number) => Promise<void>;
+  setBizumPhone: (phone: string) => Promise<void>;
   setClubHours: (hours: ClubDayHours[]) => Promise<void>;
   addBooking: (b: Omit<CourtBooking, "id">) => Promise<void>;
   deleteBooking: (id: string) => Promise<void>;
@@ -91,6 +98,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<Role | null>(null);
   const [coachId, setCoachId] = useState<string | null>(null);
+  const [studentId, setStudentId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -107,16 +115,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setEmail(user.email ?? "");
 
     const [profileRes, rolesRes] = await Promise.all([
-      supabase.from("profiles").select("full_name, coach_id").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("full_name, coach_id, student_id").eq("id", user.id).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", user.id),
     ]);
     const roles = (rolesRes.data ?? []).map((r) => r.role as Role);
-    const myRole: Role | null = roles.includes("admin") ? "admin" : roles.includes("coach") ? "coach" : null;
+    const myRole: Role | null = roles.includes("admin") ? "admin" : roles.includes("coach") ? "coach" : roles.includes("alumno") ? "alumno" : null;
     setRole(myRole);
     setCoachId(profileRes.data?.coach_id ?? null);
+    setStudentId(profileRes.data?.student_id ?? null);
     setUserName(profileRes.data?.full_name ?? user.email ?? "");
 
-    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours, materials, budgets] =
+    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours, materials, budgets, feePlans, settings] =
       await Promise.all([
         supabase.from("students").select("*").order("name"),
         supabase.from("coaches").select("*").order("name"),
@@ -129,6 +138,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         supabase.from("club_hours").select("*"),
         supabase.from("material_items").select("*").order("purchase_date", { ascending: false }),
         supabase.from("material_budgets").select("*"),
+        supabase.from("fee_plans").select("*"),
+        supabase.from("club_settings").select("bizum_phone").eq("id", true).maybeSingle(),
       ]);
 
 
@@ -179,6 +190,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         amount: Number(p.amount),
         paid: p.paid,
         paidAt: p.paid_at ?? undefined,
+        method: (p.method ?? "manual") as PaymentMethod,
       })),
       bookings: (bookings.data ?? []).map((b) => ({
         id: b.id,
@@ -218,6 +230,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         notes: m.notes ?? "",
       })),
       materialBudgets: (budgets.data ?? []).map((b) => ({ month: b.month, amount: Number(b.amount) })),
+      feePlans: {
+        "1x": Number((feePlans.data ?? []).find((f) => f.plan === "1x")?.amount ?? PLAN_PRICES["1x"]),
+        "2x": Number((feePlans.data ?? []).find((f) => f.plan === "2x")?.amount ?? PLAN_PRICES["2x"]),
+        particular: Number((feePlans.data ?? []).find((f) => f.plan === "particular")?.amount ?? PLAN_PRICES.particular),
+      },
+      bizumPhone: settings.data?.bizum_phone ?? "",
     });
 
     setHydrated(true);
@@ -254,6 +272,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       role,
       isAdmin: role === "admin",
       coachId,
+      studentId,
       userName,
       email,
       refresh,
@@ -278,7 +297,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         await supabase.from("payments").insert({
           student_id: row.id,
           month: monthKey(),
-          amount: PLAN_PRICES[input.plan],
+          amount: data.feePlans[input.plan] ?? PLAN_PRICES[input.plan],
           paid: input.paymentStatus === "pagado",
           paid_at: input.paymentStatus === "pagado" ? todayKey() : null,
         });
@@ -417,23 +436,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (insErr) throw insErr;
         await refresh();
       },
-      setPaid: async (studentId, paid) => {
+      setPaid: async (studentId, paid, method = "manual") => {
         const month = monthKey();
         const student = data.students.find((s) => s.id === studentId);
         const existing = data.payments.find((p) => p.studentId === studentId && p.month === month);
         if (existing) {
           const { error } = await supabase
             .from("payments")
-            .update({ paid, paid_at: paid ? todayKey() : null })
+            .update({ paid, paid_at: paid ? todayKey() : null, method: paid ? method : "manual" })
             .eq("id", existing.id);
           if (error) throw error;
         } else {
           const { error } = await supabase.from("payments").insert({
             student_id: studentId,
             month,
-            amount: student ? PLAN_PRICES[student.plan] : 0,
+            amount: student ? data.feePlans[student.plan] : 0,
             paid,
             paid_at: paid ? todayKey() : null,
+            method: paid ? method : "manual",
           });
           if (error) throw error;
         }
@@ -442,6 +462,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .update({ payment_status: paid ? "pagado" : "pendiente" })
           .eq("id", studentId);
         if (sErr) throw sErr;
+        await refresh();
+      },
+      setPlanFee: async (plan, amount) => {
+        const { error } = await supabase
+          .from("fee_plans")
+          .upsert({ plan, amount, updated_at: new Date().toISOString() });
+        if (error) throw error;
+        await refresh();
+      },
+      setBizumPhone: async (phone) => {
+        const { error } = await supabase
+          .from("club_settings")
+          .upsert({ id: true, bizum_phone: phone, updated_at: new Date().toISOString() });
+        if (error) throw error;
         await refresh();
       },
       setClubHours: async (hours) => {
@@ -555,7 +589,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
     };
 
-  }, [data, hydrated, loading, role, coachId, userName, email, refresh]);
+  }, [data, hydrated, loading, role, coachId, studentId, userName, email, refresh]);
 
   return <StoreContext.Provider value={api}>{children}</StoreContext.Provider>;
 }

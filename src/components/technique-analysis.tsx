@@ -9,7 +9,7 @@ import { analyzeTechnique } from "@/lib/technique-analysis.functions";
 import { mediaPathOf, useStore } from "@/lib/store";
 import { signedMediaUrl } from "@/lib/media-storage";
 import { framesFromUrl } from "@/lib/technique-frames";
-import type { MediaItem, Student } from "@/lib/padel";
+import { TECHNIQUE_REPORT_MARK, type MediaItem, type Student } from "@/lib/padel";
 
 
 /**
@@ -88,7 +88,7 @@ export function TechniqueAnalysis({ item, student }: { item: MediaItem; student:
               size="sm"
               variant="secondary"
               onClick={() => {
-                void updateMedia(item.id, { comment: analysis.slice(0, 2000) }).then(() =>
+                void updateMedia(item.id, { comment: `${TECHNIQUE_REPORT_MARK}\n${analysis}`.slice(0, 2000) }).then(() =>
                   toast.success("Análisis guardado en el archivo"),
                 );
               }}

@@ -53,6 +53,14 @@ export interface ClassSession {
   attendance: Record<string, boolean>;
 }
 
+export type PaymentMethod = "tarjeta" | "bizum" | "manual";
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  tarjeta: "Tarjeta",
+  bizum: "Bizum",
+  manual: "Manual",
+};
+
 export interface Payment {
   id: string;
   studentId: string;
@@ -60,6 +68,8 @@ export interface Payment {
   amount: number;
   paid: boolean;
   paidAt?: string | undefined;
+  /** Cómo se cobró la cuota: tarjeta en línea, Bizum o marca manual. */
+  method: PaymentMethod;
 }
 
 export type BookingType = "clase" | "alquiler";
@@ -77,6 +87,14 @@ export interface CourtBooking {
 }
 
 export type MediaKind = "foto" | "video";
+
+/** Marca con la que empiezan los informes de técnica generados con IA en el comentario del archivo. */
+export const TECHNIQUE_REPORT_MARK = "🔬 INFORME DE TÉCNICA";
+
+/** Detecta si el comentario de un archivo multimedia es un informe de técnica con IA. */
+export function isTechniqueReport(comment: string): boolean {
+  return comment.includes(TECHNIQUE_REPORT_MARK) || comment.includes("GOLPE DETECTADO");
+}
 
 export interface MediaItem {
   id: string;
@@ -136,6 +154,10 @@ export interface AppData {
   clubHours: ClubDayHours[];
   materials: MaterialItem[];
   materialBudgets: MaterialBudget[];
+  /** Cuotas mensuales por tipo de tarifa, editables por el administrador. */
+  feePlans: Record<Plan, number>;
+  /** Teléfono Bizum del club para cobros manuales. */
+  bizumPhone: string;
 }
 
 export const COURTS = [1, 2, 3, 4];
@@ -200,6 +222,7 @@ export const PLAN_LABELS: Record<Plan, string> = {
   particular: "Clases particulares",
 };
 
+/** Tarifas iniciales por defecto; la app usa las editables de `AppData.feePlans`. */
 export const PLAN_PRICES: Record<Plan, number> = {
   "1x": 55,
   "2x": 95,
@@ -324,6 +347,7 @@ export function seedData(): AppData {
     amount: PLAN_PRICES[s.plan],
     paid: s.paymentStatus === "pagado",
     paidAt: s.paymentStatus === "pagado" ? d(-3) : undefined,
+    method: "manual",
   }));
 
   const bookings: CourtBooking[] = [
@@ -342,6 +366,7 @@ export function seedData(): AppData {
     clubHours: DEFAULT_CLUB_HOURS,
     materials: [],
     materialBudgets: [],
+    feePlans: PLAN_PRICES,
+    bizumPhone: "",
   };
-
 }

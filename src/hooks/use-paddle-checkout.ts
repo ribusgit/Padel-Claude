@@ -6,6 +6,8 @@ export function usePaddleCheckout() {
 
   const openCheckout = async (options: {
     priceId: string;
+    /** ID interno de Paddle ya resuelto (omite la resolución por external_id). */
+    paddlePriceId?: string;
     customerEmail?: string;
     customData?: Record<string, string>;
     successUrl?: string;
@@ -14,7 +16,7 @@ export function usePaddleCheckout() {
     setLoading(true);
     try {
       await initializePaddle();
-      const paddlePriceId = await getPaddlePriceId(options.priceId);
+      const paddlePriceId = options.paddlePriceId ?? (await getPaddlePriceId(options.priceId));
 
       window.Paddle.Checkout.open({
         items: [{ priceId: paddlePriceId, quantity: 1 }],
