@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { addDays, format, isSameDay, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarPlus, ChevronLeft, ChevronRight, Lock, Plus, Trash2, Users } from "lucide-react";
+import { CalendarPlus, ChevronLeft, ChevronRight, Clock, Lock, Plus, Radio, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { BookingDialog } from "@/components/booking-dialog";
+import { ClubHoursDialog } from "@/components/club-hours-dialog";
 import { WhatsAppButton, generalReminder } from "@/components/whatsapp-dialog";
 import { EmptyState } from "@/components/padel-ui";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,10 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
   BOOKING_LABELS,
-  COURT_HOURS,
   COURTS,
   classEndTime,
+  clubHoursForDate,
+  hourSlots,
   overlaps,
   timeToMin,
   todayKey,
