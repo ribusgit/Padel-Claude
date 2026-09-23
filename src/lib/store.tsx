@@ -57,6 +57,7 @@ interface StoreApi {
   deleteClass: (id: string) => Promise<void>;
   markAttendance: (classId: string, studentId: string, present: boolean) => Promise<void>;
   setPaid: (studentId: string, paid: boolean) => Promise<void>;
+  setClubHours: (hours: ClubDayHours[]) => Promise<void>;
   addBooking: (b: Omit<CourtBooking, "id">) => Promise<void>;
   deleteBooking: (id: string) => Promise<void>;
   addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<void>;
