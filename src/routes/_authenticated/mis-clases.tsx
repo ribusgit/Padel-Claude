@@ -4,6 +4,7 @@ import { es } from "date-fns/locale";
 import { Check, X, Users } from "lucide-react";
 import { toast } from "sonner";
 import { LevelBadge, Avatar, EmptyState } from "@/components/padel-ui";
+import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, classReminder } from "@/components/whatsapp-dialog";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
