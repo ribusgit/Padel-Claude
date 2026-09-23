@@ -80,7 +80,7 @@ export function StatCard({
   );
 }
 
-export function Avatar({ name, src, className }: { name: string; src?: string | undefined; className?: string }) {
+export function Avatar({ name, src, className }: { name: string; src?: string | undefined; className?: string | undefined }) {
   const initials = name
     .split(" ")
     .slice(0, 2)

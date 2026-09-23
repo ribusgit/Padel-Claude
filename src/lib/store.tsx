@@ -242,6 +242,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (error) throw error;
         await refresh();
       },
+      setStudentPhoto: async (id, file) => {
+        const oldPath = data.students.find((s) => s.id === id)?.photoPath;
+        let newPath: string | null = null;
+        if (file) {
+          newPath = await uploadMediaFile(id, file, `avatar-${Date.now()}.jpg`);
+        }
+        const { error } = await supabase.from("students").update({ photo_path: newPath }).eq("id", id);
+        if (error) {
+          if (newPath) await removeMediaFile(newPath);
+          throw error;
+        }
+        if (oldPath && oldPath !== newPath) await removeMediaFile(oldPath);
+        await refresh();
+      },
       addNote: async (studentId, note) => {
         const { error } = await supabase.from("progress_notes").insert({
           student_id: studentId,
