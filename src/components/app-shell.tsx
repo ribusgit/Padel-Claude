@@ -32,6 +32,7 @@ type NavTo =
   | "/material"
   | "/mis-clases"
   | "/mensajes"
+  | "/informes"
   | "/pizarra";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 

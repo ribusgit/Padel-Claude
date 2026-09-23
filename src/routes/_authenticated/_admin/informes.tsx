@@ -104,7 +104,7 @@ function InformesPage() {
                   className="flex w-full items-center gap-3 p-3 text-left"
                   onClick={() => setOpenId(open ? null : item.id)}
                 >
-                  <StudentAvatar student={student!} className="size-10" />
+                  <StudentAvatar name={student!.name} photoPath={student!.photoPath} className="size-10" />
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                       <span className="truncate text-sm font-semibold">{student!.name}</span>
