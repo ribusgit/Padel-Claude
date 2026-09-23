@@ -33,8 +33,8 @@ function AuthPage() {
         void navigate({ to: "/panel", replace: true });
         return;
       }
-      const { data } = await supabase.from("school_state").select("admin_claimed").maybeSingle();
-      setMode(data?.admin_claimed === false ? "bootstrap" : "login");
+      const { data } = await supabase.rpc("is_admin_claimed" as never);
+      setMode(data === false ? "bootstrap" : "login");
     })();
   }, [navigate]);
 
