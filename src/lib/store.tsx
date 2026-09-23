@@ -22,7 +22,15 @@ import {
 
 export type Role = "admin" | "coach";
 
-const EMPTY: AppData = { students: [], coaches: [], classes: [], payments: [], bookings: [], media: [] };
+const EMPTY: AppData = {
+  students: [],
+  coaches: [],
+  classes: [],
+  payments: [],
+  bookings: [],
+  media: [],
+  clubHours: DEFAULT_CLUB_HOURS,
+};
 
 interface StoreApi {
   data: AppData;
