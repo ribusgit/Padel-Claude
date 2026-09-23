@@ -15,6 +15,7 @@ import { VideoSearch } from "@/components/video-search";
 import { DeleteStudentButton } from "@/components/delete-student-button";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { StudentAccessDialog } from "@/components/student-access-dialog";
+import { BizumDialog } from "@/components/bizum-dialog";
 
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
@@ -101,11 +102,14 @@ function StudentDetail() {
                 kind: student.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
                 body:
                   student.paymentStatus === "pendiente"
-                    ? paymentReminder(student.name, PLAN_PRICES[student.plan], format(new Date(), "MMMM", { locale: es }))
+                    ? paymentReminder(student.name, data.feePlans[student.plan], format(new Date(), "MMMM", { locale: es }))
                     : generalReminder(student.name),
               }}
               label="Notificar"
             />
+            {student.paymentStatus === "pendiente" && (
+              <BizumDialog canConfirm studentId={student.id} studentName={student.name} amount={data.feePlans[student.plan]} />
+            )}
             {isAdmin && <StudentAccessDialog student={student} />}
             <DeleteStudentButton student={student} redirectToList />
           </div>
