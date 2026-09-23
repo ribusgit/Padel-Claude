@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
 import { Route as AuthenticatedMisClasesRouteImport } from './routes/_authenticated/mis-clases'
+import { Route as AuthenticatedPizarraRouteImport } from './routes/_authenticated/pizarra'
 import { Route as AuthenticatedAdminCalendarioRouteImport } from './routes/_authenticated/_admin/calendario'
 import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authenticated/_admin/pagos'
 import { Route as AuthenticatedAdminReservasRouteImport } from './routes/_authenticated/_admin/reservas'
@@ -43,6 +44,11 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
 const AuthenticatedMisClasesRoute = AuthenticatedMisClasesRouteImport.update({
   id: '/mis-clases',
   path: '/mis-clases',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPizarraRoute = AuthenticatedPizarraRouteImport.update({
+  id: '/pizarra',
+  path: '/pizarra',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminCalendarioRoute =
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
+  '/pizarra': typeof AuthenticatedPizarraRoute
   '/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/': typeof AuthenticatedIndexRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
+  '/pizarra': typeof AuthenticatedPizarraRoute
   '/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/pagos': typeof AuthenticatedAdminPagosRoute
   '/reservas': typeof AuthenticatedAdminReservasRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/mis-clases': typeof AuthenticatedMisClasesRoute
+  '/_authenticated/pizarra': typeof AuthenticatedPizarraRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/_authenticated/_admin/pagos': typeof AuthenticatedAdminPagosRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/mis-clases'
+    | '/pizarra'
     | '/calendario'
     | '/pagos'
     | '/reservas'
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/'
     | '/mis-clases'
+    | '/pizarra'
     | '/calendario'
     | '/pagos'
     | '/reservas'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/_admin'
     | '/_authenticated/mis-clases'
+    | '/_authenticated/pizarra'
     | '/_authenticated/'
     | '/_authenticated/_admin/calendario'
     | '/_authenticated/_admin/pagos'
@@ -206,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/mis-clases'
       fullPath: '/mis-clases'
       preLoaderRoute: typeof AuthenticatedMisClasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pizarra': {
+      id: '/_authenticated/pizarra'
+      path: '/pizarra'
+      fullPath: '/pizarra'
+      preLoaderRoute: typeof AuthenticatedPizarraRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/_admin/calendario': {
@@ -286,6 +305,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedMisClasesRoute: typeof AuthenticatedMisClasesRoute
+  AuthenticatedPizarraRoute: typeof AuthenticatedPizarraRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAlumnosIdRoute: typeof AuthenticatedAlumnosIdRoute
   AuthenticatedAlumnosIndexRoute: typeof AuthenticatedAlumnosIndexRoute
@@ -294,6 +314,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedMisClasesRoute: AuthenticatedMisClasesRoute,
+  AuthenticatedPizarraRoute: AuthenticatedPizarraRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAlumnosIdRoute: AuthenticatedAlumnosIdRoute,
   AuthenticatedAlumnosIndexRoute: AuthenticatedAlumnosIndexRoute,

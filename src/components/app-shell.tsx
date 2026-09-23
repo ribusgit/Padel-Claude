@@ -8,6 +8,7 @@ import {
   LandPlot,
   LogOut,
   Clipboard,
+  PenTool,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -15,7 +16,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 
-type NavTo = "/" | "/alumnos" | "/calendario" | "/reservas" | "/profesores" | "/pagos" | "/mis-clases";
+type NavTo =
+  | "/"
+  | "/alumnos"
+  | "/calendario"
+  | "/reservas"
+  | "/profesores"
+  | "/pagos"
+  | "/mis-clases"
+  | "/pizarra";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
 const ADMIN_NAV: NavItem[] = [
@@ -23,6 +32,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
   { to: "/reservas", label: "Pistas", icon: LandPlot },
+  { to: "/pizarra", label: "Pizarra", icon: PenTool },
   { to: "/profesores", label: "Profesores", icon: GraduationCap },
   { to: "/pagos", label: "Pagos", icon: Wallet },
 ];
@@ -31,6 +41,7 @@ const COACH_NAV: NavItem[] = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
+  { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];
 
 function Logo() {
@@ -116,7 +127,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Navegación inferior en móvil */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-sidebar/95 backdrop-blur md:hidden">
-        <ul className={cn("grid", nav.length === 3 ? "grid-cols-3" : "grid-cols-6")}>
+        <ul className="grid grid-cols-4">
           {nav.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <Link
