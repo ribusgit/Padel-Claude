@@ -116,17 +116,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCoachId(profileRes.data?.coach_id ?? null);
     setUserName(profileRes.data?.full_name ?? user.email ?? "");
 
-    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours] = await Promise.all([
-      supabase.from("students").select("*").order("name"),
-      supabase.from("coaches").select("*").order("name"),
-      supabase.from("classes").select("*"),
-      supabase.from("attendance").select("*"),
-      supabase.from("progress_notes").select("*").order("date", { ascending: false }),
-      supabase.from("payments").select("*"),
-      supabase.from("bookings").select("*"),
-      supabase.from("media").select("*").order("created_at", { ascending: false }),
-      supabase.from("club_hours").select("*"),
-    ]);
+    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours, materials, budgets] =
+      await Promise.all([
+        supabase.from("students").select("*").order("name"),
+        supabase.from("coaches").select("*").order("name"),
+        supabase.from("classes").select("*"),
+        supabase.from("attendance").select("*"),
+        supabase.from("progress_notes").select("*").order("date", { ascending: false }),
+        supabase.from("payments").select("*"),
+        supabase.from("bookings").select("*"),
+        supabase.from("media").select("*").order("created_at", { ascending: false }),
+        supabase.from("club_hours").select("*"),
+        supabase.from("material_items").select("*").order("purchase_date", { ascending: false }),
+        supabase.from("material_budgets").select("*"),
+      ]);
+
 
     mediaPaths.clear();
     for (const m of media.data ?? []) mediaPaths.set(m.id, m.storage_path);
