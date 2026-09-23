@@ -25,6 +25,7 @@ interface BizumDialogProps {
   /** Si es true, un administrador confirma el cobro; si es false (portal del alumno) solo muestra instrucciones. */
   canConfirm?: boolean;
   triggerLabel?: string;
+  triggerClassName?: string;
 }
 
 function monthLabel(month: string): string {
@@ -33,7 +34,7 @@ function monthLabel(month: string): string {
 }
 
 /** Instrucciones de pago por Bizum y, para el administrador, confirmación del cobro. */
-export function BizumDialog({ studentId, studentName, amount, month, canConfirm, triggerLabel }: BizumDialogProps) {
+export function BizumDialog({ studentId, studentName, amount, month, canConfirm, triggerLabel, triggerClassName }: BizumDialogProps) {
   const { data, setPaid } = useStore();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -66,7 +67,7 @@ export function BizumDialog({ studentId, studentName, amount, month, canConfirm,
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" aria-label={`Pagar por Bizum la cuota de ${studentName}`}>
+        <Button variant="outline" size="sm" className={triggerClassName} aria-label={`Pagar por Bizum la cuota de ${studentName}`}>
           <Smartphone className="size-4" /> {triggerLabel ?? "Bizum"}
         </Button>
       </DialogTrigger>

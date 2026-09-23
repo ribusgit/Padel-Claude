@@ -112,8 +112,8 @@ export function StudentPortal() {
                   <p className="font-display text-2xl font-bold text-warning">{currentFee} €</p>
                 </div>
                 <div className="mt-3 grid gap-2">
-                  <PayFeeButton studentId={student.id} studentName={student.name} plan={student.plan} email={student.email} month={p.month} />
-                  <BizumDialog studentId={student.id} studentName={student.name} amount={currentFee} month={p.month} />
+                  <PayFeeButton studentId={student.id} studentName={student.name} plan={student.plan} email={student.email} month={p.month} className="h-11 w-full text-base" />
+                  <BizumDialog studentId={student.id} studentName={student.name} amount={currentFee} month={p.month} triggerClassName="h-11 w-full text-base" />
                 </div>
               </li>
             ))}
