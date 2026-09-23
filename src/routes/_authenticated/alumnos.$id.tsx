@@ -14,6 +14,7 @@ import { StudentWhiteboard } from "@/components/student-whiteboard";
 import { VideoSearch } from "@/components/video-search";
 import { DeleteStudentButton } from "@/components/delete-student-button";
 import { PayFeeButton } from "@/components/pay-fee-button";
+import { StudentAccessDialog } from "@/components/student-access-dialog";
 
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
@@ -105,6 +106,7 @@ function StudentDetail() {
               }}
               label="Notificar"
             />
+            {isAdmin && <StudentAccessDialog student={student} />}
             <DeleteStudentButton student={student} redirectToList />
           </div>
 
