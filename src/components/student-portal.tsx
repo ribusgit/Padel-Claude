@@ -36,8 +36,9 @@ export function StudentPortal() {
     .sort((a, b) => b.month.localeCompare(a.month));
   const pending = myPayments.filter((p) => !p.paid);
   const paidHistory = myPayments.filter((p) => p.paid);
-  const currentFee = data.feePlans[student.plan];
-  const totalDebt = pending.length * currentFee;
+  // Las tarifas son solo para administradores; el alumno ve el importe de sus propias cuotas.
+  const currentFee = myPayments[0]?.amount ?? 0;
+  const totalDebt = pending.reduce((sum, p) => sum + p.amount, 0);
 
   const latestReport = data.media
     .filter((m) => m.studentId === student.id && isTechniqueReport(m.comment))

@@ -20,15 +20,17 @@ interface PayFeeButtonProps {
   email?: string;
   /** Mes a cobrar (yyyy-MM); por defecto el mes en curso. */
   month?: string;
+  /** Importe explícito (portal del alumno, donde las tarifas no son legibles). */
+  amount?: number;
   iconOnly?: boolean;
   className?: string;
 }
 
 /** Abre el pago en línea de la cuota del alumno con la tarifa editable actual. */
-export function PayFeeButton({ studentId, studentName, plan, email, month, iconOnly, className }: PayFeeButtonProps) {
+export function PayFeeButton({ studentId, studentName, plan, email, month, amount: amountProp, iconOnly, className }: PayFeeButtonProps) {
   const { openCheckout, loading } = usePaddleCheckout();
   const { data } = useStore();
-  const amount = data.feePlans[plan];
+  const amount = amountProp ?? data.feePlans[plan];
   const targetMonth = month ?? monthKey();
 
   const pay = () => {
