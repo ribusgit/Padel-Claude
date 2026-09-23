@@ -42,7 +42,7 @@ const fmt = (d: string) => format(parseISO(d), "d MMM yyyy", { locale: es });
 
 function StudentDetail() {
   const { id } = Route.useParams();
-  const { data, updateStudent, addNote, setPaid, isAdmin, coachId } = useStore();
+  const { data, loading, updateStudent, addNote, setPaid, isAdmin, coachId } = useStore();
   const student = data.students.find((s) => s.id === id);
   const [note, setNote] = useState("");
   const [noteCoachId, setNoteCoachId] = useState(coachId ?? data.coaches[0]?.id ?? "");
