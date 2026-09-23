@@ -27,6 +27,8 @@ export interface Student {
   plan: Plan;
   level: number;
   active: boolean;
+  /** Ruta de la foto de perfil en el almacenamiento privado. */
+  photoPath?: string;
   attendance: AttendanceRecord[];
   notes: ProgressNote[];
 }
