@@ -6,6 +6,8 @@ import {
   todayKey,
   monthKey,
   PLAN_PRICES,
+  DEFAULT_CLUB_HOURS,
+  type ClubDayHours,
   type AppData,
   type Student,
   type Coach,
@@ -22,7 +24,15 @@ import {
 
 export type Role = "admin" | "coach";
 
-const EMPTY: AppData = { students: [], coaches: [], classes: [], payments: [], bookings: [], media: [] };
+const EMPTY: AppData = {
+  students: [],
+  coaches: [],
+  classes: [],
+  payments: [],
+  bookings: [],
+  media: [],
+  clubHours: DEFAULT_CLUB_HOURS,
+};
 
 interface StoreApi {
   data: AppData;
@@ -47,6 +57,7 @@ interface StoreApi {
   deleteClass: (id: string) => Promise<void>;
   markAttendance: (classId: string, studentId: string, present: boolean) => Promise<void>;
   setPaid: (studentId: string, paid: boolean) => Promise<void>;
+  setClubHours: (hours: ClubDayHours[]) => Promise<void>;
   addBooking: (b: Omit<CourtBooking, "id">) => Promise<void>;
   deleteBooking: (id: string) => Promise<void>;
   addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<void>;
@@ -94,7 +105,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCoachId(profileRes.data?.coach_id ?? null);
     setUserName(profileRes.data?.full_name ?? user.email ?? "");
 
-    const [students, coaches, classes, attendance, notes, payments, bookings, media] = await Promise.all([
+    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours] = await Promise.all([
       supabase.from("students").select("*").order("name"),
       supabase.from("coaches").select("*").order("name"),
       supabase.from("classes").select("*"),
@@ -103,6 +114,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       supabase.from("payments").select("*"),
       supabase.from("bookings").select("*"),
       supabase.from("media").select("*").order("created_at", { ascending: false }),
+      supabase.from("club_hours").select("*"),
     ]);
 
     mediaPaths.clear();
@@ -176,6 +188,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         size: Number(m.size),
         coachId: m.coach_id ?? undefined,
       })),
+      clubHours: DEFAULT_CLUB_HOURS.map((d) => {
+        const row = (clubHours.data ?? []).find((h) => h.weekday === d.weekday);
+        return row ? { weekday: row.weekday, open: row.open_time, close: row.close_time, closed: row.closed } : d;
+      }),
     });
     setHydrated(true);
     setLoading(false);
@@ -382,6 +398,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .update({ payment_status: paid ? "pagado" : "pendiente" })
           .eq("id", studentId);
         if (sErr) throw sErr;
+        await refresh();
+      },
+      setClubHours: async (hours) => {
+        const { error } = await supabase.from("club_hours").upsert(
+          hours.map((h) => ({
+            weekday: h.weekday,
+            open_time: h.open,
+            close_time: h.close,
+            closed: h.closed,
+          })),
+          { onConflict: "weekday" },
+        );
+        if (error) throw error;
         await refresh();
       },
       addBooking: async (input) => {

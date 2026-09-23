@@ -9,6 +9,7 @@ import {
   LandPlot,
   LogOut,
   Clipboard,
+  MessageCircle,
   PenTool,
   type LucideIcon,
 } from "lucide-react";
@@ -26,6 +27,7 @@ type NavTo =
   | "/profesores"
   | "/pagos"
   | "/mis-clases"
+  | "/mensajes"
   | "/pizarra";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
@@ -38,6 +40,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
   { to: "/profesores", label: "Profesores", icon: GraduationCap },
   { to: "/pagos", label: "Pagos", icon: Wallet },
+  { to: "/mensajes", label: "Mensajes", icon: MessageCircle },
 ];
 
 const COACH_NAV: NavItem[] = [

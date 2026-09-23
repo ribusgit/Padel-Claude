@@ -132,6 +132,33 @@ export type Database = {
           },
         ]
       }
+      club_hours: {
+        Row: {
+          close_time: string
+          closed: boolean
+          created_at: string
+          open_time: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          close_time?: string
+          closed?: boolean
+          created_at?: string
+          open_time?: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          close_time?: string
+          closed?: boolean
+          created_at?: string
+          open_time?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
       coaches: {
         Row: {
           created_at: string
@@ -431,6 +458,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      whatsapp_messages: {
+        Row: {
+          body: string
+          created_at: string
+          direction: string
+          id: string
+          kind: string
+          phone: string
+          recipient_name: string
+          sent_by: string | null
+          student_id: string | null
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          kind?: string
+          phone?: string
+          recipient_name?: string
+          sent_by?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          kind?: string
+          phone?: string
+          recipient_name?: string
+          sent_by?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

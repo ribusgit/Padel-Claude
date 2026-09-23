@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { addDays, format, isSameDay, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarPlus, ChevronLeft, ChevronRight, Lock, Plus, Trash2, Users } from "lucide-react";
+import { CalendarPlus, ChevronLeft, ChevronRight, Clock, Lock, Plus, Radio, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { BookingDialog } from "@/components/booking-dialog";
+import { ClubHoursDialog } from "@/components/club-hours-dialog";
 import { WhatsAppButton, generalReminder } from "@/components/whatsapp-dialog";
 import { EmptyState } from "@/components/padel-ui";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,10 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
   BOOKING_LABELS,
-  COURT_HOURS,
   COURTS,
   classEndTime,
+  clubHoursForDate,
+  hourSlots,
   overlaps,
   timeToMin,
   todayKey,
@@ -48,6 +50,23 @@ function BookingsPage() {
 
   const dayClasses = useMemo(() => data.classes.filter((c) => c.date === dateKey), [data.classes, dateKey]);
   const dayBookings = useMemo(() => data.bookings.filter((b) => b.date === dateKey), [data.bookings, dateKey]);
+
+  // Horario real del club para el día seleccionado
+  const clubDay = clubHoursForDate(data.clubHours, selected);
+  const hours = useMemo(
+    () => (clubDay.closed ? [] : hourSlots(clubDay.open, clubDay.close)),
+    [clubDay.closed, clubDay.open, clubDay.close],
+  );
+
+  // Reloj para saber qué franja se está jugando ahora mismo
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const isToday = isSameDay(selected, now);
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const currentHour = isToday ? hours.find((h) => timeToMin(h) <= nowMin && nowMin < timeToMin(h) + 60) : undefined;
 
   const slotFor = (court: number, hour: string): Slot => {
     const hourEnd = classEndTime(hour, 60);
@@ -82,10 +101,15 @@ function BookingsPage() {
   };
 
   const occupiedSlots = COURTS.reduce(
-    (n, court) => n + COURT_HOURS.filter((h) => slotFor(court, h).kind !== "libre").length,
+    (n, court) => n + hours.filter((h) => slotFor(court, h).kind !== "libre").length,
     0,
   );
-  const totalSlots = COURTS.length * COURT_HOURS.length;
+  const totalSlots = COURTS.length * hours.length;
+
+  /** Pistas ocupadas en la franja que se está jugando ahora mismo. */
+  const occupiedNow = currentHour
+    ? COURTS.map((court) => ({ court, slot: slotFor(court, currentHour) })).filter((x) => x.slot.kind !== "libre")
+    : [];
 
   const agenda = [
     ...dayClasses.map((c) => ({
@@ -141,7 +165,48 @@ function BookingsPage() {
             <ChevronRight />
           </Button>
         </div>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2">
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="size-3.5" />
+            {clubDay.closed ? "El club está cerrado este día" : `El club abre de ${clubDay.open} a ${clubDay.close}`}
+          </p>
+          <ClubHoursDialog
+            trigger={
+              <Button variant="secondary" size="sm">
+                <Clock /> Horario del club
+              </Button>
+            }
+          />
+        </div>
       </div>
+
+      {/* Ahora mismo */}
+      {isToday && !clubDay.closed && (
+        <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/5 p-3">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+            <Radio className="size-4" /> Ahora mismo · {currentHour ?? format(now, "HH:mm")}
+          </p>
+          {!currentHour ? (
+            <p className="mt-1 text-xs text-muted-foreground">Fuera del horario de apertura del club.</p>
+          ) : occupiedNow.length === 0 ? (
+            <p className="mt-1 text-xs text-muted-foreground">Las {COURTS.length} pistas están libres en esta franja.</p>
+          ) : (
+            <ul className="mt-2 space-y-1.5">
+              {occupiedNow.map(({ court, slot }) => (
+                <li key={court} className="flex items-center gap-2 text-xs">
+                  <span className="rounded-lg bg-primary/15 px-2 py-0.5 font-semibold text-primary">Pista {court}</span>
+                  <span className="min-w-0 flex-1 truncate text-foreground">
+                    {slot.kind === "libre" ? "" : slot.label}
+                  </span>
+                  <span className="shrink-0 text-muted-foreground">
+                    {slot.kind === "libre" ? "" : `hasta ${slot.end}`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* Cuadrante */}
       <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
@@ -155,10 +220,18 @@ function BookingsPage() {
               <span key={c} className="border-l border-border px-2 py-2.5 text-center">Pista {c}</span>
             ))}
           </div>
-          {COURT_HOURS.map((hour) => (
+          {hours.length === 0 && (
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+              El club está cerrado este día: no hay franjas disponibles.
+            </p>
+          )}
+          {hours.map((hour) => (
             <div
               key={hour}
-              className="grid border-b border-border last:border-0"
+              className={cn(
+                "grid border-b border-border last:border-0",
+                hour === currentHour && "bg-primary/5 ring-1 ring-inset ring-primary/40",
+              )}
               style={{ gridTemplateColumns: `64px repeat(${COURTS.length}, minmax(0,1fr))` }}
             >
               <span className="flex items-center px-2 py-1 font-mono text-xs text-muted-foreground">{hour}</span>

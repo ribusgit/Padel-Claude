@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { logWhatsAppSent } from "@/lib/whatsapp-log";
 import { cn } from "@/lib/utils";
 
 /** Icono de WhatsApp (inline para no depender de otra librería). */
@@ -23,6 +24,8 @@ export interface WhatsAppMessage {
   body: string;
   /** Etiqueta contextual, p. ej. "Recordatorio de pago". */
   kind: string;
+  /** Alumno destinatario, para el historial de mensajes. */
+  studentId?: string | undefined;
 }
 
 export function WhatsAppPreviewDialog({
@@ -105,6 +108,15 @@ export function WhatsAppPreviewDialog({
             onClick={() => {
               setSent(true);
               toast.success(`Abriendo WhatsApp para ${message?.to ?? "el alumno"}…`);
+              if (message) {
+                void logWhatsAppSent({
+                  studentId: message.studentId,
+                  recipientName: message.to,
+                  phone: message.phone,
+                  kind: message.kind,
+                  body: current,
+                });
+              }
             }}
           >
             <a href={waLink} target="_blank" rel="noreferrer">
