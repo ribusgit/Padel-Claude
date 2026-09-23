@@ -59,6 +59,8 @@ const COACH_NAV: NavItem[] = [
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];
 
+const STUDENT_NAV: NavItem[] = [{ to: "/", label: "Mi portal", icon: Wallet }];
+
 function Logo() {
   return (
     <div className="flex items-center gap-2.5">
@@ -79,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
-  const nav = isAdmin ? ADMIN_NAV : COACH_NAV;
+  const nav = isAdmin ? ADMIN_NAV : role === "coach" ? COACH_NAV : STUDENT_NAV;
 
   const handleSignOut = async () => {
     await queryClient.cancelQueries();
@@ -115,7 +117,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{userName || email}</p>
             <p className="text-[11px] uppercase tracking-widest text-primary">
-              {role === "admin" ? "Administrador" : role === "coach" ? "Profesor" : "Sin permisos"}
+              {role === "admin" ? "Administrador" : role === "coach" ? "Profesor" : role === "alumno" ? "Alumno" : "Sin permisos"}
             </p>
           </div>
           <button

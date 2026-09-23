@@ -7,7 +7,7 @@ import { StudentAvatar } from "@/components/student-avatar";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
-import { LEVEL_LABELS, PLAN_LABELS, levelCategory, monthKey } from "@/lib/padel";
+import { PLAN_LABELS, levelCategory, monthKey } from "@/lib/padel";
 
 const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const monthLabel = (m: string) => {
