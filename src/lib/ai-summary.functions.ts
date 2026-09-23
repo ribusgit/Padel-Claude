@@ -23,8 +23,8 @@ export const generateProgressSummary = createServerFn({ method: "POST" })
       .select("id, name, level, plan, enrolled_at")
       .eq("id", data.studentId)
       .maybeSingle();
-    if (sErr) throw new Error(sErr.message);
-    if (!student) throw new Error("No tienes acceso a este alumno");
+    if (sErr) return { ok: false as const, message: sErr.message };
+    if (!student) return { ok: false as const, message: "No tienes acceso a este alumno" };
 
     const [notesRes, attRes] = await Promise.all([
       supabase
