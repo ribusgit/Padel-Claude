@@ -49,7 +49,7 @@ export function StudentPortal() {
             {PLAN_LABELS[student.plan]} · {currentFee} €/mes
           </p>
         </div>
-        <LevelBadge label={LEVEL_LABELS[levelCategory(student.level)]} level={student.level} />
+        <LevelBadge level={student.level} category={levelCategory(student.level)} />
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
