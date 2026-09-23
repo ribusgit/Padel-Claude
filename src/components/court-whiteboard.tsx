@@ -177,7 +177,13 @@ function drawStroke(ctx: CanvasRenderingContext2D, s: Stroke, w: number, h: numb
   ctx.restore();
 }
 
-export function CourtWhiteboard() {
+interface CourtWhiteboardProps {
+  /** Si se indica, se muestra un botón para guardar el dibujo (PNG compuesto). */
+  onSave?: (blob: Blob) => Promise<void> | void;
+  saveLabel?: string;
+}
+
+export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtWhiteboardProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
