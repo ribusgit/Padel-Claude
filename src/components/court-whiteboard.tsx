@@ -558,25 +558,41 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
           <Button variant="secondary" size="icon" className="size-11" onClick={clear} aria-label="Limpiar pizarra">
             <Trash2 />
           </Button>
+          {onSave && (
+            <Button className="h-11" onClick={handleSave} disabled={saving}>
+              {saving ? "Guardando…" : saveLabel}
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-border bg-card p-2">
-        <canvas
-          ref={canvasRef}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endStroke}
-          onPointerCancel={endStroke}
-          onPointerLeave={endStroke}
-          onContextMenu={(e) => e.preventDefault()}
-          className="aspect-[2/1] w-full touch-none select-none rounded-xl"
-          style={{ touchAction: "none" }}
-        />
+        <div className="relative overflow-hidden rounded-xl">
+          <video
+            ref={videoRef}
+            playsInline
+            muted
+            className={cn("absolute inset-0 size-full object-cover", cameraOn ? "block" : "hidden")}
+          />
+          <canvas
+            ref={canvasRef}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endStroke}
+            onPointerCancel={endStroke}
+            onPointerLeave={endStroke}
+            onContextMenu={(e) => e.preventDefault()}
+            className="relative aspect-[2/1] w-full touch-none select-none rounded-xl"
+            style={{ touchAction: "none" }}
+          />
+        </div>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        {inputHint ?? "Dibuja con el Apple Pencil (la presión cambia el grosor) o con el dedo. Con el lápiz en uso se ignora el apoyo de la mano."}
+        {inputHint ??
+          (cameraOn
+            ? `Dibujando sobre la imagen de la cámara${frozen ? " (imagen congelada)" : ""}. Congela la imagen para corregir con calma.`
+            : "Dibuja con el Apple Pencil (la presión cambia el grosor) o con el dedo. Con el lápiz en uso se ignora el apoyo de la mano.")}
       </p>
     </div>
   );
