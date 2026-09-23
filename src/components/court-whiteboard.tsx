@@ -591,10 +591,14 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
             onPointerMove={onPointerMove}
             onPointerUp={endStroke}
             onPointerCancel={endStroke}
-            onPointerLeave={endStroke}
             onContextMenu={(e) => e.preventDefault()}
             className="relative aspect-[2/1] w-full touch-none select-none rounded-xl"
-            style={{ touchAction: "none" }}
+            style={{
+              touchAction: "none",
+              WebkitUserSelect: "none",
+              userSelect: "none",
+              WebkitTouchCallout: "none",
+            }}
           />
         </div>
       </div>
