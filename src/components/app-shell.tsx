@@ -38,7 +38,7 @@ const ADMIN_NAV: NavItem[] = [
 ];
 
 const COACH_NAV: NavItem[] = [
-  { to: "/", label: "Panel", icon: LayoutDashboard },
+  { to: "/", label: "Inicio", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
