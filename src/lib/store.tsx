@@ -15,11 +15,14 @@ import {
   type ProgressNote,
   type CourtBooking,
   type MediaItem,
+  type MaterialItem,
+  type MaterialCategory,
   type LevelCategory,
   type Plan,
   type PaymentStatus,
   type BookingType,
   type MediaKind,
+
 } from "./padel";
 
 export type Role = "admin" | "coach";
@@ -32,7 +35,10 @@ const EMPTY: AppData = {
   bookings: [],
   media: [],
   clubHours: DEFAULT_CLUB_HOURS,
+  materials: [],
+  materialBudgets: [],
 };
+
 
 interface StoreApi {
   data: AppData;
@@ -63,6 +69,11 @@ interface StoreApi {
   addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<void>;
   updateMedia: (id: string, patch: Partial<MediaItem>) => Promise<void>;
   deleteMedia: (id: string) => Promise<void>;
+  addMaterial: (m: Omit<MaterialItem, "id">) => Promise<void>;
+  updateMaterial: (id: string, patch: Partial<MaterialItem>) => Promise<void>;
+  deleteMaterial: (id: string) => Promise<void>;
+  setMaterialBudget: (month: string, amount: number) => Promise<void>;
+
 }
 
 const globalRef = globalThis as typeof globalThis & {
@@ -105,17 +116,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCoachId(profileRes.data?.coach_id ?? null);
     setUserName(profileRes.data?.full_name ?? user.email ?? "");
 
-    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours] = await Promise.all([
-      supabase.from("students").select("*").order("name"),
-      supabase.from("coaches").select("*").order("name"),
-      supabase.from("classes").select("*"),
-      supabase.from("attendance").select("*"),
-      supabase.from("progress_notes").select("*").order("date", { ascending: false }),
-      supabase.from("payments").select("*"),
-      supabase.from("bookings").select("*"),
-      supabase.from("media").select("*").order("created_at", { ascending: false }),
-      supabase.from("club_hours").select("*"),
-    ]);
+    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours, materials, budgets] =
+      await Promise.all([
+        supabase.from("students").select("*").order("name"),
+        supabase.from("coaches").select("*").order("name"),
+        supabase.from("classes").select("*"),
+        supabase.from("attendance").select("*"),
+        supabase.from("progress_notes").select("*").order("date", { ascending: false }),
+        supabase.from("payments").select("*"),
+        supabase.from("bookings").select("*"),
+        supabase.from("media").select("*").order("created_at", { ascending: false }),
+        supabase.from("club_hours").select("*"),
+        supabase.from("material_items").select("*").order("purchase_date", { ascending: false }),
+        supabase.from("material_budgets").select("*"),
+      ]);
+
 
     mediaPaths.clear();
     for (const m of media.data ?? []) mediaPaths.set(m.id, m.storage_path);
@@ -192,7 +207,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const row = (clubHours.data ?? []).find((h) => h.weekday === d.weekday);
         return row ? { weekday: row.weekday, open: row.open_time, close: row.close_time, closed: row.closed } : d;
       }),
+      materials: (materials.data ?? []).map((m) => ({
+        id: m.id,
+        name: m.name,
+        category: m.category as MaterialCategory,
+        quantity: m.quantity,
+        unitCost: Number(m.unit_cost),
+        purchaseDate: m.purchase_date,
+        supplier: m.supplier ?? "",
+        notes: m.notes ?? "",
+      })),
+      materialBudgets: (budgets.data ?? []).map((b) => ({ month: b.month, amount: Number(b.amount) })),
     });
+
     setHydrated(true);
     setLoading(false);
   }, []);
@@ -466,7 +493,46 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (path) await removeMediaFile(path);
         await refresh();
       },
+      addMaterial: async (input) => {
+        const { error } = await supabase.from("material_items").insert({
+          name: input.name,
+          category: input.category,
+          quantity: input.quantity,
+          unit_cost: input.unitCost,
+          purchase_date: input.purchaseDate,
+          supplier: input.supplier,
+          notes: input.notes,
+        });
+        if (error) throw error;
+        await refresh();
+      },
+      updateMaterial: async (id, patch) => {
+        const payload: Database["public"]["Tables"]["material_items"]["Update"] = {};
+        if (patch.name !== undefined) payload["name"] = patch.name;
+        if (patch.category !== undefined) payload["category"] = patch.category;
+        if (patch.quantity !== undefined) payload["quantity"] = patch.quantity;
+        if (patch.unitCost !== undefined) payload["unit_cost"] = patch.unitCost;
+        if (patch.purchaseDate !== undefined) payload["purchase_date"] = patch.purchaseDate;
+        if (patch.supplier !== undefined) payload["supplier"] = patch.supplier;
+        if (patch.notes !== undefined) payload["notes"] = patch.notes;
+        const { error } = await supabase.from("material_items").update(payload).eq("id", id);
+        if (error) throw error;
+        await refresh();
+      },
+      deleteMaterial: async (id) => {
+        const { error } = await supabase.from("material_items").delete().eq("id", id);
+        if (error) throw error;
+        await refresh();
+      },
+      setMaterialBudget: async (month, amount) => {
+        const { error } = await supabase
+          .from("material_budgets")
+          .upsert({ month, amount }, { onConflict: "month" });
+        if (error) throw error;
+        await refresh();
+      },
     };
+
   }, [data, hydrated, loading, role, coachId, userName, email, refresh]);
 
   return <StoreContext.Provider value={api}>{children}</StoreContext.Provider>;

@@ -8,3 +8,6 @@
 - [x] Sección en el panel del administrador con el registro de mensajes de WhatsApp enviados (los recibidos requieren WhatsApp Business).
 - [x] Sección de horarios (próximas clases) en la pantalla de inicio del profesor.
 - [x] Pizarra con webcam dentro de la pantalla de clase del profesor, sin pasar por la pizarra general.
+- [x] Apartado "Material" con inventario de compras y presupuesto mensual controlado.
+- [x] Análisis exhaustivo de técnica con IA sobre los vídeos/fotos de cada alumno, guardable en el archivo y en las notas de progreso.
+- [x] Botón en "Alumnos" para exportar a Excel el listado de alumnos con su situación de pagos.

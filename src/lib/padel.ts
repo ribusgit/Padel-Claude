@@ -99,6 +99,33 @@ export interface ClubDayHours {
   closed: boolean;
 }
 
+export type MaterialCategory = "palas" | "pelotas" | "redes" | "ropa" | "mantenimiento" | "otros";
+
+export interface MaterialItem {
+  id: string;
+  name: string;
+  category: MaterialCategory;
+  quantity: number;
+  unitCost: number;
+  purchaseDate: string; // yyyy-MM-dd
+  supplier: string;
+  notes: string;
+}
+
+export interface MaterialBudget {
+  month: string; // yyyy-MM
+  amount: number;
+}
+
+export const MATERIAL_CATEGORY_LABELS: Record<MaterialCategory, string> = {
+  palas: "Palas",
+  pelotas: "Pelotas",
+  redes: "Redes y pista",
+  ropa: "Ropa y equipación",
+  mantenimiento: "Mantenimiento",
+  otros: "Otros",
+};
+
 export interface AppData {
   students: Student[];
   coaches: Coach[];
@@ -107,10 +134,13 @@ export interface AppData {
   bookings: CourtBooking[];
   media: MediaItem[];
   clubHours: ClubDayHours[];
+  materials: MaterialItem[];
+  materialBudgets: MaterialBudget[];
 }
 
 export const COURTS = [1, 2, 3, 4];
 export const MAX_STUDENTS_PER_CLASS = 4;
+
 
 /** Franjas horarias máximas del cuadrante (07:00 – 00:00), se recortan al horario del club. */
 export const COURT_HOURS = Array.from({ length: 17 }, (_, i) => `${String(7 + i).padStart(2, "0")}:00`);
@@ -302,5 +332,16 @@ export function seedData(): AppData {
     { id: "b3", court: 2, date: d(1), start: "20:00", end: "21:30", type: "alquiler", name: "Ana y Miguel", phone: "688 987 654" },
   ];
 
-  return { students, coaches, classes, payments, bookings, media: [], clubHours: DEFAULT_CLUB_HOURS };
+  return {
+    students,
+    coaches,
+    classes,
+    payments,
+    bookings,
+    media: [],
+    clubHours: DEFAULT_CLUB_HOURS,
+    materials: [],
+    materialBudgets: [],
+  };
+
 }

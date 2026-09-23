@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState } from "@/components/padel-ui";
 import { WhatsAppButton, mediaReminder } from "@/components/whatsapp-dialog";
+import { TechniqueAnalysis } from "@/components/technique-analysis";
 import { mediaPathOf } from "@/lib/store";
 import { signedMediaUrl } from "@/lib/media-storage";
 import { useStore } from "@/lib/store";
@@ -125,6 +126,7 @@ function MediaCard({ item, student }: { item: MediaItem; student: Student }) {
                 <Trash2 />
               </Button>
             </div>
+            <TechniqueAnalysis item={item} student={student} />
           </>
         )}
       </div>
