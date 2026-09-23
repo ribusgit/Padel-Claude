@@ -186,6 +186,63 @@ export type Database = {
         }
         Relationships: []
       }
+      material_budgets: {
+        Row: {
+          amount: number
+          created_at: string
+          month: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          month: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          month?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      material_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          name: string
+          notes: string
+          purchase_date: string
+          quantity: number
+          supplier: string
+          unit_cost: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string
+          purchase_date?: string
+          quantity?: number
+          supplier?: string
+          unit_cost?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string
+          purchase_date?: string
+          quantity?: number
+          supplier?: string
+          unit_cost?: number
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           coach_id: string | null
