@@ -234,6 +234,90 @@ export function CourtWhiteboard() {
     return () => ro.disconnect();
   }, [resize]);
 
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }, []);
+
+  useEffect(() => () => stopCamera(), [stopCamera]);
+
+  // Arranca/para la cámara de la tablet y la muestra bajo el lienzo
+  useEffect(() => {
+    if (!cameraOn) {
+      stopCamera();
+      setFrozen(false);
+      repaint();
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 1920 } },
+          audio: false,
+        });
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        stopCamera();
+        streamRef.current = stream;
+        const video = videoRef.current;
+        if (video) {
+          video.srcObject = stream;
+          await video.play().catch(() => undefined);
+        }
+        setFrozen(false);
+        repaint();
+      } catch {
+        if (!cancelled) {
+          setCameraOn(false);
+          toast.error("No se pudo abrir la cámara. Revisa los permisos del navegador.");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [cameraOn, facing, repaint, stopCamera]);
+
+  const toggleFreeze = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (frozen) {
+      void video.play().catch(() => undefined);
+      setFrozen(false);
+    } else {
+      video.pause();
+      setFrozen(true);
+    }
+  };
+
+  /** Lienzo final: imagen de la cámara (o pista) + trazos. */
+  const composite = (): HTMLCanvasElement | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    if (!cameraOn) return canvas;
+    const out = document.createElement("canvas");
+    out.width = canvas.width;
+    out.height = canvas.height;
+    const ctx = out.getContext("2d");
+    const video = videoRef.current;
+    if (!ctx) return canvas;
+    ctx.fillStyle = "#0b0f0c";
+    ctx.fillRect(0, 0, out.width, out.height);
+    if (video && video.videoWidth > 0) {
+      // Recorte tipo object-cover
+      const scale = Math.max(out.width / video.videoWidth, out.height / video.videoHeight);
+      const dw = video.videoWidth * scale;
+      const dh = video.videoHeight * scale;
+      ctx.drawImage(video, (out.width - dw) / 2, (out.height - dh) / 2, dw, dh);
+    }
+    ctx.drawImage(canvas, 0, 0);
+    return out;
+  };
+
   const pointFrom = (e: PointerEvent | React.PointerEvent): Point => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
