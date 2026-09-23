@@ -191,6 +191,7 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
   const redoRef = useRef<Stroke[]>([]);
   const drawingRef = useRef<{ id: number; stroke: Stroke } | null>(null);
   const lastPenAtRef = useRef(0);
+  const penSeenRef = useRef(false);
   const sizeRef = useRef({ w: 0, h: 0 });
 
   const [tool, setTool] = useState<Tool>("pen");
@@ -240,6 +241,22 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
     if (canvasRef.current) ro.observe(canvasRef.current);
     return () => ro.disconnect();
   }, [resize]);
+
+  // iPadOS: bloquea scroll, zoom y Scribble mientras se dibuja en el lienzo
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const block = (e: Event) => e.preventDefault();
+    const opts = { passive: false } as AddEventListenerOptions;
+    canvas.addEventListener("touchstart", block, opts);
+    canvas.addEventListener("touchmove", block, opts);
+    canvas.addEventListener("gesturestart", block, opts);
+    return () => {
+      canvas.removeEventListener("touchstart", block, opts);
+      canvas.removeEventListener("touchmove", block, opts);
+      canvas.removeEventListener("gesturestart", block, opts);
+    };
+  }, []);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -337,19 +354,29 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    // Evita que iPadOS interprete el trazo como Scribble, selección o scroll
+    e.preventDefault();
+
     if (e.pointerType === "pen") {
+      penSeenRef.current = true;
       lastPenAtRef.current = Date.now();
       setInputHint("Apple Pencil detectado · presión activa");
     } else if (e.pointerType === "touch") {
-      // Rechazo de palma: con el lápiz en uso, ignoramos el contacto de la mano
-      if (!fingerDrawing || Date.now() - lastPenAtRef.current < 1500) return;
+      // Rechazo de palma: sólo si ya hemos visto el lápiz en este dispositivo
+      const palm = penSeenRef.current && Date.now() - lastPenAtRef.current < 1500;
+      if (palm) return;
+      if (!fingerDrawing && penSeenRef.current) return;
       setInputHint("Dibujando con el dedo");
     } else {
       setInputHint(null);
     }
     if (drawingRef.current) return;
 
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Safari puede rechazar la captura del lápiz; seguimos sin ella
+    }
     drawingRef.current = {
       id: e.pointerId,
       stroke: { tool, color, width, points: [pointFrom(e)] },
@@ -580,10 +607,14 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
             onPointerMove={onPointerMove}
             onPointerUp={endStroke}
             onPointerCancel={endStroke}
-            onPointerLeave={endStroke}
             onContextMenu={(e) => e.preventDefault()}
             className="relative aspect-[2/1] w-full touch-none select-none rounded-xl"
-            style={{ touchAction: "none" }}
+            style={{
+              touchAction: "none",
+              WebkitUserSelect: "none",
+              userSelect: "none",
+              WebkitTouchCallout: "none",
+            }}
           />
         </div>
       </div>
