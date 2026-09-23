@@ -51,6 +51,23 @@ function BookingsPage() {
   const dayClasses = useMemo(() => data.classes.filter((c) => c.date === dateKey), [data.classes, dateKey]);
   const dayBookings = useMemo(() => data.bookings.filter((b) => b.date === dateKey), [data.bookings, dateKey]);
 
+  // Horario real del club para el día seleccionado
+  const clubDay = clubHoursForDate(data.clubHours, selected);
+  const hours = useMemo(
+    () => (clubDay.closed ? [] : hourSlots(clubDay.open, clubDay.close)),
+    [clubDay.closed, clubDay.open, clubDay.close],
+  );
+
+  // Reloj para saber qué franja se está jugando ahora mismo
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const isToday = isSameDay(selected, now);
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const currentHour = isToday ? hours.find((h) => timeToMin(h) <= nowMin && nowMin < timeToMin(h) + 60) : undefined;
+
   const slotFor = (court: number, hour: string): Slot => {
     const hourEnd = classEndTime(hour, 60);
     const cls = dayClasses.find(
