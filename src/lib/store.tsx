@@ -117,6 +117,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         plan: s.plan as Plan,
         level: Number(s.level),
         active: s.active,
+        photoPath: s.photo_path ?? undefined,
         attendance: (attendance.data ?? [])
           .filter((a) => a.student_id === s.id)
           .map((a) => ({ classId: a.class_id, date: a.date, present: a.present })),

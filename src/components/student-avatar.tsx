@@ -41,8 +41,8 @@ export function StudentAvatar({
   className,
 }: {
   name: string;
-  photoPath?: string;
-  className?: string;
+  photoPath?: string | undefined;
+  className?: string | undefined;
 }) {
   const url = useStudentPhotoUrl(photoPath);
   return <Avatar name={name} src={url ?? undefined} className={className} />;
