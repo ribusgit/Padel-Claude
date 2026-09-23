@@ -220,6 +220,11 @@ function BookingsPage() {
               <span key={c} className="border-l border-border px-2 py-2.5 text-center">Pista {c}</span>
             ))}
           </div>
+          {hours.length === 0 && (
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+              El club está cerrado este día: no hay franjas disponibles.
+            </p>
+          )}
           {hours.map((hour) => (
             <div
               key={hour}
