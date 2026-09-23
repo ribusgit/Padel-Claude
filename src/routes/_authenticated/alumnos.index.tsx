@@ -7,6 +7,7 @@ import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { StudentDialog } from "@/components/student-dialog";
 import { DeleteStudentButton } from "@/components/delete-student-button";
+import { ExportStudentsButton } from "@/components/export-students-button";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,13 +52,16 @@ function StudentsPage() {
         subtitle={`${data.students.filter((s) => s.active).length} alumnos activos`}
         action={
           isAdmin ? (
-            <StudentDialog
-              trigger={
-                <Button>
-                  <UserPlus /> Nuevo alumno
-                </Button>
-              }
-            />
+            <div className="flex flex-wrap gap-2">
+              <ExportStudentsButton />
+              <StudentDialog
+                trigger={
+                  <Button>
+                    <UserPlus /> Nuevo alumno
+                  </Button>
+                }
+              />
+            </div>
           ) : undefined
         }
       />
