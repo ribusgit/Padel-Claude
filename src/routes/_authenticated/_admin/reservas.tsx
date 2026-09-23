@@ -165,7 +165,48 @@ function BookingsPage() {
             <ChevronRight />
           </Button>
         </div>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2">
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="size-3.5" />
+            {clubDay.closed ? "El club está cerrado este día" : `El club abre de ${clubDay.open} a ${clubDay.close}`}
+          </p>
+          <ClubHoursDialog
+            trigger={
+              <Button variant="secondary" size="sm">
+                <Clock /> Horario del club
+              </Button>
+            }
+          />
+        </div>
       </div>
+
+      {/* Ahora mismo */}
+      {isToday && !clubDay.closed && (
+        <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/5 p-3">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+            <Radio className="size-4" /> Ahora mismo · {currentHour ?? format(now, "HH:mm")}
+          </p>
+          {!currentHour ? (
+            <p className="mt-1 text-xs text-muted-foreground">Fuera del horario de apertura del club.</p>
+          ) : occupiedNow.length === 0 ? (
+            <p className="mt-1 text-xs text-muted-foreground">Las {COURTS.length} pistas están libres en esta franja.</p>
+          ) : (
+            <ul className="mt-2 space-y-1.5">
+              {occupiedNow.map(({ court, slot }) => (
+                <li key={court} className="flex items-center gap-2 text-xs">
+                  <span className="rounded-lg bg-primary/15 px-2 py-0.5 font-semibold text-primary">Pista {court}</span>
+                  <span className="min-w-0 flex-1 truncate text-foreground">
+                    {slot.kind === "libre" ? "" : slot.label}
+                  </span>
+                  <span className="shrink-0 text-muted-foreground">
+                    {slot.kind === "libre" ? "" : `hasta ${slot.end}`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* Cuadrante */}
       <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
