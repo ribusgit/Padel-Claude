@@ -7,6 +7,7 @@ import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { StudentDialog } from "@/components/student-dialog";
 import { DeleteStudentButton } from "@/components/delete-student-button";
+import { PayFeeButton } from "@/components/pay-fee-button";
 import { ExportStudentsButton } from "@/components/export-students-button";
 
 import { Button } from "@/components/ui/button";
@@ -94,6 +95,9 @@ function StudentsPage() {
           {list.map((s) => (
             <li key={s.id} className="relative">
               <div className="absolute right-3 top-1/2 z-10 flex -translate-y-1/2 items-center gap-0.5 md:right-10">
+                {s.paymentStatus === "pendiente" && (
+                  <PayFeeButton iconOnly studentId={s.id} studentName={s.name} plan={s.plan} email={s.email} />
+                )}
                 <WhatsAppButton
                   iconOnly
                   label={`Enviar recordatorio a ${s.name}`}
@@ -130,7 +134,18 @@ function StudentsPage() {
                   <LevelBadge level={s.level} />
                   <PaymentBadge status={s.paymentStatus} />
                 </div>
-                <span className={cn("shrink-0", isAdmin ? "w-[4.75rem]" : "w-9")} />
+                <span
+                  className={cn(
+                    "shrink-0",
+                    s.paymentStatus === "pendiente"
+                      ? isAdmin
+                        ? "w-[7rem]"
+                        : "w-[4.75rem]"
+                      : isAdmin
+                        ? "w-[4.75rem]"
+                        : "w-9",
+                  )}
+                />
                 <ChevronRight className="hidden size-4 shrink-0 text-muted-foreground md:block" />
               </Link>
             </li>
