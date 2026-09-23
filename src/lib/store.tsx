@@ -6,6 +6,8 @@ import {
   todayKey,
   monthKey,
   PLAN_PRICES,
+  DEFAULT_CLUB_HOURS,
+  type ClubDayHours,
   type AppData,
   type Student,
   type Coach,
