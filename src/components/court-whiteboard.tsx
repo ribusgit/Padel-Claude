@@ -494,7 +494,48 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
           ))}
         </div>
 
-        <div className="ml-auto flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5 md:ml-2">
+          <button
+            onClick={() => setCameraOn((v) => !v)}
+            aria-pressed={cameraOn}
+            className={cn(
+              "flex h-11 items-center gap-2 rounded-xl px-3 text-xs font-semibold transition-colors",
+              cameraOn ? "bg-primary text-primary-foreground glow-lime" : "bg-secondary text-muted-foreground",
+            )}
+          >
+            {cameraOn ? <Video className="size-4" /> : <VideoOff className="size-4" />}
+            {cameraOn ? "Cámara" : "Pista"}
+          </button>
+          {cameraOn && (
+            <>
+              <Button
+                variant={frozen ? "default" : "secondary"}
+                size="icon"
+                className="size-11"
+                onClick={toggleFreeze}
+                aria-label={frozen ? "Reanudar vídeo" : "Congelar imagen"}
+              >
+                <Snowflake />
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="size-11"
+                onClick={() => setFacing((f) => (f === "environment" ? "user" : "environment"))}
+                aria-label="Cambiar cámara"
+              >
+                <SwitchCamera />
+              </Button>
+            </>
+          )}
+          {!cameraOn && (
+            <span className="hidden h-11 items-center gap-2 rounded-xl bg-secondary px-3 text-xs font-semibold text-muted-foreground md:flex">
+              <LayoutGrid className="size-4" /> Pista dibujada
+            </span>
+          )}
+        </div>
+
+        <div className="ml-auto flex flex-wrap gap-1.5">
           <button
             onClick={() => setFingerDrawing((v) => !v)}
             aria-pressed={fingerDrawing}
