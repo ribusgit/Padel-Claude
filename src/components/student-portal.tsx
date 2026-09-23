@@ -1,13 +1,14 @@
+import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { CheckCircle2, Clock3, Wallet } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, Sparkles, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { StatCard, EmptyState, LevelBadge } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
-import { PLAN_LABELS, levelCategory, monthKey } from "@/lib/padel";
+import { PLAN_LABELS, isTechniqueReport, levelCategory } from "@/lib/padel";
 
 const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const monthLabel = (m: string) => {
@@ -15,9 +16,10 @@ const monthLabel = (m: string) => {
   return `${MONTHS_ES[(mm ?? 1) - 1]} ${y}`;
 };
 
-/** Portal privado del alumno: ve su cuota y paga lo que debe, sin acceso a la gestión. */
+/** Portal privado del alumno: ve su cuota, paga lo que debe y consulta su informe de técnica. */
 export function StudentPortal() {
   const { data, studentId, userName } = useStore();
+  const [reportOpen, setReportOpen] = useState(false);
   const student = data.students.find((s) => s.id === studentId);
 
   if (!student) {
@@ -36,6 +38,10 @@ export function StudentPortal() {
   const paidHistory = myPayments.filter((p) => p.paid);
   const currentFee = data.feePlans[student.plan];
   const totalDebt = pending.length * currentFee;
+
+  const latestReport = data.media
+    .filter((m) => m.studentId === student.id && isTechniqueReport(m.comment))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
 
   return (
     <>
@@ -63,6 +69,36 @@ export function StudentPortal() {
         />
       </div>
 
+      {latestReport && (
+        <section className="mt-6">
+          <h2 className="font-display text-lg font-semibold">Tu último informe de técnica</h2>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-primary/30 bg-card">
+            <button
+              type="button"
+              onClick={() => setReportOpen((v) => !v)}
+              aria-expanded={reportOpen}
+              className="flex w-full items-center gap-3 p-4 text-left"
+            >
+              <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Sparkles className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-semibold">{latestReport.title}</span>
+                <span className="block text-xs capitalize text-muted-foreground">
+                  {format(parseISO(latestReport.createdAt), "d 'de' MMMM yyyy", { locale: es })}
+                </span>
+              </span>
+              <ChevronDown className={`size-5 shrink-0 text-muted-foreground transition-transform ${reportOpen ? "rotate-180" : ""}`} />
+            </button>
+            {reportOpen && (
+              <p className="whitespace-pre-line border-t border-border p-4 text-sm leading-relaxed text-muted-foreground">
+                {latestReport.comment}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
       <section className="mt-6">
         <h2 className="font-display text-lg font-semibold">Cuotas pendientes</h2>
         {pending.length === 0 ? (
@@ -71,15 +107,13 @@ export function StudentPortal() {
           <ul className="mt-3 space-y-3">
             {pending.map((p) => (
               <li key={p.id} className="rounded-2xl border border-border bg-card p-4">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <p className="font-semibold capitalize">Cuota de {monthLabel(p.month)}</p>
-                    <p className="font-display text-xl font-bold text-warning">{currentFee} €</p>
-                  </div>
-                  <div className="flex flex-col items-stretch gap-2 sm:flex-row">
-                    <PayFeeButton studentId={student.id} studentName={student.name} plan={student.plan} email={student.email} month={p.month} />
-                    <BizumDialog studentId={student.id} studentName={student.name} amount={currentFee} month={p.month} />
-                  </div>
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="font-semibold capitalize">Cuota de {monthLabel(p.month)}</p>
+                  <p className="font-display text-2xl font-bold text-warning">{currentFee} €</p>
+                </div>
+                <div className="mt-3 grid gap-2">
+                  <PayFeeButton studentId={student.id} studentName={student.name} plan={student.plan} email={student.email} month={p.month} />
+                  <BizumDialog studentId={student.id} studentName={student.name} amount={currentFee} month={p.month} />
                 </div>
               </li>
             ))}
