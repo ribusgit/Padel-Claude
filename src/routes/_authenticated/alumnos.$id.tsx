@@ -309,6 +309,24 @@ function StudentPhotoButton({ student }: { student: Student }) {
           e.target.value = "";
         }}
       />
+      <PhotoSourceDialog
+        open={sourceOpen}
+        onOpenChange={setSourceOpen}
+        onPickFile={() => {
+          setSourceOpen(false);
+          inputRef.current?.click();
+        }}
+        onPickCamera={() => {
+          setSourceOpen(false);
+          setCameraOpen(true);
+        }}
+      />
+      <CameraCaptureDialog
+        open={cameraOpen}
+        onOpenChange={setCameraOpen}
+        title={`Foto de ${student.name}`}
+        onCapture={(file) => onFile(file)}
+      />
     </div>
   );
 }
