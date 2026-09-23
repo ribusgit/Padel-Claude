@@ -179,6 +179,8 @@ function drawStroke(ctx: CanvasRenderingContext2D, s: Stroke, w: number, h: numb
 
 export function CourtWhiteboard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const strokesRef = useRef<Stroke[]>([]);
   const redoRef = useRef<Stroke[]>([]);
   const drawingRef = useRef<{ id: number; stroke: Stroke } | null>(null);
@@ -191,13 +193,24 @@ export function CourtWhiteboard() {
   const [fingerDrawing, setFingerDrawing] = useState(true);
   const [counts, setCounts] = useState({ strokes: 0, redo: 0 });
   const [inputHint, setInputHint] = useState<string | null>(null);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [frozen, setFrozen] = useState(false);
+
+  const cameraRef = useRef(false);
+  cameraRef.current = cameraOn;
 
   const repaint = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
     const { w, h } = sizeRef.current;
-    drawCourt(ctx, w, h);
+    if (cameraRef.current) {
+      // Con la cámara activa el lienzo es transparente: se dibuja sobre el vídeo real
+      ctx.clearRect(0, 0, w, h);
+    } else {
+      drawCourt(ctx, w, h);
+    }
     for (const s of strokesRef.current) drawStroke(ctx, s, w, h);
     const live = drawingRef.current?.stroke;
     if (live) drawStroke(ctx, live, w, h);
