@@ -107,6 +107,15 @@ export function WhatsAppPreviewDialog({
             onClick={() => {
               setSent(true);
               toast.success(`Abriendo WhatsApp para ${message?.to ?? "el alumno"}…`);
+              if (message) {
+                void logWhatsAppSent({
+                  studentId: message.studentId,
+                  recipientName: message.to,
+                  phone: message.phone,
+                  kind: message.kind,
+                  body: current,
+                });
+              }
             }}
           >
             <a href={waLink} target="_blank" rel="noreferrer">
