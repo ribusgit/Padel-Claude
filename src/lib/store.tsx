@@ -38,6 +38,8 @@ interface StoreApi {
   addStudent: (s: Omit<Student, "id" | "attendance" | "notes" | "active">) => Promise<Student>;
   updateStudent: (id: string, patch: Partial<Student>) => Promise<void>;
   setStudentPhoto: (id: string, file: Blob | null) => Promise<void>;
+  deleteStudent: (id: string) => Promise<void>;
+
   addNote: (studentId: string, note: Omit<ProgressNote, "id">) => Promise<void>;
   addCoach: (c: Omit<Coach, "id">) => Promise<Coach | null>;
   addClass: (c: Omit<ClassSession, "id" | "attendance">) => Promise<void>;
@@ -256,6 +258,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (oldPath && oldPath !== newPath) await removeMediaFile(oldPath);
         await refresh();
       },
+      deleteStudent: async (id) => {
+        const student = data.students.find((s) => s.id === id);
+        const paths = data.media
+          .filter((m) => m.studentId === id)
+          .map((m) => mediaPathOf(m.id))
+          .filter((p): p is string => Boolean(p));
+        if (student?.photoPath) paths.push(student.photoPath);
+
+        // Quitar al alumno de las clases donde esté inscrito
+        for (const cls of data.classes.filter((c) => c.studentIds.includes(id))) {
+          const attendance = { ...cls.attendance };
+          delete attendance[id];
+          const { error } = await supabase
+            .from("classes")
+            .update({ student_ids: cls.studentIds.filter((sid) => sid !== id), attendance })
+            .eq("id", cls.id);
+          if (error) throw error;
+        }
+
+        for (const table of ["attendance", "media", "payments", "progress_notes", "progress_summaries"] as const) {
+          const { error } = await supabase.from(table).delete().eq("student_id", id);
+          if (error) throw error;
+        }
+
+        const { error } = await supabase.from("students").delete().eq("id", id);
+        if (error) throw error;
+
+        for (const path of paths) {
+          await removeMediaFile(path).catch(() => undefined);
+        }
+        await refresh();
+      },
+
       addNote: async (studentId, note) => {
         const { error } = await supabase.from("progress_notes").insert({
           student_id: studentId,
