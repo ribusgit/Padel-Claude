@@ -36,7 +36,11 @@ export function ProgressSummary({ studentId, studentName }: { studentId: string;
   const run = async () => {
     setBusy(true);
     try {
-      await generate({ data: { studentId } });
+      const result = await generate({ data: { studentId } });
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
       await load();
       toast.success("Resumen de evolución generado");
     } catch (error) {
