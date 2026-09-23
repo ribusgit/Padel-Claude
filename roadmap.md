@@ -6,5 +6,5 @@
 - [x] Tarifas de pago editables por el administrador
 - [x] Portal del alumno: rol "alumno", acceso limitado a sus cuotas, pago con tarjeta y Bizum
 - [x] Número de Bizum real del club configurado (665295627)
-- [ ] Probar pago completo desde Mi portal hasta la deuda actualizada
-- [ ] Home pública de la web (diseño de pádel) con botón "Entrar" que da acceso a la app
+- [x] Probar pago completo desde Mi portal hasta la deuda actualizada — verificado (Bizum)
+- [x] Home pública de la web con botón "Entrar" (el panel vive en /panel)
