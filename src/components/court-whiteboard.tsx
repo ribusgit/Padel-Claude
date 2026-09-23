@@ -10,6 +10,11 @@ import {
   Trash2,
   Download,
   Hand,
+  Video,
+  VideoOff,
+  SwitchCamera,
+  Snowflake,
+  LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -172,8 +177,16 @@ function drawStroke(ctx: CanvasRenderingContext2D, s: Stroke, w: number, h: numb
   ctx.restore();
 }
 
-export function CourtWhiteboard() {
+interface CourtWhiteboardProps {
+  /** Si se indica, se muestra un botón para guardar el dibujo (PNG compuesto). */
+  onSave?: (blob: Blob) => Promise<void> | void;
+  saveLabel?: string;
+}
+
+export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtWhiteboardProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const strokesRef = useRef<Stroke[]>([]);
   const redoRef = useRef<Stroke[]>([]);
   const drawingRef = useRef<{ id: number; stroke: Stroke } | null>(null);
@@ -186,13 +199,25 @@ export function CourtWhiteboard() {
   const [fingerDrawing, setFingerDrawing] = useState(true);
   const [counts, setCounts] = useState({ strokes: 0, redo: 0 });
   const [inputHint, setInputHint] = useState<string | null>(null);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [frozen, setFrozen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const cameraRef = useRef(false);
+  cameraRef.current = cameraOn;
 
   const repaint = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
     const { w, h } = sizeRef.current;
-    drawCourt(ctx, w, h);
+    if (cameraRef.current) {
+      // Con la cámara activa el lienzo es transparente: se dibuja sobre el vídeo real
+      ctx.clearRect(0, 0, w, h);
+    } else {
+      drawCourt(ctx, w, h);
+    }
     for (const s of strokesRef.current) drawStroke(ctx, s, w, h);
     const live = drawingRef.current?.stroke;
     if (live) drawStroke(ctx, live, w, h);
@@ -215,6 +240,90 @@ export function CourtWhiteboard() {
     if (canvasRef.current) ro.observe(canvasRef.current);
     return () => ro.disconnect();
   }, [resize]);
+
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }, []);
+
+  useEffect(() => () => stopCamera(), [stopCamera]);
+
+  // Arranca/para la cámara de la tablet y la muestra bajo el lienzo
+  useEffect(() => {
+    if (!cameraOn) {
+      stopCamera();
+      setFrozen(false);
+      repaint();
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 1920 } },
+          audio: false,
+        });
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        stopCamera();
+        streamRef.current = stream;
+        const video = videoRef.current;
+        if (video) {
+          video.srcObject = stream;
+          await video.play().catch(() => undefined);
+        }
+        setFrozen(false);
+        repaint();
+      } catch {
+        if (!cancelled) {
+          setCameraOn(false);
+          toast.error("No se pudo abrir la cámara. Revisa los permisos del navegador.");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [cameraOn, facing, repaint, stopCamera]);
+
+  const toggleFreeze = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (frozen) {
+      void video.play().catch(() => undefined);
+      setFrozen(false);
+    } else {
+      video.pause();
+      setFrozen(true);
+    }
+  };
+
+  /** Lienzo final: imagen de la cámara (o pista) + trazos. */
+  const composite = (): HTMLCanvasElement | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    if (!cameraOn) return canvas;
+    const out = document.createElement("canvas");
+    out.width = canvas.width;
+    out.height = canvas.height;
+    const ctx = out.getContext("2d");
+    const video = videoRef.current;
+    if (!ctx) return canvas;
+    ctx.fillStyle = "#0b0f0c";
+    ctx.fillRect(0, 0, out.width, out.height);
+    if (video && video.videoWidth > 0) {
+      // Recorte tipo object-cover
+      const scale = Math.max(out.width / video.videoWidth, out.height / video.videoHeight);
+      const dw = video.videoWidth * scale;
+      const dh = video.videoHeight * scale;
+      ctx.drawImage(video, (out.width - dw) / 2, (out.height - dh) / 2, dw, dh);
+    }
+    ctx.drawImage(canvas, 0, 0);
+    return out;
+  };
 
   const pointFrom = (e: PointerEvent | React.PointerEvent): Point => {
     const canvas = canvasRef.current!;
@@ -300,13 +409,30 @@ export function CourtWhiteboard() {
   };
 
   const download = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const out = composite();
+    if (!out) return;
     const link = document.createElement("a");
     link.download = `pizarra-padel-${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = out.toDataURL("image/png");
     link.click();
     toast.success("Imagen guardada");
+  };
+
+  const handleSave = async () => {
+    if (!onSave) return;
+    const out = composite();
+    if (!out) return;
+    const blob = await new Promise<Blob | null>((resolve) => out.toBlob(resolve, "image/png"));
+    if (!blob) {
+      toast.error("No se pudo generar la imagen");
+      return;
+    }
+    setSaving(true);
+    try {
+      await onSave(blob);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -368,7 +494,48 @@ export function CourtWhiteboard() {
           ))}
         </div>
 
-        <div className="ml-auto flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5 md:ml-2">
+          <button
+            onClick={() => setCameraOn((v) => !v)}
+            aria-pressed={cameraOn}
+            className={cn(
+              "flex h-11 items-center gap-2 rounded-xl px-3 text-xs font-semibold transition-colors",
+              cameraOn ? "bg-primary text-primary-foreground glow-lime" : "bg-secondary text-muted-foreground",
+            )}
+          >
+            {cameraOn ? <Video className="size-4" /> : <VideoOff className="size-4" />}
+            {cameraOn ? "Cámara" : "Pista"}
+          </button>
+          {cameraOn && (
+            <>
+              <Button
+                variant={frozen ? "default" : "secondary"}
+                size="icon"
+                className="size-11"
+                onClick={toggleFreeze}
+                aria-label={frozen ? "Reanudar vídeo" : "Congelar imagen"}
+              >
+                <Snowflake />
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="size-11"
+                onClick={() => setFacing((f) => (f === "environment" ? "user" : "environment"))}
+                aria-label="Cambiar cámara"
+              >
+                <SwitchCamera />
+              </Button>
+            </>
+          )}
+          {!cameraOn && (
+            <span className="hidden h-11 items-center gap-2 rounded-xl bg-secondary px-3 text-xs font-semibold text-muted-foreground md:flex">
+              <LayoutGrid className="size-4" /> Pista dibujada
+            </span>
+          )}
+        </div>
+
+        <div className="ml-auto flex flex-wrap gap-1.5">
           <button
             onClick={() => setFingerDrawing((v) => !v)}
             aria-pressed={fingerDrawing}
@@ -391,25 +558,41 @@ export function CourtWhiteboard() {
           <Button variant="secondary" size="icon" className="size-11" onClick={clear} aria-label="Limpiar pizarra">
             <Trash2 />
           </Button>
+          {onSave && (
+            <Button className="h-11" onClick={handleSave} disabled={saving}>
+              {saving ? "Guardando…" : saveLabel}
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-border bg-card p-2">
-        <canvas
-          ref={canvasRef}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endStroke}
-          onPointerCancel={endStroke}
-          onPointerLeave={endStroke}
-          onContextMenu={(e) => e.preventDefault()}
-          className="aspect-[2/1] w-full touch-none select-none rounded-xl"
-          style={{ touchAction: "none" }}
-        />
+        <div className="relative overflow-hidden rounded-xl">
+          <video
+            ref={videoRef}
+            playsInline
+            muted
+            className={cn("absolute inset-0 size-full object-cover", cameraOn ? "block" : "hidden")}
+          />
+          <canvas
+            ref={canvasRef}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endStroke}
+            onPointerCancel={endStroke}
+            onPointerLeave={endStroke}
+            onContextMenu={(e) => e.preventDefault()}
+            className="relative aspect-[2/1] w-full touch-none select-none rounded-xl"
+            style={{ touchAction: "none" }}
+          />
+        </div>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        {inputHint ?? "Dibuja con el Apple Pencil (la presión cambia el grosor) o con el dedo. Con el lápiz en uso se ignora el apoyo de la mano."}
+        {inputHint ??
+          (cameraOn
+            ? `Dibujando sobre la imagen de la cámara${frozen ? " (imagen congelada)" : ""}. Congela la imagen para corregir con calma.`
+            : "Dibuja con el Apple Pencil (la presión cambia el grosor) o con el dedo. Con el lápiz en uso se ignora el apoyo de la mano.")}
       </p>
     </div>
   );

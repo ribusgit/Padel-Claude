@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { LevelBadge, PaymentBadge, Avatar, EmptyState } from "@/components/padel-ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMedia } from "@/components/student-media";
+import { StudentWhiteboard } from "@/components/student-whiteboard";
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
@@ -136,10 +137,15 @@ function StudentDetail() {
         <TabsList className="w-full">
           <TabsTrigger value="resumen" className="flex-1">Seguimiento</TabsTrigger>
           <TabsTrigger value="multimedia" className="flex-1">Análisis Multimedia</TabsTrigger>
+          <TabsTrigger value="pizarra" className="flex-1">Pizarra</TabsTrigger>
         </TabsList>
 
         <TabsContent value="multimedia" className="mt-4">
           <StudentMedia student={student} />
+        </TabsContent>
+
+        <TabsContent value="pizarra" className="mt-4">
+          <StudentWhiteboard student={student} />
         </TabsContent>
 
         <TabsContent value="resumen" className="mt-4 space-y-6">
