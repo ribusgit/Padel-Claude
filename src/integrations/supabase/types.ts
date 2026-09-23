@@ -380,18 +380,21 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          student_id: string | null
         }
         Insert: {
           coach_id?: string | null
           created_at?: string
           full_name?: string
           id: string
+          student_id?: string | null
         }
         Update: {
           coach_id?: string | null
           created_at?: string
           full_name?: string
           id?: string
+          student_id?: string | null
         }
         Relationships: [
           {
@@ -399,6 +402,13 @@ export type Database = {
             columns: ["coach_id"]
             isOneToOne: false
             referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -607,7 +617,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "coach"
+      app_role: "admin" | "coach" | "alumno"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -735,7 +745,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "coach"],
+      app_role: ["admin", "coach", "alumno"],
     },
   },
 } as const
