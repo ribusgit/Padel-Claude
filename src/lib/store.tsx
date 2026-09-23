@@ -119,7 +119,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCoachId(profileRes.data?.coach_id ?? null);
     setUserName(profileRes.data?.full_name ?? user.email ?? "");
 
-    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours, materials, budgets] =
+    const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours, materials, budgets, feePlans, settings] =
       await Promise.all([
         supabase.from("students").select("*").order("name"),
         supabase.from("coaches").select("*").order("name"),
