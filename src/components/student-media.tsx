@@ -19,7 +19,7 @@ import { framesFromFile } from "@/lib/technique-frames";
 import { analyzeTechnique } from "@/lib/technique-analysis.functions";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { MediaItem, Student } from "@/lib/padel";
+import { TECHNIQUE_REPORT_MARK, type MediaItem, type Student } from "@/lib/padel";
 
 const MAX_SIZE = 80 * 1024 * 1024; // 80 MB por archivo
 

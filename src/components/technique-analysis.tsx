@@ -9,7 +9,7 @@ import { analyzeTechnique } from "@/lib/technique-analysis.functions";
 import { mediaPathOf, useStore } from "@/lib/store";
 import { signedMediaUrl } from "@/lib/media-storage";
 import { framesFromUrl } from "@/lib/technique-frames";
-import type { MediaItem, Student } from "@/lib/padel";
+import { TECHNIQUE_REPORT_MARK, type MediaItem, type Student } from "@/lib/padel";
 
 
 /**
