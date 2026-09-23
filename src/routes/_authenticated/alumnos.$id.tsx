@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { LevelBadge, PaymentBadge, Avatar, EmptyState } from "@/components/padel-ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMedia } from "@/components/student-media";
+import { StudentWhiteboard } from "@/components/student-whiteboard";
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
