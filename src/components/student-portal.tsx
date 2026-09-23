@@ -36,7 +36,6 @@ export function StudentPortal() {
   const paidHistory = myPayments.filter((p) => p.paid);
   const currentFee = data.feePlans[student.plan];
   const totalDebt = pending.length * currentFee;
-  const currentFee = data.feePlans[student.plan];
 
   return (
     <>
