@@ -20,6 +20,7 @@ import {
   type LevelCategory,
   type Plan,
   type PaymentStatus,
+  type PaymentMethod,
   type BookingType,
   type MediaKind,
 
@@ -221,6 +222,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         notes: m.notes ?? "",
       })),
       materialBudgets: (budgets.data ?? []).map((b) => ({ month: b.month, amount: Number(b.amount) })),
+      feePlans: {
+        "1x": Number((feePlans.data ?? []).find((f) => f.plan === "1x")?.amount ?? PLAN_PRICES["1x"]),
+        "2x": Number((feePlans.data ?? []).find((f) => f.plan === "2x")?.amount ?? PLAN_PRICES["2x"]),
+        particular: Number((feePlans.data ?? []).find((f) => f.plan === "particular")?.amount ?? PLAN_PRICES.particular),
+      },
+      bizumPhone: settings.data?.bizum_phone ?? "",
     });
 
     setHydrated(true);
