@@ -332,5 +332,16 @@ export function seedData(): AppData {
     { id: "b3", court: 2, date: d(1), start: "20:00", end: "21:30", type: "alquiler", name: "Ana y Miguel", phone: "688 987 654" },
   ];
 
-  return { students, coaches, classes, payments, bookings, media: [], clubHours: DEFAULT_CLUB_HOURS };
+  return {
+    students,
+    coaches,
+    classes,
+    payments,
+    bookings,
+    media: [],
+    clubHours: DEFAULT_CLUB_HOURS,
+    materials: [],
+    materialBudgets: [],
+  };
+
 }
