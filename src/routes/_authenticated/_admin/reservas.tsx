@@ -101,10 +101,15 @@ function BookingsPage() {
   };
 
   const occupiedSlots = COURTS.reduce(
-    (n, court) => n + COURT_HOURS.filter((h) => slotFor(court, h).kind !== "libre").length,
+    (n, court) => n + hours.filter((h) => slotFor(court, h).kind !== "libre").length,
     0,
   );
-  const totalSlots = COURTS.length * COURT_HOURS.length;
+  const totalSlots = COURTS.length * hours.length;
+
+  /** Pistas ocupadas en la franja que se está jugando ahora mismo. */
+  const occupiedNow = currentHour
+    ? COURTS.map((court) => ({ court, slot: slotFor(court, currentHour) })).filter((x) => x.slot.kind !== "libre")
+    : [];
 
   const agenda = [
     ...dayClasses.map((c) => ({
