@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { LevelBadge, Avatar, EmptyState } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, classReminder } from "@/components/whatsapp-dialog";
+import { ClassWhiteboard } from "@/components/class-whiteboard";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { todayKey } from "@/lib/padel";
@@ -132,6 +133,7 @@ function MyClasses() {
                     })}
                   </ul>
                 )}
+                <ClassWhiteboard session={c} students={students} />
               </section>
             );
           })}
