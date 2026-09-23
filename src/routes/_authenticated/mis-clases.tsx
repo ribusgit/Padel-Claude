@@ -72,7 +72,7 @@ function MyClasses() {
                       const state = c.attendance[s.id];
                       return (
                         <li key={s.id} className="flex items-center gap-3 px-4 py-3">
-                          <Avatar name={s.name} />
+                          <StudentAvatar name={s.name} photoPath={s.photoPath} />
                           <div className="min-w-0 flex-1">
                             <Link to="/alumnos/$id" params={{ id: s.id }} className="truncate font-medium hover:underline">
                               {s.name}
