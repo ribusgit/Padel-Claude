@@ -132,6 +132,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         supabase.from("club_hours").select("*"),
         supabase.from("material_items").select("*").order("purchase_date", { ascending: false }),
         supabase.from("material_budgets").select("*"),
+        supabase.from("fee_plans").select("*"),
+        supabase.from("club_settings").select("bizum_phone").eq("id", true).maybeSingle(),
       ]);
 
 

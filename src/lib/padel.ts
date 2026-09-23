@@ -366,6 +366,7 @@ export function seedData(): AppData {
     clubHours: DEFAULT_CLUB_HOURS,
     materials: [],
     materialBudgets: [],
+    feePlans: PLAN_PRICES,
+    bizumPhone: "",
   };
-
 }
