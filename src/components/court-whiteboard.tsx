@@ -402,13 +402,30 @@ export function CourtWhiteboard() {
   };
 
   const download = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const out = composite();
+    if (!out) return;
     const link = document.createElement("a");
     link.download = `pizarra-padel-${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = out.toDataURL("image/png");
     link.click();
     toast.success("Imagen guardada");
+  };
+
+  const handleSave = async () => {
+    if (!onSave) return;
+    const out = composite();
+    if (!out) return;
+    const blob = await new Promise<Blob | null>((resolve) => out.toBlob(resolve, "image/png"));
+    if (!blob) {
+      toast.error("No se pudo generar la imagen");
+      return;
+    }
+    setSaving(true);
+    try {
+      await onSave(blob);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
