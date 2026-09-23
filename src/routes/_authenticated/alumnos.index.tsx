@@ -126,7 +126,7 @@ function StudentsPage() {
                   <LevelBadge level={s.level} />
                   <PaymentBadge status={s.paymentStatus} />
                 </div>
-                <span className="w-9 shrink-0" />
+                <span className={cn("shrink-0", isAdmin ? "w-[4.75rem]" : "w-9")} />
                 <ChevronRight className="hidden size-4 shrink-0 text-muted-foreground md:block" />
               </Link>
             </li>
