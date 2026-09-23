@@ -23,6 +23,8 @@ export interface WhatsAppMessage {
   body: string;
   /** Etiqueta contextual, p. ej. "Recordatorio de pago". */
   kind: string;
+  /** Alumno destinatario, para el historial de mensajes. */
+  studentId?: string | undefined;
 }
 
 export function WhatsAppPreviewDialog({
