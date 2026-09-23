@@ -60,6 +60,41 @@ function PaymentsPage() {
         <StatCard label="Previsto" value={`${collected + owed} €`} icon={Euro} />
       </div>
 
+      {data.bizumPhone.trim() && rows.some((r) => !r.paid) ? (
+        <section className="mt-5 rounded-2xl border border-primary/40 bg-primary/5 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="font-display text-base font-bold">Bizum por confirmar</h2>
+              <p className="text-xs text-muted-foreground">
+                Cuando recibas el Bizum en {data.bizumPhone}, confírmalo aquí y la deuda del alumno se actualiza al instante.
+              </p>
+            </div>
+          </div>
+          <ul className="mt-3 space-y-2">
+            {rows.filter((r) => !r.paid).map(({ student: s, amount }) => (
+              <li key={s.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5">
+                <StudentAvatar name={s.name} photoPath={s.photoPath} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{s.name}</p>
+                  <p className="text-xs text-muted-foreground">{amount} € · {PLAN_LABELS[s.plan]}</p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    void setPaid(s.id, true, "bizum");
+                    toast.success(`Bizum de ${s.name} confirmado`);
+                  }}
+                >
+                  Confirmar Bizum
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+
+
       <div className="mt-5 flex gap-1.5">
         {(["todos", "pendiente", "pagado"] as Tab[]).map((t) => (
           <button
