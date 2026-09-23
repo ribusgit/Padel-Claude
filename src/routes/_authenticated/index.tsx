@@ -3,7 +3,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Users, CalendarDays, LandPlot, AlertCircle, UserPlus, CalendarPlus, ChevronRight, Clock } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
-import { StatCard, LevelBadge, Avatar, EmptyState } from "@/components/padel-ui";
+import { StatCard, LevelBadge, EmptyState } from "@/components/padel-ui";
+import { StudentAvatar } from "@/components/student-avatar";
 import { StudentDialog } from "@/components/student-dialog";
 import { ClassDialog } from "@/components/class-dialog";
 import { BookingDialog } from "@/components/booking-dialog";
@@ -125,7 +126,7 @@ function Dashboard() {
                     params={{ id: s.id }}
                     className="flex items-center gap-3 rounded-2xl border border-warning/30 bg-card p-3 transition-colors hover:bg-accent"
                   >
-                    <Avatar name={s.name} />
+                    <StudentAvatar name={s.name} photoPath={s.photoPath} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{s.name}</p>
                       <p className="text-xs text-muted-foreground">{s.phone}</p>

@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, UserPlus, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
-import { LevelBadge, PaymentBadge, Avatar, EmptyState } from "@/components/padel-ui";
+import { LevelBadge, PaymentBadge, EmptyState } from "@/components/padel-ui";
+import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { StudentDialog } from "@/components/student-dialog";
 import { Button } from "@/components/ui/button";
@@ -106,7 +107,7 @@ function StudentsPage() {
                 params={{ id: s.id }}
                 className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:bg-accent md:p-4"
               >
-                <Avatar name={s.name} />
+                <StudentAvatar name={s.name} photoPath={s.photoPath} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{s.name}</p>
                   <p className="truncate text-xs text-muted-foreground">

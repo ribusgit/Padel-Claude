@@ -80,7 +80,7 @@ export function StatCard({
   );
 }
 
-export function Avatar({ name, className }: { name: string; className?: string }) {
+export function Avatar({ name, src, className }: { name: string; src?: string | undefined; className?: string | undefined }) {
   const initials = name
     .split(" ")
     .slice(0, 2)
@@ -90,11 +90,11 @@ export function Avatar({ name, className }: { name: string; className?: string }
   return (
     <span
       className={cn(
-        "flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary font-display text-sm font-bold text-foreground",
+        "relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary font-display text-sm font-bold text-foreground",
         className,
       )}
     >
-      {initials}
+      {src ? <img src={src} alt={name} className="absolute inset-0 size-full object-cover" /> : initials}
     </span>
   );
 }

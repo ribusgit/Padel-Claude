@@ -37,6 +37,7 @@ interface StoreApi {
   signOut: () => Promise<void>;
   addStudent: (s: Omit<Student, "id" | "attendance" | "notes" | "active">) => Promise<Student>;
   updateStudent: (id: string, patch: Partial<Student>) => Promise<void>;
+  setStudentPhoto: (id: string, file: Blob | null) => Promise<void>;
   addNote: (studentId: string, note: Omit<ProgressNote, "id">) => Promise<void>;
   addCoach: (c: Omit<Coach, "id">) => Promise<Coach | null>;
   addClass: (c: Omit<ClassSession, "id" | "attendance">) => Promise<void>;
@@ -116,6 +117,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         plan: s.plan as Plan,
         level: Number(s.level),
         active: s.active,
+        photoPath: s.photo_path ?? undefined,
         attendance: (attendance.data ?? [])
           .filter((a) => a.student_id === s.id)
           .map((a) => ({ classId: a.class_id, date: a.date, present: a.present })),
@@ -238,6 +240,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (patch.paymentStatus !== undefined) payload["payment_status"] = patch.paymentStatus;
         const { error } = await supabase.from("students").update(payload).eq("id", id);
         if (error) throw error;
+        await refresh();
+      },
+      setStudentPhoto: async (id, file) => {
+        const oldPath = data.students.find((s) => s.id === id)?.photoPath;
+        let newPath: string | null = null;
+        if (file) {
+          newPath = await uploadMediaFile(id, file, `avatar-${Date.now()}.jpg`);
+        }
+        const { error } = await supabase.from("students").update({ photo_path: newPath }).eq("id", id);
+        if (error) {
+          if (newPath) await removeMediaFile(newPath);
+          throw error;
+        }
+        if (oldPath && oldPath !== newPath) await removeMediaFile(oldPath);
         await refresh();
       },
       addNote: async (studentId, note) => {

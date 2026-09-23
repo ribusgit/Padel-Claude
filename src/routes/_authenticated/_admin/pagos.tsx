@@ -5,7 +5,8 @@ import { es } from "date-fns/locale";
 import { CheckCircle2, Clock3, Euro, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
-import { StatCard, Avatar, EmptyState } from "@/components/padel-ui";
+import { StatCard, EmptyState } from "@/components/padel-ui";
+import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
@@ -74,7 +75,7 @@ function PaymentsPage() {
         <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
           {visible.map(({ student: s, amount, paid, paidAt }) => (
             <li key={s.id} className="flex items-center gap-3 p-3 md:p-4">
-              <Avatar name={s.name} />
+              <StudentAvatar name={s.name} photoPath={s.photoPath} />
               <div className="min-w-0 flex-1">
                 <Link to="/alumnos/$id" params={{ id: s.id }} className="truncate font-semibold hover:underline">
                   {s.name}

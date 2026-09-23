@@ -383,6 +383,7 @@ export type Database = {
           name: string
           payment_status: string
           phone: string
+          photo_path: string | null
           plan: string
         }
         Insert: {
@@ -395,6 +396,7 @@ export type Database = {
           name: string
           payment_status?: string
           phone?: string
+          photo_path?: string | null
           plan?: string
         }
         Update: {
@@ -407,6 +409,7 @@ export type Database = {
           name?: string
           payment_status?: string
           phone?: string
+          photo_path?: string | null
           plan?: string
         }
         Relationships: []
