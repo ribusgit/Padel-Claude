@@ -15,11 +15,14 @@ import {
   type ProgressNote,
   type CourtBooking,
   type MediaItem,
+  type MaterialItem,
+  type MaterialCategory,
   type LevelCategory,
   type Plan,
   type PaymentStatus,
   type BookingType,
   type MediaKind,
+
 } from "./padel";
 
 export type Role = "admin" | "coach";
@@ -32,7 +35,10 @@ const EMPTY: AppData = {
   bookings: [],
   media: [],
   clubHours: DEFAULT_CLUB_HOURS,
+  materials: [],
+  materialBudgets: [],
 };
+
 
 interface StoreApi {
   data: AppData;
@@ -63,6 +69,11 @@ interface StoreApi {
   addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<void>;
   updateMedia: (id: string, patch: Partial<MediaItem>) => Promise<void>;
   deleteMedia: (id: string) => Promise<void>;
+  addMaterial: (m: Omit<MaterialItem, "id">) => Promise<void>;
+  updateMaterial: (id: string, patch: Partial<MaterialItem>) => Promise<void>;
+  deleteMaterial: (id: string) => Promise<void>;
+  setMaterialBudget: (month: string, amount: number) => Promise<void>;
+
 }
 
 const globalRef = globalThis as typeof globalThis & {
