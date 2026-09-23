@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { LevelBadge, PaymentBadge, Avatar, EmptyState } from "@/components/padel-ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMedia } from "@/components/student-media";
+import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -141,7 +142,9 @@ function StudentDetail() {
           <StudentMedia student={student} />
         </TabsContent>
 
-        <TabsContent value="resumen" className="mt-4 grid gap-6 lg:grid-cols-2">
+        <TabsContent value="resumen" className="mt-4 space-y-6">
+        <ProgressSummary studentId={student.id} studentName={student.name} />
+        <div className="grid gap-6 lg:grid-cols-2">
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Historial de asistencia</h2>
@@ -211,6 +214,7 @@ function StudentDetail() {
             </ul>
           )}
         </section>
+        </div>
         </TabsContent>
       </Tabs>
     </>
