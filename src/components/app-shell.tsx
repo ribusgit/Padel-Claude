@@ -16,7 +16,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 
-type NavTo = "/" | "/alumnos" | "/calendario" | "/reservas" | "/profesores" | "/pagos" | "/mis-clases";
+type NavTo =
+  | "/"
+  | "/alumnos"
+  | "/calendario"
+  | "/reservas"
+  | "/profesores"
+  | "/pagos"
+  | "/mis-clases"
+  | "/pizarra";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
 const ADMIN_NAV: NavItem[] = [
@@ -24,6 +32,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
   { to: "/reservas", label: "Pistas", icon: LandPlot },
+  { to: "/pizarra", label: "Pizarra", icon: PenTool },
   { to: "/profesores", label: "Profesores", icon: GraduationCap },
   { to: "/pagos", label: "Pagos", icon: Wallet },
 ];
@@ -32,6 +41,7 @@ const COACH_NAV: NavItem[] = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
+  { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];
 
 function Logo() {
