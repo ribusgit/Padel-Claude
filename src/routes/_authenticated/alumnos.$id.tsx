@@ -136,10 +136,15 @@ function StudentDetail() {
         <TabsList className="w-full">
           <TabsTrigger value="resumen" className="flex-1">Seguimiento</TabsTrigger>
           <TabsTrigger value="multimedia" className="flex-1">Análisis Multimedia</TabsTrigger>
+          <TabsTrigger value="pizarra" className="flex-1">Pizarra</TabsTrigger>
         </TabsList>
 
         <TabsContent value="multimedia" className="mt-4">
           <StudentMedia student={student} />
+        </TabsContent>
+
+        <TabsContent value="pizarra" className="mt-4">
+          <StudentWhiteboard student={student} />
         </TabsContent>
 
         <TabsContent value="resumen" className="mt-4 space-y-6">
