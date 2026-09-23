@@ -38,7 +38,7 @@ type NavTo =
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
 const ADMIN_NAV: NavItem[] = [
-  { to: "/", label: "Panel", icon: LayoutDashboard },
+  { to: "/panel", label: "Panel", icon: LayoutDashboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
   { to: "/horarios", label: "Horarios", icon: CalendarClock },
@@ -53,13 +53,13 @@ const ADMIN_NAV: NavItem[] = [
 
 
 const COACH_NAV: NavItem[] = [
-  { to: "/", label: "Inicio", icon: LayoutDashboard },
+  { to: "/panel", label: "Inicio", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];
 
-const STUDENT_NAV: NavItem[] = [{ to: "/", label: "Mi portal", icon: Wallet }];
+const STUDENT_NAV: NavItem[] = [{ to: "/panel", label: "Mi portal", icon: Wallet }];
 
 function Logo() {
   return (

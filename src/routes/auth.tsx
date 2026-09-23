@@ -30,7 +30,7 @@ function AuthPage() {
     void (async () => {
       const { data: session } = await supabase.auth.getSession();
       if (session.session) {
-        void navigate({ to: "/", replace: true });
+        void navigate({ to: "/panel", replace: true });
         return;
       }
       const { data } = await supabase.from("school_state").select("admin_claimed").maybeSingle();
@@ -46,7 +46,7 @@ function AuthPage() {
       toast.error("Correo o contraseña incorrectos");
       return;
     }
-    void navigate({ to: "/", replace: true });
+    void navigate({ to: "/panel", replace: true });
   };
 
   const createAdmin = async () => {
@@ -85,7 +85,7 @@ function AuthPage() {
     await supabase.from("school_state").update({ admin_claimed: true }).eq("id", true);
     setBusy(false);
     toast.success("Cuenta de administrador creada");
-    void navigate({ to: "/", replace: true });
+    void navigate({ to: "/panel", replace: true });
   };
 
   return (
