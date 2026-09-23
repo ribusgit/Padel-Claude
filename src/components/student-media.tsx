@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { EmptyState } from "@/components/padel-ui";
 import { WhatsAppButton, mediaReminder } from "@/components/whatsapp-dialog";
 import { TechniqueAnalysis } from "@/components/technique-analysis";
+import { CoachViewButton } from "@/components/coach-view-button";
 import { mediaPathOf } from "@/lib/store";
 import { signedMediaUrl } from "@/lib/media-storage";
 import { useStore } from "@/lib/store";
@@ -113,6 +114,7 @@ function MediaCard({ item, student }: { item: MediaItem; student: Student }) {
                 }}
                 label="Notificar"
               />
+              {item.kind === "video" && <CoachViewButton item={item} />}
               <Button
                 size="icon"
                 variant="ghost"
