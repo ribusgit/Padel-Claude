@@ -493,7 +493,46 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (path) await removeMediaFile(path);
         await refresh();
       },
+      addMaterial: async (input) => {
+        const { error } = await supabase.from("material_items").insert({
+          name: input.name,
+          category: input.category,
+          quantity: input.quantity,
+          unit_cost: input.unitCost,
+          purchase_date: input.purchaseDate,
+          supplier: input.supplier,
+          notes: input.notes,
+        });
+        if (error) throw error;
+        await refresh();
+      },
+      updateMaterial: async (id, patch) => {
+        const payload: Database["public"]["Tables"]["material_items"]["Update"] = {};
+        if (patch.name !== undefined) payload["name"] = patch.name;
+        if (patch.category !== undefined) payload["category"] = patch.category;
+        if (patch.quantity !== undefined) payload["quantity"] = patch.quantity;
+        if (patch.unitCost !== undefined) payload["unit_cost"] = patch.unitCost;
+        if (patch.purchaseDate !== undefined) payload["purchase_date"] = patch.purchaseDate;
+        if (patch.supplier !== undefined) payload["supplier"] = patch.supplier;
+        if (patch.notes !== undefined) payload["notes"] = patch.notes;
+        const { error } = await supabase.from("material_items").update(payload).eq("id", id);
+        if (error) throw error;
+        await refresh();
+      },
+      deleteMaterial: async (id) => {
+        const { error } = await supabase.from("material_items").delete().eq("id", id);
+        if (error) throw error;
+        await refresh();
+      },
+      setMaterialBudget: async (month, amount) => {
+        const { error } = await supabase
+          .from("material_budgets")
+          .upsert({ month, amount }, { onConflict: "month" });
+        if (error) throw error;
+        await refresh();
+      },
     };
+
   }, [data, hydrated, loading, role, coachId, userName, email, refresh]);
 
   return <StoreContext.Provider value={api}>{children}</StoreContext.Provider>;
