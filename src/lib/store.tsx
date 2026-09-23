@@ -26,7 +26,7 @@ import {
 
 } from "./padel";
 
-export type Role = "admin" | "coach";
+export type Role = "admin" | "coach" | "alumno";
 
 const EMPTY: AppData = {
   students: [],
@@ -50,6 +50,8 @@ interface StoreApi {
   role: Role | null;
   isAdmin: boolean;
   coachId: string | null;
+  /** Ficha de alumno vinculada a la cuenta (rol "alumno"). */
+  studentId: string | null;
   userName: string;
   email: string;
   refresh: () => Promise<void>;
@@ -96,6 +98,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<Role | null>(null);
   const [coachId, setCoachId] = useState<string | null>(null);
+  const [studentId, setStudentId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -112,13 +115,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setEmail(user.email ?? "");
 
     const [profileRes, rolesRes] = await Promise.all([
-      supabase.from("profiles").select("full_name, coach_id").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("full_name, coach_id, student_id").eq("id", user.id).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", user.id),
     ]);
     const roles = (rolesRes.data ?? []).map((r) => r.role as Role);
-    const myRole: Role | null = roles.includes("admin") ? "admin" : roles.includes("coach") ? "coach" : null;
+    const myRole: Role | null = roles.includes("admin") ? "admin" : roles.includes("coach") ? "coach" : roles.includes("alumno") ? "alumno" : null;
     setRole(myRole);
     setCoachId(profileRes.data?.coach_id ?? null);
+    setStudentId(profileRes.data?.student_id ?? null);
     setUserName(profileRes.data?.full_name ?? user.email ?? "");
 
     const [students, coaches, classes, attendance, notes, payments, bookings, media, clubHours, materials, budgets, feePlans, settings] =
@@ -268,6 +272,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       role,
       isAdmin: role === "admin",
       coachId,
+      studentId,
       userName,
       email,
       refresh,
