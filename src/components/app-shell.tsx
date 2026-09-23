@@ -47,6 +47,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/pagos", label: "Pagos", icon: Wallet },
   { to: "/material", label: "Material", icon: Package },
   { to: "/mensajes", label: "Mensajes", icon: MessageCircle },
+  { to: "/informes", label: "Informes", icon: Sparkles },
 ];
 
 
