@@ -36,8 +36,9 @@ export function StudentPortal() {
     .sort((a, b) => b.month.localeCompare(a.month));
   const pending = myPayments.filter((p) => !p.paid);
   const paidHistory = myPayments.filter((p) => p.paid);
-  const currentFee = data.feePlans[student.plan];
-  const totalDebt = pending.length * currentFee;
+  // Las tarifas son solo para administradores; el alumno ve el importe de sus propias cuotas.
+  const currentFee = myPayments[0]?.amount ?? 0;
+  const totalDebt = pending.reduce((sum, p) => sum + p.amount, 0);
 
   const latestReport = data.media
     .filter((m) => m.studentId === student.id && isTechniqueReport(m.comment))
@@ -52,14 +53,14 @@ export function StudentPortal() {
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold">{student.name}</p>
           <p className="text-xs text-muted-foreground">
-            {PLAN_LABELS[student.plan]} · {currentFee} €/mes
+            {PLAN_LABELS[student.plan]}{currentFee > 0 ? ` · ${currentFee} €/mes` : ""}
           </p>
         </div>
         <LevelBadge level={student.level} category={levelCategory(student.level)} />
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <StatCard label="Cuota mensual" value={`${currentFee} €`} icon={Wallet} tone="primary" />
+        <StatCard label="Cuota mensual" value={currentFee > 0 ? `${currentFee} €` : "—"} icon={Wallet} tone="primary" />
         <StatCard
           label="Pendiente"
           value={`${totalDebt} €`}
@@ -109,11 +110,11 @@ export function StudentPortal() {
               <li key={p.id} className="rounded-2xl border border-border bg-card p-4">
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="font-semibold capitalize">Cuota de {monthLabel(p.month)}</p>
-                  <p className="font-display text-2xl font-bold text-warning">{currentFee} €</p>
+                  <p className="font-display text-2xl font-bold text-warning">{p.amount} €</p>
                 </div>
                 <div className="mt-3 grid gap-2">
-                  <PayFeeButton studentId={student.id} studentName={student.name} plan={student.plan} email={student.email} month={p.month} className="h-11 w-full text-base" />
-                  <BizumDialog studentId={student.id} studentName={student.name} amount={currentFee} month={p.month} triggerClassName="h-11 w-full text-base" />
+                  <PayFeeButton studentId={student.id} studentName={student.name} plan={student.plan} email={student.email} month={p.month} amount={p.amount} className="h-11 w-full text-base" />
+                  <BizumDialog studentId={student.id} studentName={student.name} amount={p.amount} month={p.month} triggerClassName="h-11 w-full text-base" />
                 </div>
               </li>
             ))}
