@@ -172,26 +172,60 @@ export function StudentMedia({ student }: { student: Student }) {
     setComment("");
   };
 
+  /** Genera el informe del golpe con IA y lo guarda en el archivo recién subido. */
+  const runAutoAnalysis = async (mediaId: string, file: File, kind: "foto" | "video", fileTitle: string, note: string) => {
+    setAnalyzing(true);
+    try {
+      const frames = await framesFromFile(file, kind);
+      const res = await analyze({
+        data: {
+          studentId: student.id,
+          mediaId,
+          frames,
+          title: fileTitle,
+          ...(note ? { focus: note } : {}),
+        },
+      });
+      if (!res.ok) {
+        toast.error(res.message || "No se ha podido generar el informe automático");
+        return;
+      }
+      const body = note ? `${note}\n\n${res.analysis}` : res.analysis;
+      await updateMedia(mediaId, { comment: body.slice(0, 4000) });
+      toast.success("Informe de técnica generado automáticamente");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se ha podido generar el informe automático");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const save = async () => {
     if (!pending) return;
     setUploading(true);
+    const file = pending.file;
+    const kind = pending.kind;
+    const fileTitle = title.trim() || file.name;
+    const note = comment.trim();
     try {
-      await addMedia(
+      const mediaId = await addMedia(
         {
           studentId: student.id,
-          kind: pending.kind,
-          title: title.trim() || pending.file.name,
-          comment: comment.trim(),
-          fileName: pending.file.name,
-          mimeType: pending.file.type,
-          size: pending.file.size,
+          kind,
+          title: fileTitle,
+          comment: note,
+          fileName: file.name,
+          mimeType: file.type,
+          size: file.size,
         },
-        pending.file,
+        file,
       );
       toast.success("Archivo subido a la ficha del alumno");
       setPending(null);
       setTitle("");
       setComment("");
+      setUploading(false);
+      if (autoAnalyze) await runAutoAnalysis(mediaId, file, kind, fileTitle, note);
     } catch {
       toast.error("No se ha podido guardar el archivo");
     } finally {
