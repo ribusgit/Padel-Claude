@@ -6,6 +6,8 @@ import { LevelBadge, PaymentBadge, EmptyState } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { StudentDialog } from "@/components/student-dialog";
+import { DeleteStudentButton } from "@/components/delete-student-button";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
@@ -87,7 +89,7 @@ function StudentsPage() {
         <ul className="space-y-2">
           {list.map((s) => (
             <li key={s.id} className="relative">
-              <div className="absolute right-3 top-1/2 z-10 -translate-y-1/2 md:right-12">
+              <div className="absolute right-3 top-1/2 z-10 flex -translate-y-1/2 items-center gap-0.5 md:right-10">
                 <WhatsAppButton
                   iconOnly
                   label={`Enviar recordatorio a ${s.name}`}
@@ -101,7 +103,9 @@ function StudentsPage() {
                         : generalReminder(s.name),
                   }}
                 />
+                <DeleteStudentButton student={s} />
               </div>
+
               <Link
                 to="/alumnos/$id"
                 params={{ id: s.id }}
