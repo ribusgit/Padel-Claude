@@ -159,6 +159,24 @@ export type Database = {
         }
         Relationships: []
       }
+      club_settings: {
+        Row: {
+          bizum_phone: string
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          bizum_phone?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          bizum_phone?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coaches: {
         Row: {
           created_at: string
@@ -183,6 +201,24 @@ export type Database = {
           name?: string
           phone?: string
           specialty?: string
+        }
+        Relationships: []
+      }
+      fee_plans: {
+        Row: {
+          amount: number
+          plan: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          plan: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          plan?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -304,6 +340,7 @@ export type Database = {
         Row: {
           amount: number
           id: string
+          method: string
           month: string
           paid: boolean
           paid_at: string | null
@@ -312,6 +349,7 @@ export type Database = {
         Insert: {
           amount?: number
           id?: string
+          method?: string
           month: string
           paid?: boolean
           paid_at?: string | null
@@ -320,6 +358,7 @@ export type Database = {
         Update: {
           amount?: number
           id?: string
+          method?: string
           month?: string
           paid?: boolean
           paid_at?: string | null
