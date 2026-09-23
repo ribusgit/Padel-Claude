@@ -34,7 +34,8 @@ export function StudentPortal() {
     .sort((a, b) => b.month.localeCompare(a.month));
   const pending = myPayments.filter((p) => !p.paid);
   const paidHistory = myPayments.filter((p) => p.paid);
-  const totalDebt = pending.reduce((t, p) => t + p.amount, 0);
+  const currentFee = data.feePlans[student.plan];
+  const totalDebt = pending.length * currentFee;
   const currentFee = data.feePlans[student.plan];
 
   return (
@@ -74,11 +75,11 @@ export function StudentPortal() {
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <p className="font-semibold capitalize">Cuota de {monthLabel(p.month)}</p>
-                    <p className="font-display text-xl font-bold text-warning">{p.amount} €</p>
+                    <p className="font-display text-xl font-bold text-warning">{currentFee} €</p>
                   </div>
                   <div className="flex flex-col items-stretch gap-2 sm:flex-row">
                     <PayFeeButton studentId={student.id} studentName={student.name} plan={student.plan} email={student.email} month={p.month} />
-                    <BizumDialog studentId={student.id} studentName={student.name} amount={p.amount} month={p.month} />
+                    <BizumDialog studentId={student.id} studentName={student.name} amount={currentFee} month={p.month} />
                   </div>
                 </div>
               </li>
