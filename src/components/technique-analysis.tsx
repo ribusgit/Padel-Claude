@@ -33,7 +33,7 @@ export function TechniqueAnalysis({ item, student }: { item: MediaItem; student:
     setAnalysis(null);
     try {
       const url = await signedMediaUrl(path);
-      const frames = item.kind === "video" ? await framesFromVideo(url) : await framesFromImage(url);
+      const frames = await framesFromUrl(url, item.kind === "video" ? "video" : "foto");
       const res = await analyze({
         data: {
           studentId: student.id,
