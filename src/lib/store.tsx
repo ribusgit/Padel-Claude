@@ -37,6 +37,7 @@ interface StoreApi {
   signOut: () => Promise<void>;
   addStudent: (s: Omit<Student, "id" | "attendance" | "notes" | "active">) => Promise<Student>;
   updateStudent: (id: string, patch: Partial<Student>) => Promise<void>;
+  setStudentPhoto: (id: string, file: Blob | null) => Promise<void>;
   addNote: (studentId: string, note: Omit<ProgressNote, "id">) => Promise<void>;
   addCoach: (c: Omit<Coach, "id">) => Promise<Coach | null>;
   addClass: (c: Omit<ClassSession, "id" | "attendance">) => Promise<void>;
