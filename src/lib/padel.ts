@@ -53,6 +53,14 @@ export interface ClassSession {
   attendance: Record<string, boolean>;
 }
 
+export type PaymentMethod = "tarjeta" | "bizum" | "manual";
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  tarjeta: "Tarjeta",
+  bizum: "Bizum",
+  manual: "Manual",
+};
+
 export interface Payment {
   id: string;
   studentId: string;
@@ -60,6 +68,8 @@ export interface Payment {
   amount: number;
   paid: boolean;
   paidAt?: string | undefined;
+  /** Cómo se cobró la cuota: tarjeta en línea, Bizum o marca manual. */
+  method: PaymentMethod;
 }
 
 export type BookingType = "clase" | "alquiler";
@@ -144,6 +154,10 @@ export interface AppData {
   clubHours: ClubDayHours[];
   materials: MaterialItem[];
   materialBudgets: MaterialBudget[];
+  /** Cuotas mensuales por tipo de tarifa, editables por el administrador. */
+  feePlans: Record<Plan, number>;
+  /** Teléfono Bizum del club para cobros manuales. */
+  bizumPhone: string;
 }
 
 export const COURTS = [1, 2, 3, 4];
@@ -208,6 +222,7 @@ export const PLAN_LABELS: Record<Plan, string> = {
   particular: "Clases particulares",
 };
 
+/** Tarifas iniciales por defecto; la app usa las editables de `AppData.feePlans`. */
 export const PLAN_PRICES: Record<Plan, number> = {
   "1x": 55,
   "2x": 95,
