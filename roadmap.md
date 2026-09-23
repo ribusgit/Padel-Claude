@@ -13,3 +13,4 @@
 - [x] Botón en "Alumnos" para exportar a Excel el listado de alumnos con su situación de pagos.
 
 - [x] Pago de la cuota mensual dentro de la app desde la ficha/listado de alumnos y Pagos, con la deuda actualizada en tiempo real al completarse el cobro.
+- [ ] Botón en el análisis multimedia del alumno para abrir el vídeo en la aplicación Coach View.
