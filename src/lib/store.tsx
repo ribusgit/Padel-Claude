@@ -400,6 +400,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (sErr) throw sErr;
         await refresh();
       },
+      setClubHours: async (hours) => {
+        const { error } = await supabase.from("club_hours").upsert(
+          hours.map((h) => ({
+            weekday: h.weekday,
+            open_time: h.open,
+            close_time: h.close,
+            closed: h.closed,
+          })),
+          { onConflict: "weekday" },
+        );
+        if (error) throw error;
+        await refresh();
+      },
       addBooking: async (input) => {
         const { error } = await supabase.from("bookings").insert({
           court: input.court,
