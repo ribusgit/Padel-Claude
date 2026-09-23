@@ -10,7 +10,9 @@ import {
   LogOut,
   Clipboard,
   MessageCircle,
+  Package,
   PenTool,
+
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -26,6 +28,7 @@ type NavTo =
   | "/reservas"
   | "/profesores"
   | "/pagos"
+  | "/material"
   | "/mis-clases"
   | "/mensajes"
   | "/pizarra";
@@ -40,8 +43,10 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
   { to: "/profesores", label: "Profesores", icon: GraduationCap },
   { to: "/pagos", label: "Pagos", icon: Wallet },
+  { to: "/material", label: "Material", icon: Package },
   { to: "/mensajes", label: "Mensajes", icon: MessageCircle },
 ];
+
 
 const COACH_NAV: NavItem[] = [
   { to: "/", label: "Inicio", icon: LayoutDashboard },
