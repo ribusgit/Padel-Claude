@@ -4,7 +4,7 @@ import { es } from "date-fns/locale";
 import { CalendarDays, ChevronRight, Clipboard, Clock, MessageCircleWarning, NotebookPen } from "lucide-react";
 import { Avatar, EmptyState, LevelBadge } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
-import { WhatsAppButton, classReminder, mediaReminder } from "@/components/whatsapp-dialog";
+import { WhatsAppButton, classReminder } from "@/components/whatsapp-dialog";
 import { useStore } from "@/lib/store";
 import { todayKey } from "@/lib/padel";
 
