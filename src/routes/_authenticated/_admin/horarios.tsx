@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { LevelBadge } from "@/components/padel-ui";
 import { ClassDialog } from "@/components/class-dialog";
+import { ClassRemindersButton } from "@/components/class-reminders-button";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
