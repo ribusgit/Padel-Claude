@@ -13,6 +13,7 @@ import { StudentMedia } from "@/components/student-media";
 import { StudentWhiteboard } from "@/components/student-whiteboard";
 import { VideoSearch } from "@/components/video-search";
 import { DeleteStudentButton } from "@/components/delete-student-button";
+import { PayFeeButton } from "@/components/pay-fee-button";
 
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
@@ -78,7 +79,15 @@ function StudentDetail() {
               <PaymentBadge status={student.paymentStatus} />
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+            {student.paymentStatus === "pendiente" && (
+              <PayFeeButton
+                studentId={student.id}
+                studentName={student.name}
+                plan={student.plan}
+                email={student.email}
+              />
+            )}
             <WhatsAppButton
               message={{
                 to: student.name,

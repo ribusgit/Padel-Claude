@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/app-shell";
 import { StatCard, EmptyState } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, paymentReminder } from "@/components/whatsapp-dialog";
+import { PayFeeButton } from "@/components/pay-fee-button";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -88,6 +89,7 @@ function PaymentsPage() {
               <div className="text-right">
                 <p className={cn("font-display text-lg font-bold", paid ? "text-success" : "text-warning")}>{amount} €</p>
               </div>
+              {!paid && <PayFeeButton iconOnly studentId={s.id} studentName={s.name} plan={s.plan} email={s.email} />}
               {!paid && (
                 <WhatsAppButton
                   iconOnly

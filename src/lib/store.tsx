@@ -228,6 +228,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [refresh]);
 
+  // Los cobros en línea llegan por webhook: escuchamos los cambios de cuotas
+  // para que la deuda se actualice al instante sin recargar la página.
+  useEffect(() => {
+    const channel = supabase
+      .channel("pagos-en-vivo")
+      .on("postgres_changes", { event: "*", schema: "public", table: "payments" }, () => {
+        void refresh();
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "students" }, () => {
+        void refresh();
+      })
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [refresh]);
+
   const api = useMemo<StoreApi>(() => {
     const currentCoach = () => coachId;
     return {
