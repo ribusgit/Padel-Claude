@@ -90,16 +90,18 @@ export const generateProgressSummary = createServerFn({ method: "POST" })
     });
 
     const summary = (await result.text).trim();
-    if (!summary) throw new Error("La IA no devolvió un resumen. Inténtalo de nuevo.");
+    if (!summary) {
+      return { ok: false as const, message: "La IA no devolvió un resumen. Inténtalo de nuevo." };
+    }
 
     const { data: row, error: insErr } = await supabase
       .from("progress_summaries")
       .insert({ student_id: data.studentId, summary, generated_by: userId })
       .select("id, summary, created_at")
       .single();
-    if (insErr) throw new Error(insErr.message);
+    if (insErr) return { ok: false as const, message: insErr.message };
 
-    return row;
+    return { ok: true as const, summary: row };
   });
 
 function createRunIdFetch() {
