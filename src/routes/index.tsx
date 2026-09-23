@@ -56,7 +56,8 @@ function HomePage() {
           height={1008}
           className="absolute inset-0 -z-10 size-full object-cover"
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-background via-background/85 to-background/40" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-background via-background/60 to-background/10" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-background/80 via-background/30 to-transparent" />
 
         <div className="mx-auto w-full max-w-5xl px-5 py-24 md:px-10">
           <p className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
