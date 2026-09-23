@@ -140,6 +140,11 @@ function SchedulePage() {
                                   <LevelBadge category={c.level} />
                                   <span className="text-[10px] text-muted-foreground">{c.studentIds.length}/4</span>
                                 </div>
+                                {c.studentIds.length > 0 && (
+                                  <div className="mt-1.5">
+                                    <ClassRemindersButton session={c} label="Avisar" />
+                                  </div>
+                                )}
                               </li>
                             );
                           })}
