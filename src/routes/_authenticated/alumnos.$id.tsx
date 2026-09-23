@@ -214,6 +214,7 @@ function StudentDetail() {
             </ul>
           )}
         </section>
+        </div>
         </TabsContent>
       </Tabs>
     </>
