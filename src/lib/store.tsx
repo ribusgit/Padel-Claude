@@ -459,6 +459,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (sErr) throw sErr;
         await refresh();
       },
+      setPlanFee: async (plan, amount) => {
+        const { error } = await supabase
+          .from("fee_plans")
+          .upsert({ plan, amount, updated_at: new Date().toISOString() });
+        if (error) throw error;
+        await refresh();
+      },
+      setBizumPhone: async (phone) => {
+        const { error } = await supabase
+          .from("club_settings")
+          .upsert({ id: true, bizum_phone: phone, updated_at: new Date().toISOString() });
+        if (error) throw error;
+        await refresh();
+      },
       setClubHours: async (hours) => {
         const { error } = await supabase.from("club_hours").upsert(
           hours.map((h) => ({
