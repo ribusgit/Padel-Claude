@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Package,
   PenTool,
+  Sparkles,
 
   type LucideIcon,
 } from "lucide-react";
