@@ -177,8 +177,13 @@ export function WhatsAppButton({
 
 /* ---------- Plantillas de mensajes ---------- */
 
-export function paymentReminder(name: string, amount: number, month: string) {
-  return `Hola ${name} 👋\n\nTe recordamos que está pendiente el pago de la mensualidad de pádel de ${month} (${amount} €).\n\nPuedes abonarlo en recepción o por transferencia antes del día 5. ¡Gracias!\n\n— Escuela de Pádel`;
+/**
+ * Recordatorio de cuota SIN datos de pago: ni importe, ni número Bizum, ni método.
+ * El alumno consulta y paga de forma segura dentro de su portal con sesión iniciada.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function paymentReminder(name: string, _amount?: number, _month?: string) {
+  return `Hola ${name} 👋\n\nTienes un aviso sobre tu cuota en la Escuela de Pádel.\n\nEntra en tu portal para verlo y pagar de forma segura:\nhttps://www.anochde.com/auth\n\n¡Gracias!\n\n— Escuela de Pádel`;
 }
 
 export function classReminder(name: string, time: string, court: number, coach: string, dayLabel: string) {
