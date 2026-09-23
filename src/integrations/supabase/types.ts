@@ -132,6 +132,33 @@ export type Database = {
           },
         ]
       }
+      club_hours: {
+        Row: {
+          close_time: string
+          closed: boolean
+          created_at: string
+          open_time: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          close_time?: string
+          closed?: boolean
+          created_at?: string
+          open_time?: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          close_time?: string
+          closed?: boolean
+          created_at?: string
+          open_time?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
       coaches: {
         Row: {
           created_at: string
