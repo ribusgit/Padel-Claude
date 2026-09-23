@@ -14,7 +14,7 @@ import { StudentPortal } from "@/components/student-portal";
 import { useStore } from "@/lib/store";
 import { COURTS, todayKey } from "@/lib/padel";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/_authenticated/panel")({
   head: () => ({
     meta: [
       { title: "Panel de control — Escuela de Pádel" },

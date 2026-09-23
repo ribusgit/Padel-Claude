@@ -9,11 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
 import { Route as AuthenticatedMisClasesRouteImport } from './routes/_authenticated/mis-clases'
+import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPizarraRouteImport } from './routes/_authenticated/pizarra'
 import { Route as AuthenticatedAdminCalendarioRouteImport } from './routes/_authenticated/_admin/calendario'
 import { Route as AuthenticatedAdminHorariosRouteImport } from './routes/_authenticated/_admin/horarios'
@@ -28,6 +29,11 @@ import { Route as AuthenticatedAdminProfesoresIndexRouteImport } from './routes/
 import { Route as AuthenticatedAdminProfesoresIdRouteImport } from './routes/_authenticated/_admin/profesores.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -37,11 +43,6 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/_admin',
   getParentRoute: () => AuthenticatedRouteRoute,
@@ -49,6 +50,11 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
 const AuthenticatedMisClasesRoute = AuthenticatedMisClasesRouteImport.update({
   id: '/mis-clases',
   path: '/mis-clases',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPizarraRoute = AuthenticatedPizarraRouteImport.update({
@@ -128,9 +134,10 @@ const ApiPublicPaymentsWebhookRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/pizarra': typeof AuthenticatedPizarraRoute
   '/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/horarios': typeof AuthenticatedAdminHorariosRoute
@@ -146,9 +153,10 @@ export interface FileRoutesByFullPath {
   '/profesores/': typeof AuthenticatedAdminProfesoresIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/': typeof AuthenticatedIndexRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/pizarra': typeof AuthenticatedPizarraRoute
   '/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/horarios': typeof AuthenticatedAdminHorariosRoute
@@ -165,12 +173,13 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/mis-clases': typeof AuthenticatedMisClasesRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/pizarra': typeof AuthenticatedPizarraRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_admin/calendario': typeof AuthenticatedAdminCalendarioRoute
   '/_authenticated/_admin/horarios': typeof AuthenticatedAdminHorariosRoute
   '/_authenticated/_admin/informes': typeof AuthenticatedAdminInformesRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/mis-clases'
+    | '/panel'
     | '/pizarra'
     | '/calendario'
     | '/horarios'
@@ -205,9 +215,10 @@ export interface FileRouteTypes {
     | '/profesores/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/auth'
     | '/'
+    | '/auth'
     | '/mis-clases'
+    | '/panel'
     | '/pizarra'
     | '/calendario'
     | '/horarios'
@@ -223,12 +234,13 @@ export interface FileRouteTypes {
     | '/profesores'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/_admin'
     | '/_authenticated/mis-clases'
+    | '/_authenticated/panel'
     | '/_authenticated/pizarra'
-    | '/_authenticated/'
     | '/_authenticated/_admin/calendario'
     | '/_authenticated/_admin/horarios'
     | '/_authenticated/_admin/informes'
@@ -244,6 +256,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -251,6 +264,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -265,13 +285,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/_admin': {
       id: '/_authenticated/_admin'
       path: ''
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/mis-clases'
       fullPath: '/mis-clases'
       preLoaderRoute: typeof AuthenticatedMisClasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/panel': {
+      id: '/_authenticated/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof AuthenticatedPanelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pizarra': {
@@ -414,8 +434,8 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedMisClasesRoute: typeof AuthenticatedMisClasesRoute
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedPizarraRoute: typeof AuthenticatedPizarraRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAlumnosIdRoute: typeof AuthenticatedAlumnosIdRoute
   AuthenticatedAlumnosIndexRoute: typeof AuthenticatedAlumnosIndexRoute
 }
@@ -423,8 +443,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedMisClasesRoute: AuthenticatedMisClasesRoute,
+  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedPizarraRoute: AuthenticatedPizarraRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAlumnosIdRoute: AuthenticatedAlumnosIdRoute,
   AuthenticatedAlumnosIndexRoute: AuthenticatedAlumnosIndexRoute,
 }
@@ -433,6 +453,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
