@@ -5,3 +5,6 @@
 - [x] WhatsApp real: botón en la vista previa que abre WhatsApp (wa.me) con el mensaje y el teléfono del alumno listos para enviar.
 - [ ] Horario real del club editable por el administrador; el cuadrante muestra solo esas franjas, resalta la hora actual y lista las pistas ocupadas ahora mismo.
 - [ ] Botón en Horarios para enviar el recordatorio de clase por WhatsApp a cada alumno de la clase.
+- [ ] Sección en el panel del administrador con el registro de mensajes de WhatsApp enviados (los recibidos requieren WhatsApp Business; avisar al usuario).
+- [ ] Sección de horarios (próximas clases) en la pantalla de inicio del profesor.
+- [ ] Pizarra con webcam dentro de la pantalla de clase del profesor, sin pasar por la pizarra general.
