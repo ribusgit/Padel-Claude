@@ -195,5 +195,3 @@ export function CoachHome() {
   );
 }
 
-// Referencia para el mensaje de deberes disponible en whatsapp-dialog.
-export { mediaReminder };
