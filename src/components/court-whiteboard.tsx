@@ -337,19 +337,29 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    // Evita que iPadOS interprete el trazo como Scribble, selección o scroll
+    e.preventDefault();
+
     if (e.pointerType === "pen") {
+      penSeenRef.current = true;
       lastPenAtRef.current = Date.now();
       setInputHint("Apple Pencil detectado · presión activa");
     } else if (e.pointerType === "touch") {
-      // Rechazo de palma: con el lápiz en uso, ignoramos el contacto de la mano
-      if (!fingerDrawing || Date.now() - lastPenAtRef.current < 1500) return;
+      // Rechazo de palma: sólo si ya hemos visto el lápiz en este dispositivo
+      const palm = penSeenRef.current && Date.now() - lastPenAtRef.current < 1500;
+      if (palm) return;
+      if (!fingerDrawing && penSeenRef.current) return;
       setInputHint("Dibujando con el dedo");
     } else {
       setInputHint(null);
     }
     if (drawingRef.current) return;
 
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Safari puede rechazar la captura del lápiz; seguimos sin ella
+    }
     drawingRef.current = {
       id: e.pointerId,
       stroke: { tool, color, width, points: [pointFrom(e)] },
