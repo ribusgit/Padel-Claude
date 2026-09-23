@@ -347,6 +347,7 @@ export function seedData(): AppData {
     amount: PLAN_PRICES[s.plan],
     paid: s.paymentStatus === "pagado",
     paidAt: s.paymentStatus === "pagado" ? d(-3) : undefined,
+    method: "manual",
   }));
 
   const bookings: CourtBooking[] = [

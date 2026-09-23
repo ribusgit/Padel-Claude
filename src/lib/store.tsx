@@ -37,6 +37,8 @@ const EMPTY: AppData = {
   clubHours: DEFAULT_CLUB_HOURS,
   materials: [],
   materialBudgets: [],
+  feePlans: PLAN_PRICES,
+  bizumPhone: "",
 };
 
 
@@ -179,6 +181,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         amount: Number(p.amount),
         paid: p.paid,
         paidAt: p.paid_at ?? undefined,
+        method: (p.method ?? "manual") as PaymentMethod,
       })),
       bookings: (bookings.data ?? []).map((b) => ({
         id: b.id,
