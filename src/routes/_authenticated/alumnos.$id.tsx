@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type { Student } from "@/lib/padel";
 import { LevelBadge, PaymentBadge, EmptyState } from "@/components/padel-ui";
 import { StudentAvatar, resizePhoto } from "@/components/student-avatar";
+import { CameraCaptureDialog, PhotoSourceDialog } from "@/components/camera-capture-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMedia } from "@/components/student-media";
 import { StudentWhiteboard } from "@/components/student-whiteboard";
@@ -234,6 +235,8 @@ function StudentPhotoButton({ student }: { student: Student }) {
   const { isAdmin, setStudentPhoto } = useStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [sourceOpen, setSourceOpen] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const onFile = async (file: File | undefined) => {
     if (!file) return;
@@ -271,7 +274,7 @@ function StudentPhotoButton({ student }: { student: Student }) {
     <div className="relative shrink-0">
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
+        onClick={() => setSourceOpen(true)}
         disabled={busy}
         className="group relative block cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={student.photoPath ? "Cambiar foto del alumno" : "Añadir foto del alumno"}
@@ -305,6 +308,24 @@ function StudentPhotoButton({ student }: { student: Student }) {
           void onFile(e.target.files?.[0]);
           e.target.value = "";
         }}
+      />
+      <PhotoSourceDialog
+        open={sourceOpen}
+        onOpenChange={setSourceOpen}
+        onPickFile={() => {
+          setSourceOpen(false);
+          inputRef.current?.click();
+        }}
+        onPickCamera={() => {
+          setSourceOpen(false);
+          setCameraOpen(true);
+        }}
+      />
+      <CameraCaptureDialog
+        open={cameraOpen}
+        onOpenChange={setCameraOpen}
+        title={`Foto de ${student.name}`}
+        onCapture={(file) => onFile(file)}
       />
     </div>
   );
