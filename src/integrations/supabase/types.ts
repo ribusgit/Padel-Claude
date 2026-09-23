@@ -322,6 +322,41 @@ export type Database = {
           },
         ]
       }
+      progress_summaries: {
+        Row: {
+          created_at: string
+          generated_by: string | null
+          id: string
+          student_id: string
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          student_id: string
+          summary: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          student_id?: string
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progress_summaries_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       school_state: {
         Row: {
           admin_claimed: boolean
