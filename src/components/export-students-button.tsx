@@ -5,7 +5,7 @@ import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
-import { LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, levelCategory, type Student } from "@/lib/padel";
+import { LEVEL_LABELS, PLAN_LABELS, PAYMENT_METHOD_LABELS, levelCategory, type Student } from "@/lib/padel";
 
 const euro = (n: number) => Number(n.toFixed(2));
 
@@ -34,7 +34,7 @@ export function ExportStudentsButton() {
           Nivel: s.level.toFixed(1),
           Categoría: LEVEL_LABELS[levelCategory(s.level)],
           Tarifa: PLAN_LABELS[s.plan],
-          "Cuota mensual (€)": euro(PLAN_PRICES[s.plan]),
+          "Cuota mensual (€)": euro(data.feePlans[s.plan]),
           "Estado de pago": s.paymentStatus === "pagado" ? "Pagado" : "Pendiente",
           "Deuda acumulada (€)": euro(debt),
           "Meses registrados": pays.length,
@@ -54,6 +54,7 @@ export function ExportStudentsButton() {
             Mes: p.month,
             "Importe (€)": euro(p.amount),
             Situación: p.paid ? "Pagado" : "Pendiente",
+            Método: p.paid ? PAYMENT_METHOD_LABELS[p.method] : "",
             "Fecha de cobro": p.paidAt ? format(parseISO(p.paidAt), "dd/MM/yyyy") : "",
             Tarifa: s ? PLAN_LABELS[s.plan] : "",
             Teléfono: s?.phone ?? "",
@@ -79,7 +80,7 @@ export function ExportStudentsButton() {
       const sheets: Array<[string, object[], number[]]> = [
         ["Resumen", resumen, [34, 24]],
         ["Alumnos", alumnos, [26, 14, 26, 18, 8, 13, 18, 16, 15, 18, 16, 14, 14, 16, 10]],
-        ["Pagos", pagos, [26, 10, 12, 13, 15, 18, 14]],
+        ["Pagos", pagos, [26, 10, 12, 13, 10, 15, 18, 14]],
       ];
       for (const [name, rows, widths] of sheets) {
         const sheet = XLSX.utils.json_to_sheet(rows);
