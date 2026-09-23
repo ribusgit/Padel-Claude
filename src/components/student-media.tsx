@@ -282,7 +282,22 @@ export function StudentMedia({ student }: { student: Student }) {
           className="hidden"
           onChange={(e) => take(e.target.files)}
         />
+        <div className="mt-4 flex items-center justify-center gap-3 rounded-xl border border-border bg-secondary/40 p-3 text-left">
+          <Sparkles className="size-4 shrink-0 text-primary" />
+          <Label htmlFor="auto-analyze" className="flex-1 text-xs leading-snug text-muted-foreground">
+            Generar el informe de técnica con IA automáticamente al subir el archivo
+          </Label>
+          <Switch id="auto-analyze" checked={autoAnalyze} onCheckedChange={setAutoAnalyze} />
+        </div>
       </div>
+
+      {analyzing && (
+        <p className="flex items-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 p-3 text-sm">
+          <Sparkles className="size-4 animate-pulse text-primary" />
+          Analizando el golpe con IA… el informe aparecerá en el archivo en unos segundos.
+        </p>
+      )}
+
 
       {/* Formulario del archivo pendiente */}
       {pending && (
