@@ -1,9 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowLeft, Phone, Mail, CalendarCheck, Check, X, MessageSquarePlus } from "lucide-react";
+import { ArrowLeft, Phone, Mail, CalendarCheck, Check, X, MessageSquarePlus, Camera, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import type { Student } from "@/lib/padel";
 import { LevelBadge, PaymentBadge, EmptyState } from "@/components/padel-ui";
 import { StudentAvatar, resizePhoto } from "@/components/student-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
