@@ -91,6 +91,14 @@ export interface MediaItem {
   coachId?: string | undefined;
 }
 
+/** Horario real de apertura del club para un día de la semana (0 = domingo). */
+export interface ClubDayHours {
+  weekday: number;
+  open: string; // HH:mm
+  close: string; // HH:mm
+  closed: boolean;
+}
+
 export interface AppData {
   students: Student[];
   coaches: Coach[];
@@ -98,13 +106,38 @@ export interface AppData {
   payments: Payment[];
   bookings: CourtBooking[];
   media: MediaItem[];
+  clubHours: ClubDayHours[];
 }
 
 export const COURTS = [1, 2, 3, 4];
 export const MAX_STUDENTS_PER_CLASS = 4;
 
-/** Franjas horarias del cuadrante de pistas (09:00 – 22:00). */
-export const COURT_HOURS = Array.from({ length: 14 }, (_, i) => `${String(9 + i).padStart(2, "0")}:00`);
+/** Franjas horarias máximas del cuadrante (07:00 – 00:00), se recortan al horario del club. */
+export const COURT_HOURS = Array.from({ length: 17 }, (_, i) => `${String(7 + i).padStart(2, "0")}:00`);
+
+export const WEEKDAY_LABELS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+export const DEFAULT_CLUB_HOURS: ClubDayHours[] = Array.from({ length: 7 }, (_, weekday) => ({
+  weekday,
+  open: "09:00",
+  close: "22:00",
+  closed: false,
+}));
+
+/** Horario del club para una fecha concreta. */
+export function clubHoursForDate(hours: ClubDayHours[], date: Date): ClubDayHours {
+  const weekday = date.getDay();
+  return hours.find((h) => h.weekday === weekday) ?? { weekday, open: "09:00", close: "22:00", closed: false };
+}
+
+/** Franjas de una hora entre la apertura y el cierre del club. */
+export function hourSlots(open: string, close: string): string[] {
+  const start = Math.floor(timeToMin(open) / 60) * 60;
+  const end = timeToMin(close);
+  const slots: string[] = [];
+  for (let m = start; m + 60 <= end; m += 60) slots.push(minToTime(m));
+  return slots;
+}
 
 export const BOOKING_LABELS: Record<BookingType, string> = {
   clase: "Clase de la escuela",
