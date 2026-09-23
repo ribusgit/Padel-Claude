@@ -9,10 +9,12 @@ import { StatCard, EmptyState } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, paymentReminder } from "@/components/whatsapp-dialog";
 import { PayFeeButton } from "@/components/pay-fee-button";
+import { BizumDialog } from "@/components/bizum-dialog";
+import { FeeSettingsDialog } from "@/components/fee-settings-dialog";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { PLAN_LABELS, PLAN_PRICES, monthKey } from "@/lib/padel";
+import { PLAN_LABELS, PAYMENT_METHOD_LABELS, monthKey } from "@/lib/padel";
 
 export const Route = createFileRoute("/_authenticated/_admin/pagos")({
   head: () => ({
@@ -37,7 +39,7 @@ function PaymentsPage() {
     .filter((s) => s.active)
     .map((s) => {
       const p = data.payments.find((x) => x.studentId === s.id && x.month === month);
-      return { student: s, amount: p?.amount ?? PLAN_PRICES[s.plan], paid: s.paymentStatus === "pagado", paidAt: p?.paidAt };
+      return { student: s, amount: p?.amount ?? data.feePlans[s.plan], paid: s.paymentStatus === "pagado", paidAt: p?.paidAt, method: p?.method };
     })
     .sort((a, b) => Number(a.paid) - Number(b.paid) || a.student.name.localeCompare(b.student.name));
 
@@ -47,7 +49,10 @@ function PaymentsPage() {
 
   return (
     <>
-      <PageHeader title="Pagos" subtitle={hydrated ? `Mensualidad de ${format(new Date(), "MMMM yyyy", { locale: es })}` : undefined} />
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <PageHeader title="Pagos" subtitle={hydrated ? `Mensualidad de ${format(new Date(), "MMMM yyyy", { locale: es })}` : undefined} />
+        <FeeSettingsDialog />
+      </div>
 
       <div className="grid grid-cols-3 gap-3">
         <StatCard label="Cobrado" value={`${collected} €`} icon={CheckCircle2} tone="primary" />
@@ -74,7 +79,7 @@ function PaymentsPage() {
         <div className="mt-4"><EmptyState title="Nada que mostrar" /></div>
       ) : (
         <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
-          {visible.map(({ student: s, amount, paid, paidAt }) => (
+          {visible.map(({ student: s, amount, paid, paidAt, method }) => (
             <li key={s.id} className="flex items-center gap-3 p-3 md:p-4">
               <StudentAvatar name={s.name} photoPath={s.photoPath} />
               <div className="min-w-0 flex-1">
@@ -84,12 +89,14 @@ function PaymentsPage() {
                 <p className="truncate text-xs text-muted-foreground">
                   {PLAN_LABELS[s.plan]}
                   {paid && paidAt ? ` · pagado el ${format(new Date(paidAt), "d MMM", { locale: es })}` : ""}
+                  {paid && method ? ` · ${PAYMENT_METHOD_LABELS[method]}` : ""}
                 </p>
               </div>
               <div className="text-right">
                 <p className={cn("font-display text-lg font-bold", paid ? "text-success" : "text-warning")}>{amount} €</p>
               </div>
               {!paid && <PayFeeButton iconOnly studentId={s.id} studentName={s.name} plan={s.plan} email={s.email} />}
+              {!paid && <BizumDialog canConfirm studentId={s.id} studentName={s.name} amount={amount} />}
               {!paid && (
                 <WhatsAppButton
                   iconOnly
