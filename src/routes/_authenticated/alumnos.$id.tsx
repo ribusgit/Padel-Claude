@@ -235,6 +235,8 @@ function StudentPhotoButton({ student }: { student: Student }) {
   const { isAdmin, setStudentPhoto } = useStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [sourceOpen, setSourceOpen] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const onFile = async (file: File | undefined) => {
     if (!file) return;
