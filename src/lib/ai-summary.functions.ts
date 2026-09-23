@@ -41,7 +41,10 @@ export const generateProgressSummary = createServerFn({ method: "POST" })
 
     const notes = notesRes.data ?? [];
     if (notes.length === 0) {
-      throw new Error("Añade al menos una nota de progreso antes de generar el resumen");
+      return {
+        ok: false as const,
+        message: "Añade al menos una nota de progreso antes de generar el resumen",
+      };
     }
     const attendance = attRes.data ?? [];
     const present = attendance.filter((a) => a.present).length;
