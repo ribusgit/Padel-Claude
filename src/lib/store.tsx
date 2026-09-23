@@ -207,7 +207,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const row = (clubHours.data ?? []).find((h) => h.weekday === d.weekday);
         return row ? { weekday: row.weekday, open: row.open_time, close: row.close_time, closed: row.closed } : d;
       }),
+      materials: (materials.data ?? []).map((m) => ({
+        id: m.id,
+        name: m.name,
+        category: m.category as MaterialCategory,
+        quantity: m.quantity,
+        unitCost: Number(m.unit_cost),
+        purchaseDate: m.purchase_date,
+        supplier: m.supplier ?? "",
+        notes: m.notes ?? "",
+      })),
+      materialBudgets: (budgets.data ?? []).map((b) => ({ month: b.month, amount: Number(b.amount) })),
     });
+
     setHydrated(true);
     setLoading(false);
   }, []);
