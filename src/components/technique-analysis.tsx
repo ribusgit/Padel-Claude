@@ -8,59 +8,9 @@ import { Label } from "@/components/ui/label";
 import { analyzeTechnique } from "@/lib/technique-analysis.functions";
 import { mediaPathOf, useStore } from "@/lib/store";
 import { signedMediaUrl } from "@/lib/media-storage";
+import { framesFromUrl } from "@/lib/technique-frames";
 import type { MediaItem, Student } from "@/lib/padel";
 
-const MAX_WIDTH = 640;
-const FRAMES = 5;
-
-function drawToDataUrl(source: HTMLVideoElement | HTMLImageElement, width: number, height: number) {
-  const scale = Math.min(1, MAX_WIDTH / width);
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(width * scale);
-  canvas.height = Math.round(height * scale);
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("canvas");
-  ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 0.8);
-}
-
-async function framesFromImage(url: string) {
-  const img = document.createElement("img");
-  img.crossOrigin = "anonymous";
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error("No se ha podido leer la imagen"));
-    img.src = url;
-  });
-  return [drawToDataUrl(img, img.naturalWidth, img.naturalHeight)];
-}
-
-async function framesFromVideo(url: string) {
-  const video = document.createElement("video");
-  video.crossOrigin = "anonymous";
-  video.muted = true;
-  video.playsInline = true;
-  video.preload = "auto";
-  video.src = url;
-
-  await new Promise<void>((resolve, reject) => {
-    video.onloadeddata = () => resolve();
-    video.onerror = () => reject(new Error("No se ha podido leer el vídeo"));
-  });
-
-  const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 1;
-  const frames: string[] = [];
-  for (let i = 1; i <= FRAMES; i++) {
-    const time = (duration * i) / (FRAMES + 1);
-    await new Promise<void>((resolve, reject) => {
-      video.onseeked = () => resolve();
-      video.onerror = () => reject(new Error("No se ha podido leer el vídeo"));
-      video.currentTime = Math.min(time, Math.max(0, duration - 0.05));
-    });
-    frames.push(drawToDataUrl(video, video.videoWidth, video.videoHeight));
-  }
-  return frames;
-}
 
 /**
  * Análisis técnico exhaustivo del vídeo o la foto con IA: extrae fotogramas en el
@@ -83,7 +33,7 @@ export function TechniqueAnalysis({ item, student }: { item: MediaItem; student:
     setAnalysis(null);
     try {
       const url = await signedMediaUrl(path);
-      const frames = item.kind === "video" ? await framesFromVideo(url) : await framesFromImage(url);
+      const frames = await framesFromUrl(url, item.kind === "video" ? "video" : "foto");
       const res = await analyze({
         data: {
           studentId: student.id,

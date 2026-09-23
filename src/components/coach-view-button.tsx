@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, ExternalLink, Loader2, ScanEye } from "lucide-react";
+import { Download, ExternalLink, Loader2, ScanEye, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,6 +82,14 @@ export function CoachViewButton({ item }: { item: MediaItem }) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
+          {item.comment && (
+            <div className="max-h-56 overflow-y-auto rounded-xl border border-primary/40 bg-primary/5 p-3">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <Sparkles className="size-4 text-primary" /> Informe de técnica con IA
+              </p>
+              <p className="mt-1 whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">{item.comment}</p>
+            </div>
+          )}
           <div className="rounded-xl border border-border bg-secondary/40 p-3">
             <p className="text-sm font-semibold">1. Guardar el vídeo</p>
             <p className="mt-1 text-xs text-muted-foreground">«{item.title || "Sin título"}»</p>

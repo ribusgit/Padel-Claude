@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { Camera, FileVideo, ImagePlus, Pencil, Save, Trash2, Upload, Video } from "lucide-react";
+import { Camera, FileVideo, ImagePlus, Pencil, Save, Sparkles, Trash2, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,8 +12,11 @@ import { EmptyState } from "@/components/padel-ui";
 import { WhatsAppButton, mediaReminder } from "@/components/whatsapp-dialog";
 import { TechniqueAnalysis } from "@/components/technique-analysis";
 import { CoachViewButton } from "@/components/coach-view-button";
+import { Switch } from "@/components/ui/switch";
 import { mediaPathOf } from "@/lib/store";
 import { signedMediaUrl } from "@/lib/media-storage";
+import { framesFromFile } from "@/lib/technique-frames";
+import { analyzeTechnique } from "@/lib/technique-analysis.functions";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { MediaItem, Student } from "@/lib/padel";
@@ -137,12 +141,15 @@ function MediaCard({ item, student }: { item: MediaItem; student: Student }) {
 }
 
 export function StudentMedia({ student }: { student: Student }) {
-  const { data, addMedia } = useStore();
+  const { data, addMedia, updateMedia } = useStore();
+  const analyze = useServerFn(analyzeTechnique);
   const items = data.media.filter((m) => m.studentId === student.id);
   const fileInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [autoAnalyze, setAutoAnalyze] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
   const [pending, setPending] = useState<{ file: File; kind: "foto" | "video" } | null>(null);
   const [title, setTitle] = useState("");
   const [comment, setComment] = useState("");
@@ -165,26 +172,60 @@ export function StudentMedia({ student }: { student: Student }) {
     setComment("");
   };
 
+  /** Genera el informe del golpe con IA y lo guarda en el archivo recién subido. */
+  const runAutoAnalysis = async (mediaId: string, file: File, kind: "foto" | "video", fileTitle: string, note: string) => {
+    setAnalyzing(true);
+    try {
+      const frames = await framesFromFile(file, kind);
+      const res = await analyze({
+        data: {
+          studentId: student.id,
+          mediaId,
+          frames,
+          title: fileTitle,
+          ...(note ? { focus: note } : {}),
+        },
+      });
+      if (!res.ok) {
+        toast.error(res.message || "No se ha podido generar el informe automático");
+        return;
+      }
+      const body = note ? `${note}\n\n${res.analysis}` : res.analysis;
+      await updateMedia(mediaId, { comment: body.slice(0, 4000) });
+      toast.success("Informe de técnica generado automáticamente");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se ha podido generar el informe automático");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const save = async () => {
     if (!pending) return;
     setUploading(true);
+    const file = pending.file;
+    const kind = pending.kind;
+    const fileTitle = title.trim() || file.name;
+    const note = comment.trim();
     try {
-      await addMedia(
+      const mediaId = await addMedia(
         {
           studentId: student.id,
-          kind: pending.kind,
-          title: title.trim() || pending.file.name,
-          comment: comment.trim(),
-          fileName: pending.file.name,
-          mimeType: pending.file.type,
-          size: pending.file.size,
+          kind,
+          title: fileTitle,
+          comment: note,
+          fileName: file.name,
+          mimeType: file.type,
+          size: file.size,
         },
-        pending.file,
+        file,
       );
       toast.success("Archivo subido a la ficha del alumno");
       setPending(null);
       setTitle("");
       setComment("");
+      setUploading(false);
+      if (autoAnalyze) await runAutoAnalysis(mediaId, file, kind, fileTitle, note);
     } catch {
       toast.error("No se ha podido guardar el archivo");
     } finally {
@@ -241,7 +282,22 @@ export function StudentMedia({ student }: { student: Student }) {
           className="hidden"
           onChange={(e) => take(e.target.files)}
         />
+        <div className="mt-4 flex items-center justify-center gap-3 rounded-xl border border-border bg-secondary/40 p-3 text-left">
+          <Sparkles className="size-4 shrink-0 text-primary" />
+          <Label htmlFor="auto-analyze" className="flex-1 text-xs leading-snug text-muted-foreground">
+            Generar el informe de técnica con IA automáticamente al subir el archivo
+          </Label>
+          <Switch id="auto-analyze" checked={autoAnalyze} onCheckedChange={setAutoAnalyze} />
+        </div>
       </div>
+
+      {analyzing && (
+        <p className="flex items-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 p-3 text-sm">
+          <Sparkles className="size-4 animate-pulse text-primary" />
+          Analizando el golpe con IA… el informe aparecerá en el archivo en unos segundos.
+        </p>
+      )}
+
 
       {/* Formulario del archivo pendiente */}
       {pending && (
