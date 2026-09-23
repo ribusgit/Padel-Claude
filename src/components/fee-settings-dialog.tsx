@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PLAN_LABELS, PLANS, type Plan } from "@/lib/padel";
+import { PLAN_LABELS, type Plan } from "@/lib/padel";
+
+const PLANS: Plan[] = ["1x", "2x", "particular"];
 import { useStore } from "@/lib/store";
 
 /** Ajustes del administrador: tarifas mensuales por plan y teléfono Bizum del club. */

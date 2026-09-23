@@ -11,7 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MONTHS_ES, monthKey } from "@/lib/padel";
+import { monthKey } from "@/lib/padel";
+
+const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 import { useStore } from "@/lib/store";
 
 interface BizumDialogProps {
