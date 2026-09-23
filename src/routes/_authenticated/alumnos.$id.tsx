@@ -11,6 +11,9 @@ import { CameraCaptureDialog, PhotoSourceDialog } from "@/components/camera-capt
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMedia } from "@/components/student-media";
 import { StudentWhiteboard } from "@/components/student-whiteboard";
+import { VideoSearch } from "@/components/video-search";
+import { DeleteStudentButton } from "@/components/delete-student-button";
+
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
@@ -75,18 +78,22 @@ function StudentDetail() {
               <PaymentBadge status={student.paymentStatus} />
             </div>
           </div>
-          <WhatsAppButton
-            message={{
-              to: student.name,
-              phone: student.phone,
-              kind: student.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
-              body:
-                student.paymentStatus === "pendiente"
-                  ? paymentReminder(student.name, PLAN_PRICES[student.plan], format(new Date(), "MMMM", { locale: es }))
-                  : generalReminder(student.name),
-            }}
-            label="Notificar"
-          />
+          <div className="flex shrink-0 items-center gap-1">
+            <WhatsAppButton
+              message={{
+                to: student.name,
+                phone: student.phone,
+                kind: student.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
+                body:
+                  student.paymentStatus === "pendiente"
+                    ? paymentReminder(student.name, PLAN_PRICES[student.plan], format(new Date(), "MMMM", { locale: es }))
+                    : generalReminder(student.name),
+              }}
+              label="Notificar"
+            />
+            <DeleteStudentButton student={student} redirectToList />
+          </div>
+
         </div>
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm md:grid-cols-4">
           <div>
@@ -137,10 +144,11 @@ function StudentDetail() {
       </div>
 
       <Tabs defaultValue="resumen" className="mt-6">
-        <TabsList className="w-full">
-          <TabsTrigger value="resumen" className="flex-1">Seguimiento</TabsTrigger>
-          <TabsTrigger value="multimedia" className="flex-1">Análisis Multimedia</TabsTrigger>
-          <TabsTrigger value="pizarra" className="flex-1">Pizarra</TabsTrigger>
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
+          <TabsTrigger value="resumen">Seguimiento</TabsTrigger>
+          <TabsTrigger value="multimedia">Análisis Multimedia</TabsTrigger>
+          <TabsTrigger value="pizarra">Pizarra</TabsTrigger>
+          <TabsTrigger value="contenidos">Vídeos de técnica</TabsTrigger>
         </TabsList>
 
         <TabsContent value="multimedia" className="mt-4">
@@ -150,6 +158,11 @@ function StudentDetail() {
         <TabsContent value="pizarra" className="mt-4">
           <StudentWhiteboard student={student} />
         </TabsContent>
+
+        <TabsContent value="contenidos" className="mt-4">
+          <VideoSearch student={student} />
+        </TabsContent>
+
 
         <TabsContent value="resumen" className="mt-4 space-y-6">
         <ProgressSummary studentId={student.id} studentName={student.name} />
