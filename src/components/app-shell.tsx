@@ -8,6 +8,7 @@ import {
   LandPlot,
   LogOut,
   Clipboard,
+  PenTool,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
