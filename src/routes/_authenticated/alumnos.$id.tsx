@@ -274,7 +274,7 @@ function StudentPhotoButton({ student }: { student: Student }) {
     <div className="relative shrink-0">
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
+        onClick={() => setSourceOpen(true)}
         disabled={busy}
         className="group relative block cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={student.photoPath ? "Cambiar foto del alumno" : "Añadir foto del alumno"}
