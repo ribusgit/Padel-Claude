@@ -86,6 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen court-grid">
+      <PaymentTestModeBanner />
       {/* Barra lateral en escritorio */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 md:flex">
         <Logo />
