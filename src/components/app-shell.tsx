@@ -1,4 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import {
   LayoutDashboard,
   Users,
