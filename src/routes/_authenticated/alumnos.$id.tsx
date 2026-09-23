@@ -11,6 +11,9 @@ import { CameraCaptureDialog, PhotoSourceDialog } from "@/components/camera-capt
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMedia } from "@/components/student-media";
 import { StudentWhiteboard } from "@/components/student-whiteboard";
+import { VideoSearch } from "@/components/video-search";
+import { DeleteStudentButton } from "@/components/delete-student-button";
+
 import { ProgressSummary } from "@/components/progress-summary";
 import { WhatsAppButton, generalReminder, paymentReminder } from "@/components/whatsapp-dialog";
 import { Button } from "@/components/ui/button";
