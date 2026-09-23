@@ -589,7 +589,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
     };
 
-  }, [data, hydrated, loading, role, coachId, userName, email, refresh]);
+  }, [data, hydrated, loading, role, coachId, studentId, userName, email, refresh]);
 
   return <StoreContext.Provider value={api}>{children}</StoreContext.Provider>;
 }
