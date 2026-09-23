@@ -142,7 +142,9 @@ function StudentDetail() {
           <StudentMedia student={student} />
         </TabsContent>
 
-        <TabsContent value="resumen" className="mt-4 grid gap-6 lg:grid-cols-2">
+        <TabsContent value="resumen" className="mt-4 space-y-6">
+        <ProgressSummary studentId={student.id} studentName={student.name} />
+        <div className="grid gap-6 lg:grid-cols-2">
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Historial de asistencia</h2>
