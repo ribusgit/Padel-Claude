@@ -51,7 +51,7 @@ export const generateProgressSummary = createServerFn({ method: "POST" })
     const rate = attendance.length ? Math.round((present / attendance.length) * 100) : null;
 
     const apiKey = process.env["LOVABLE_API_KEY"];
-    if (!apiKey) throw new Error("Falta la configuración de IA");
+    if (!apiKey) return { ok: false as const, message: "Falta la configuración de IA" };
 
     const runIdFetch = createRunIdFetch();
     const lovable = createOpenAI({
