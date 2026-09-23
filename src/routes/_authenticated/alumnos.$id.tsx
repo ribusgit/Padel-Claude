@@ -47,7 +47,12 @@ function StudentDetail() {
   const [note, setNote] = useState("");
   const [noteCoachId, setNoteCoachId] = useState(coachId ?? data.coaches[0]?.id ?? "");
 
-  if (!student) throw notFound();
+  if (!student) {
+    if (loading) {
+      return <p className="py-16 text-center text-sm text-muted-foreground">Cargando la ficha…</p>;
+    }
+    throw notFound();
+  }
 
   const attendance = [...student.attendance].sort((a, b) => b.date.localeCompare(a.date));
   const presentCount = attendance.filter((a) => a.present).length;
