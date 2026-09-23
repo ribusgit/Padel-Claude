@@ -4,7 +4,8 @@ import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowLeft, Phone, Mail, CalendarCheck, Check, X, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
-import { LevelBadge, PaymentBadge, Avatar, EmptyState } from "@/components/padel-ui";
+import { LevelBadge, PaymentBadge, EmptyState } from "@/components/padel-ui";
+import { StudentAvatar, resizePhoto } from "@/components/student-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMedia } from "@/components/student-media";
 import { StudentWhiteboard } from "@/components/student-whiteboard";
@@ -64,7 +65,7 @@ function StudentDetail() {
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-start gap-4">
-          <Avatar name={student.name} className="size-14 text-lg" />
+          <StudentPhotoButton student={student} />
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl font-bold">{student.name}</h1>
             <div className="mt-2 flex flex-wrap gap-2">
