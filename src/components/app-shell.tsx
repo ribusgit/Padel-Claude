@@ -127,7 +127,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Navegación inferior en móvil */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-sidebar/95 backdrop-blur md:hidden">
-        <ul className={cn("grid", nav.length === 3 ? "grid-cols-3" : "grid-cols-6")}>
+        <ul className={cn("grid", nav.length <= 4 ? "grid-cols-4" : "grid-cols-4")}>
           {nav.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <Link
