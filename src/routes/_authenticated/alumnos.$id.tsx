@@ -78,18 +78,22 @@ function StudentDetail() {
               <PaymentBadge status={student.paymentStatus} />
             </div>
           </div>
-          <WhatsAppButton
-            message={{
-              to: student.name,
-              phone: student.phone,
-              kind: student.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
-              body:
-                student.paymentStatus === "pendiente"
-                  ? paymentReminder(student.name, PLAN_PRICES[student.plan], format(new Date(), "MMMM", { locale: es }))
-                  : generalReminder(student.name),
-            }}
-            label="Notificar"
-          />
+          <div className="flex shrink-0 items-center gap-1">
+            <WhatsAppButton
+              message={{
+                to: student.name,
+                phone: student.phone,
+                kind: student.paymentStatus === "pendiente" ? "Recordatorio de pago" : "Recordatorio",
+                body:
+                  student.paymentStatus === "pendiente"
+                    ? paymentReminder(student.name, PLAN_PRICES[student.plan], format(new Date(), "MMMM", { locale: es }))
+                    : generalReminder(student.name),
+              }}
+              label="Notificar"
+            />
+            <DeleteStudentButton student={student} redirectToList />
+          </div>
+
         </div>
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm md:grid-cols-4">
           <div>
