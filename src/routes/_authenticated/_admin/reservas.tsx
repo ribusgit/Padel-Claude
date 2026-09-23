@@ -179,10 +179,13 @@ function BookingsPage() {
               <span key={c} className="border-l border-border px-2 py-2.5 text-center">Pista {c}</span>
             ))}
           </div>
-          {COURT_HOURS.map((hour) => (
+          {hours.map((hour) => (
             <div
               key={hour}
-              className="grid border-b border-border last:border-0"
+              className={cn(
+                "grid border-b border-border last:border-0",
+                hour === currentHour && "bg-primary/5 ring-1 ring-inset ring-primary/40",
+              )}
               style={{ gridTemplateColumns: `64px repeat(${COURTS.length}, minmax(0,1fr))` }}
             >
               <span className="flex items-center px-2 py-1 font-mono text-xs text-muted-foreground">{hour}</span>
