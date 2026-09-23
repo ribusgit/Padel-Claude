@@ -141,12 +141,15 @@ function MediaCard({ item, student }: { item: MediaItem; student: Student }) {
 }
 
 export function StudentMedia({ student }: { student: Student }) {
-  const { data, addMedia } = useStore();
+  const { data, addMedia, updateMedia } = useStore();
+  const analyze = useServerFn(analyzeTechnique);
   const items = data.media.filter((m) => m.studentId === student.id);
   const fileInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [autoAnalyze, setAutoAnalyze] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
   const [pending, setPending] = useState<{ file: File; kind: "foto" | "video" } | null>(null);
   const [title, setTitle] = useState("");
   const [comment, setComment] = useState("");
