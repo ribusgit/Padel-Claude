@@ -242,6 +242,22 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
     return () => ro.disconnect();
   }, [resize]);
 
+  // iPadOS: bloquea scroll, zoom y Scribble mientras se dibuja en el lienzo
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const block = (e: Event) => e.preventDefault();
+    const opts = { passive: false } as AddEventListenerOptions;
+    canvas.addEventListener("touchstart", block, opts);
+    canvas.addEventListener("touchmove", block, opts);
+    canvas.addEventListener("gesturestart", block, opts);
+    return () => {
+      canvas.removeEventListener("touchstart", block, opts);
+      canvas.removeEventListener("touchmove", block, opts);
+      canvas.removeEventListener("gesturestart", block, opts);
+    };
+  }, []);
+
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
