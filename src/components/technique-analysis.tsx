@@ -88,7 +88,7 @@ export function TechniqueAnalysis({ item, student }: { item: MediaItem; student:
               size="sm"
               variant="secondary"
               onClick={() => {
-                void updateMedia(item.id, { comment: analysis.slice(0, 2000) }).then(() =>
+                void updateMedia(item.id, { comment: `${TECHNIQUE_REPORT_MARK}\n${analysis}`.slice(0, 2000) }).then(() =>
                   toast.success("Análisis guardado en el archivo"),
                 );
               }}

@@ -78,6 +78,14 @@ export interface CourtBooking {
 
 export type MediaKind = "foto" | "video";
 
+/** Marca con la que empiezan los informes de técnica generados con IA en el comentario del archivo. */
+export const TECHNIQUE_REPORT_MARK = "🔬 INFORME DE TÉCNICA";
+
+/** Detecta si el comentario de un archivo multimedia es un informe de técnica con IA. */
+export function isTechniqueReport(comment: string): boolean {
+  return comment.includes(TECHNIQUE_REPORT_MARK) || comment.includes("GOLPE DETECTADO");
+}
+
 export interface MediaItem {
   id: string;
   studentId: string;

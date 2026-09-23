@@ -190,7 +190,7 @@ export function StudentMedia({ student }: { student: Student }) {
         toast.error(res.message || "No se ha podido generar el informe automático");
         return;
       }
-      const body = note ? `${note}\n\n${res.analysis}` : res.analysis;
+      const body = note ? `${note}\n\n${TECHNIQUE_REPORT_MARK}\n${res.analysis}` : `${TECHNIQUE_REPORT_MARK}\n${res.analysis}`;
       await updateMedia(mediaId, { comment: body.slice(0, 4000) });
       toast.success("Informe de técnica generado automáticamente");
     } catch (error) {
