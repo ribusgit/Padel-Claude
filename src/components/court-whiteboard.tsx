@@ -202,6 +202,7 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
   const [cameraOn, setCameraOn] = useState(false);
   const [facing, setFacing] = useState<"environment" | "user">("environment");
   const [frozen, setFrozen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const cameraRef = useRef(false);
   cameraRef.current = cameraOn;
