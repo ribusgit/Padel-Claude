@@ -66,7 +66,7 @@ interface StoreApi {
   setClubHours: (hours: ClubDayHours[]) => Promise<void>;
   addBooking: (b: Omit<CourtBooking, "id">) => Promise<void>;
   deleteBooking: (id: string) => Promise<void>;
-  addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<void>;
+  addMedia: (m: Omit<MediaItem, "id" | "createdAt">, file: Blob) => Promise<string>;
   updateMedia: (id: string, patch: Partial<MediaItem>) => Promise<void>;
   deleteMedia: (id: string) => Promise<void>;
   addMaterial: (m: Omit<MaterialItem, "id">) => Promise<void>;
@@ -478,22 +478,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       addMedia: async (input, file) => {
         const path = await uploadMediaFile(input.studentId, file, input.fileName);
-        const { error } = await supabase.from("media").insert({
-          student_id: input.studentId,
-          coach_id: currentCoach(),
-          kind: input.kind,
-          title: input.title,
-          comment: input.comment,
-          storage_path: path,
-          file_name: input.fileName,
-          mime_type: input.mimeType,
-          size: input.size,
-        });
+        const { data: inserted, error } = await supabase
+          .from("media")
+          .insert({
+            student_id: input.studentId,
+            coach_id: currentCoach(),
+            kind: input.kind,
+            title: input.title,
+            comment: input.comment,
+            storage_path: path,
+            file_name: input.fileName,
+            mime_type: input.mimeType,
+            size: input.size,
+          })
+          .select("id")
+          .single();
         if (error) {
           await removeMediaFile(path);
           throw error;
         }
         await refresh();
+        return inserted.id;
       },
       updateMedia: async (id, patch) => {
         const payload: Database["public"]["Tables"]["media"]["Update"] = {};
