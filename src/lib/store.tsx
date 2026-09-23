@@ -65,7 +65,9 @@ interface StoreApi {
   updateClass: (id: string, patch: Partial<ClassSession>) => Promise<void>;
   deleteClass: (id: string) => Promise<void>;
   markAttendance: (classId: string, studentId: string, present: boolean) => Promise<void>;
-  setPaid: (studentId: string, paid: boolean) => Promise<void>;
+  setPaid: (studentId: string, paid: boolean, method?: PaymentMethod) => Promise<void>;
+  setPlanFee: (plan: Plan, amount: number) => Promise<void>;
+  setBizumPhone: (phone: string) => Promise<void>;
   setClubHours: (hours: ClubDayHours[]) => Promise<void>;
   addBooking: (b: Omit<CourtBooking, "id">) => Promise<void>;
   deleteBooking: (id: string) => Promise<void>;
@@ -290,7 +292,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         await supabase.from("payments").insert({
           student_id: row.id,
           month: monthKey(),
-          amount: PLAN_PRICES[input.plan],
+          amount: data.feePlans[input.plan] ?? PLAN_PRICES[input.plan],
           paid: input.paymentStatus === "pagado",
           paid_at: input.paymentStatus === "pagado" ? todayKey() : null,
         });
@@ -429,23 +431,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (insErr) throw insErr;
         await refresh();
       },
-      setPaid: async (studentId, paid) => {
+      setPaid: async (studentId, paid, method = "manual") => {
         const month = monthKey();
         const student = data.students.find((s) => s.id === studentId);
         const existing = data.payments.find((p) => p.studentId === studentId && p.month === month);
         if (existing) {
           const { error } = await supabase
             .from("payments")
-            .update({ paid, paid_at: paid ? todayKey() : null })
+            .update({ paid, paid_at: paid ? todayKey() : null, method: paid ? method : "manual" })
             .eq("id", existing.id);
           if (error) throw error;
         } else {
           const { error } = await supabase.from("payments").insert({
             student_id: studentId,
             month,
-            amount: student ? PLAN_PRICES[student.plan] : 0,
+            amount: student ? data.feePlans[student.plan] : 0,
             paid,
             paid_at: paid ? todayKey() : null,
+            method: paid ? method : "manual",
           });
           if (error) throw error;
         }
