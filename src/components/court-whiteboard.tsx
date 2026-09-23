@@ -191,6 +191,7 @@ export function CourtWhiteboard({ onSave, saveLabel = "Guardar dibujo" }: CourtW
   const redoRef = useRef<Stroke[]>([]);
   const drawingRef = useRef<{ id: number; stroke: Stroke } | null>(null);
   const lastPenAtRef = useRef(0);
+  const penSeenRef = useRef(false);
   const sizeRef = useRef({ w: 0, h: 0 });
 
   const [tool, setTool] = useState<Tool>("pen");
