@@ -10,6 +10,11 @@ import {
   Trash2,
   Download,
   Hand,
+  Video,
+  VideoOff,
+  SwitchCamera,
+  Snowflake,
+  LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
