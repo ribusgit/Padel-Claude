@@ -24,6 +24,7 @@ import { useStore } from "@/lib/store";
 
 type NavTo =
   | "/"
+  | "/panel"
   | "/alumnos"
   | "/calendario"
   | "/horarios"
