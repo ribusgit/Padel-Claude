@@ -36,7 +36,7 @@ function PaymentsPage() {
   const month = monthKey();
 
   const rows = data.students
-    .filter((s) => s.active)
+    .filter((s) => s.active && s.plan !== "prueba")
     .map((s) => {
       const p = data.payments.find((x) => x.studentId === s.id && x.month === month);
       return { student: s, amount: p?.amount ?? data.feePlans[s.plan], paid: s.paymentStatus === "pagado", paidAt: p?.paidAt, method: p?.method };
