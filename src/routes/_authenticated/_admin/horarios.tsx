@@ -11,7 +11,7 @@ import { ClassRemindersButton } from "@/components/class-reminders-button";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { COURT_HOURS, todayKey, type ClassSession } from "@/lib/padel";
+import { HALF_HOUR_SLOTS, classEndTime, timeToMin, todayKey, type ClassSession } from "@/lib/padel";
 
 export const Route = createFileRoute("/_authenticated/_admin/horarios")({
   head: () => ({
@@ -33,7 +33,22 @@ function SchedulePage() {
   const classAt = (day: Date, hour: string): ClassSession[] => {
     const key = format(day, "yyyy-MM-dd");
     return data.classes
-      .filter((c) => c.date === key && c.time === hour)
+      .filter((c) => {
+        const start = timeToMin(c.time);
+        return c.date === key && start >= timeToMin(hour) && start < timeToMin(hour) + 30;
+      })
+      .sort((a, b) => a.court - b.court);
+  };
+
+  /** Clases que empezaron antes y siguen en curso durante esta franja. */
+  const ongoingAt = (day: Date, hour: string): ClassSession[] => {
+    const key = format(day, "yyyy-MM-dd");
+    const slot = timeToMin(hour);
+    return data.classes
+      .filter((c) => {
+        const start = timeToMin(c.time);
+        return c.date === key && start < slot && start + (c.durationMin || 60) > slot;
+      })
       .sort((a, b) => a.court - b.court);
   };
 
@@ -89,22 +104,32 @@ function SchedulePage() {
             </tr>
           </thead>
           <tbody>
-            {COURT_HOURS.map((hour) => (
-              <tr key={hour} className="border-b border-border/60 last:border-0">
-                <td className="sticky left-0 z-10 bg-card p-2 font-display text-xs font-semibold text-muted-foreground">{hour}</td>
+            {HALF_HOUR_SLOTS.map((hour) => (
+              <tr key={hour} className={cn("border-b last:border-0", hour.endsWith(":30") ? "border-border/60" : "border-border/30")}>
+                <td className={cn("sticky left-0 z-10 bg-card p-2 font-display text-xs font-semibold", hour.endsWith(":30") ? "text-muted-foreground/60" : "text-muted-foreground")}>{hour}</td>
                 {days.map((d) => {
                   const classes = classAt(d, hour);
+                  const ongoing = ongoingAt(d, hour);
                   const dateKey = format(d, "yyyy-MM-dd");
                   return (
                     <td key={d.toISOString()} className={cn("align-top p-1", isSameDay(d, new Date()) && "bg-primary/5")}>
+                      {ongoing.length > 0 && (
+                        <div className="mb-1 space-y-0.5">
+                          {ongoing.map((c) => (
+                            <div key={c.id} className="truncate rounded-md border-l-2 border-primary/60 bg-primary/5 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                              Pista {c.court} · hasta {classEndTime(c.time, c.durationMin || 60)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       {classes.length === 0 ? (
-                        dateKey >= todayKey() ? (
+                        ongoing.length > 0 ? null : dateKey >= todayKey() ? (
                           <ClassDialog
                             defaultDate={dateKey}
                             defaultTime={hour}
                             trigger={
                               <button
-                                className="flex h-12 w-full items-center justify-center rounded-lg border border-dashed border-border/70 text-muted-foreground/50 transition-colors hover:border-primary/60 hover:text-primary"
+                                className="flex h-9 w-full items-center justify-center rounded-lg border border-dashed border-border/70 text-muted-foreground/50 transition-colors hover:border-primary/60 hover:text-primary"
                                 aria-label={`Programar clase el ${format(d, "EEEE d", { locale: es })} a las ${hour}`}
                               >
                                 <Plus className="size-4" />
@@ -112,7 +137,7 @@ function SchedulePage() {
                             }
                           />
                         ) : (
-                          <div className="h-12" />
+                          <div className="h-9" />
                         )
                       ) : (
                         <ul className="space-y-1">
@@ -124,7 +149,7 @@ function SchedulePage() {
                                 className="group rounded-lg border border-primary/30 bg-primary/10 px-2 py-1.5"
                               >
                                 <div className="flex items-center justify-between gap-1">
-                                  <span className="text-xs font-bold">Pista {c.court}</span>
+                                  <span className="text-xs font-bold">Pista {c.court} · {c.time}–{classEndTime(c.time, c.durationMin || 60)}</span>
                                   <span className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                     <ClassDialog
                                       session={c}
