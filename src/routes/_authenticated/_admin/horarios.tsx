@@ -136,8 +136,8 @@ function SchedulePage() {
         Toca una franja vacía para programar una clase en ese día y hora. Cada clase ocupa exactamente el espacio entre su hora de inicio y de final, y bloquea la pista en el cuadrante de reservas automáticamente.
       </p>
 
-      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-        <div className="min-w-[1180px]">
+      <div className="rounded-2xl border border-border bg-card">
+        <div>
           {/* Cabecera de días */}
           <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-border">
             <div className="sticky left-0 z-20 bg-card p-2 text-xs font-medium text-muted-foreground">Hora</div>
