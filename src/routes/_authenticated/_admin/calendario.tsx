@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarPlus, ChevronLeft, ChevronRight, Trash2, Users } from "lucide-react";
+import { CalendarPlus, ChevronLeft, ChevronRight, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { LevelBadge, EmptyState } from "@/components/padel-ui";
@@ -188,16 +188,29 @@ function CalendarPage() {
                       ))}
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      void deleteClass(c.id);
-                      toast.success("Clase eliminada");
-                    }}
-                    className="flex w-11 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    aria-label="Eliminar clase"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
+                  <div className="flex w-11 shrink-0 flex-col">
+                    <ClassDialog
+                      session={c}
+                      trigger={
+                        <button
+                          className="flex flex-1 items-center justify-center text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                          aria-label="Editar clase"
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                      }
+                    />
+                    <button
+                      onClick={() => {
+                        void deleteClass(c.id);
+                        toast.success("Clase eliminada");
+                      }}
+                      className="flex flex-1 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      aria-label="Eliminar clase"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
                 </div>
               </li>
             );

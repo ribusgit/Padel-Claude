@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarPlus, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { CalendarPlus, ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { LevelBadge } from "@/components/padel-ui";
@@ -125,16 +125,29 @@ function SchedulePage() {
                               >
                                 <div className="flex items-center justify-between gap-1">
                                   <span className="text-xs font-bold">Pista {c.court}</span>
-                                  <button
-                                    onClick={() => {
-                                      void deleteClass(c.id);
-                                      toast.success("Clase eliminada");
-                                    }}
-                                    className="text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
-                                    aria-label="Eliminar clase"
-                                  >
-                                    <Trash2 className="size-3.5" />
-                                  </button>
+                                  <span className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                    <ClassDialog
+                                      session={c}
+                                      trigger={
+                                        <button
+                                          className="text-muted-foreground transition-colors hover:text-primary"
+                                          aria-label="Editar clase"
+                                        >
+                                          <Pencil className="size-3.5" />
+                                        </button>
+                                      }
+                                    />
+                                    <button
+                                      onClick={() => {
+                                        void deleteClass(c.id);
+                                        toast.success("Clase eliminada");
+                                      }}
+                                      className="text-muted-foreground transition-colors hover:text-destructive"
+                                      aria-label="Eliminar clase"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </button>
+                                  </span>
                                 </div>
                                 <p className="truncate text-[11px] text-muted-foreground">{coach?.name ?? "Sin profesor"}</p>
                                 <div className="mt-1 flex items-center justify-between gap-1">
