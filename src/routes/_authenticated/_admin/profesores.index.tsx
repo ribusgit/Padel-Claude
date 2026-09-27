@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { UserPlus, ChevronRight, CalendarDays, KeyRound } from "lucide-react";
+import { UserPlus, ChevronRight, CalendarDays, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { Avatar } from "@/components/padel-ui";
@@ -89,7 +89,21 @@ function AccountDialog({ coach }: { coach: Coach }) {
 }
 
 function CoachesPage() {
-  const { data, addCoach } = useStore();
+  const { data, addCoach, deleteCoach } = useStore();
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const removeCoach = async (c: Coach) => {
+    if (!window.confirm(`¿Eliminar a ${c.name}? Sus clases quedarán sin profesor asignado.`)) return;
+    setDeleting(c.id);
+    try {
+      await deleteCoach(c.id);
+      toast.success("Profesor eliminado");
+    } catch {
+      toast.error("No se pudo eliminar el profesor");
+    } finally {
+      setDeleting(null);
+    }
+  };
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -174,6 +188,14 @@ function CoachesPage() {
                   Ver sus clases <ChevronRight className="size-4" />
                 </Link>
                 <AccountDialog coach={c} />
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={deleting === c.id}
+                  onClick={() => void removeCoach(c)}
+                >
+                  <Trash2 /> {deleting === c.id ? "Eliminando…" : "Eliminar"}
+                </Button>
               </div>
             </li>
           );
