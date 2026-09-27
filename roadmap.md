@@ -8,3 +8,5 @@
 - [x] Número de Bizum real del club configurado (665295627)
 - [x] Probar pago completo desde Mi portal hasta la deuda actualizada — verificado (Bizum)
 - [x] Home pública de la web con botón "Entrar" (el panel vive en /panel)
+
+- [ ] Envío automático por WhatsApp Business (bloqueado: falta dar de alta el número)
