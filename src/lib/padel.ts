@@ -1,7 +1,7 @@
 import { addDays, format, subDays } from "date-fns";
 
 export type PaymentStatus = "pagado" | "pendiente";
-export type Plan = "1x" | "2x" | "particular";
+export type Plan = "1x" | "2x" | "particular" | "prueba";
 export type LevelCategory = "iniciacion" | "intermedio" | "avanzado";
 
 export interface AttendanceRecord {
@@ -51,6 +51,8 @@ export interface ClassSession {
   level: LevelCategory;
   studentIds: string[];
   attendance: Record<string, boolean>;
+  /** Clase de prueba, sin coste para el alumno. */
+  isTrial?: boolean | undefined;
 }
 
 export type PaymentMethod = "tarjeta" | "bizum" | "manual";
@@ -220,6 +222,7 @@ export const PLAN_LABELS: Record<Plan, string> = {
   "1x": "1 clase/semana",
   "2x": "2 clases/semana",
   particular: "Clases particulares",
+  prueba: "Alumno de prueba (sin coste)",
 };
 
 /** Tarifas iniciales por defecto; la app usa las editables de `AppData.feePlans`. */
@@ -227,6 +230,7 @@ export const PLAN_PRICES: Record<Plan, number> = {
   "1x": 55,
   "2x": 95,
   particular: 140,
+  prueba: 0,
 };
 
 export const LEVEL_LABELS: Record<LevelCategory, string> = {

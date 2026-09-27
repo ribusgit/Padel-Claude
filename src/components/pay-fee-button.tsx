@@ -11,6 +11,7 @@ const PRICE_IDS: Record<Plan, string> = {
   "1x": "cuota_1x",
   "2x": "cuota_2x",
   particular: "cuota_particular",
+  prueba: "cuota_prueba",
 };
 
 interface PayFeeButtonProps {
@@ -48,6 +49,8 @@ export function PayFeeButton({ studentId, studentName, plan, email, month, amoun
       });
     })().catch(() => toast.error("No se pudo abrir el pago. Inténtalo de nuevo."));
   };
+
+  if (plan === "prueba" || amount <= 0) return null;
 
   return (
     <Button

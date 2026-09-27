@@ -30,6 +30,7 @@ export function FeeSettingsDialog() {
     "1x": String(data.feePlans["1x"]),
     "2x": String(data.feePlans["2x"]),
     particular: String(data.feePlans.particular),
+    prueba: "0",
   };
   const currentBizum = bizum ?? data.bizumPhone;
 

@@ -144,7 +144,7 @@ function CalendarPage() {
                   <div className="min-w-0 flex-1 p-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-semibold">Pista {c.court}</p>
-                      <LevelBadge category={c.level} />
+                      <LevelBadge category={c.level} />{c.isTrial && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">Prueba · gratis</span>}
                       <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
                         <Users className="size-3.5" /> {c.studentIds.length}/{MAX_STUDENTS_PER_CLASS}
                       </span>

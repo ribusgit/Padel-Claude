@@ -138,7 +138,7 @@ function SchedulePage() {
                                 </div>
                                 <p className="truncate text-[11px] text-muted-foreground">{coach?.name ?? "Sin profesor"}</p>
                                 <div className="mt-1 flex items-center justify-between gap-1">
-                                  <LevelBadge category={c.level} />
+                                  <LevelBadge category={c.level} />{c.isTrial && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">Prueba · gratis</span>}
                                   <span className="text-[10px] text-muted-foreground">{c.studentIds.length}/4</span>
                                 </div>
                                 {c.studentIds.length > 0 && (

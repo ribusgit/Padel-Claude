@@ -37,6 +37,7 @@ export function ClassDialog({
   const [coachId, setCoachId] = useState(data.coaches[0]?.id ?? "");
   const [level, setLevel] = useState<LevelCategory>("intermedio");
   const [studentIds, setStudentIds] = useState<string[]>([]);
+  const [isTrial, setIsTrial] = useState(false);
 
   const candidates = useMemo(
     () => data.students.filter((s) => s.active && levelCategory(s.level) === level),
@@ -65,7 +66,7 @@ export function ClassDialog({
       toast.error(`La pista ${court} ya está ocupada a las ${time}`);
       return;
     }
-    void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds });
+    void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds, isTrial });
     toast.success("Clase programada");
     setOpen(false);
     setStudentIds([]);
@@ -176,6 +177,10 @@ export function ClassDialog({
               </div>
             )}
           </div>
+          <label className="flex items-center gap-3 rounded-md border border-border p-3 text-sm">
+            <input type="checkbox" className="size-4 accent-primary" checked={isTrial} onChange={(e) => setIsTrial(e.target.checked)} />
+            <span><strong>Clase de prueba</strong> · sin coste para los alumnos</span>
+          </label>
           <Button type="submit" className="w-full" size="lg">Guardar clase</Button>
         </form>
       </DialogContent>
