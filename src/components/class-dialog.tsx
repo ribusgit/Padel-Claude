@@ -13,6 +13,10 @@ import {
   LEVEL_LABELS,
   LEVEL_RANGES,
   MAX_STUDENTS_PER_CLASS,
+  CLASS_DURATIONS,
+  HALF_HOUR_SLOTS,
+  classEndTime,
+  classesOverlap,
   levelCategory,
   todayKey,
   type ClassSession,
@@ -42,6 +46,7 @@ export function ClassDialog({
   const [level, setLevel] = useState<LevelCategory>("intermedio");
   const [studentIds, setStudentIds] = useState<string[]>([]);
   const [isTrial, setIsTrial] = useState(false);
+  const [duration, setDuration] = useState(60);
 
   const resetFromSession = () => {
     if (!session) return;
@@ -52,6 +57,7 @@ export function ClassDialog({
     setLevel(session.level);
     setStudentIds(session.studentIds);
     setIsTrial(session.isTrial ?? false);
+    setDuration(session.durationMin || 60);
   };
 
   const candidates = useMemo(
@@ -77,17 +83,21 @@ export function ClassDialog({
       return;
     }
     const clash = data.classes.some(
-      (c) => c.id !== session?.id && c.date === date && c.time === time && c.court === Number(court),
+      (c) =>
+        c.id !== session?.id &&
+        c.date === date &&
+        c.court === Number(court) &&
+        classesOverlap(c.time, c.durationMin || 60, time, duration),
     );
     if (clash) {
-      toast.error(`La pista ${court} ya está ocupada a las ${time}`);
+      toast.error(`La pista ${court} ya está ocupada entre las ${time} y las ${classEndTime(time, duration)}`);
       return;
     }
     if (editing && session) {
-      void updateClass(session.id, { date, time, court: Number(court), coachId, level, studentIds, isTrial });
+      void updateClass(session.id, { date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial });
       toast.success("Clase actualizada");
     } else {
-      void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds, isTrial });
+      void addClass({ date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial });
       toast.success("Clase programada");
     }
     setOpen(false);
@@ -117,8 +127,34 @@ export function ClassDialog({
               <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="time">Hora</Label>
-              <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+              <Label>Hora de inicio</Label>
+              <Select value={time} onValueChange={setTime}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {HALF_HOUR_SLOTS.map((t) => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Hora de final</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {CLASS_DURATIONS.map((d) => (
+                <button
+                  type="button"
+                  key={d}
+                  onClick={() => setDuration(d)}
+                  className={cn(
+                    "rounded-xl border px-2 py-2 text-center transition-colors",
+                    duration === d ? "border-primary bg-primary/10" : "border-border hover:bg-accent",
+                  )}
+                >
+                  <p className="font-display text-sm font-bold">{classEndTime(time, d)}</p>
+                  <p className="text-[11px] text-muted-foreground">{{ 30: "30 min", 60: "1 h", 90: "1 h 30", 120: "2 h" }[d]}</p>
+                </button>
+              ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
