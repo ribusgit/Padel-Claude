@@ -169,6 +169,22 @@ export const MAX_STUDENTS_PER_CLASS = 4;
 /** Franjas horarias máximas del cuadrante (07:00 – 00:00), se recortan al horario del club. */
 export const COURT_HOURS = Array.from({ length: 17 }, (_, i) => `${String(7 + i).padStart(2, "0")}:00`);
 
+/** Franjas de media hora (07:00 – 23:30) para clases y horarios. */
+export const HALF_HOUR_SLOTS = Array.from({ length: 34 }, (_, i) => {
+  const m = 7 * 60 + i * 30;
+  return `${String(Math.floor(m / 60)).padStart(2, "0")}:${m % 60 === 0 ? "00" : "30"}`;
+});
+
+/** Duraciones permitidas para una clase (en minutos). */
+export const CLASS_DURATIONS = [30, 60, 90, 120];
+
+/** ¿Se solapan dos clases en el tiempo? */
+export function classesOverlap(aTime: string, aDur: number, bTime: string, bDur: number) {
+  const a = timeToMin(aTime);
+  const b = timeToMin(bTime);
+  return a < b + bDur && b < a + aDur;
+}
+
 export const WEEKDAY_LABELS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 export const DEFAULT_CLUB_HOURS: ClubDayHours[] = Array.from({ length: 7 }, (_, weekday) => ({
