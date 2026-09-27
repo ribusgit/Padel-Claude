@@ -23,13 +23,16 @@ export function ClassDialog({
   defaultDate,
   defaultTime,
   defaultCourt,
+  session,
 }: {
   trigger: ReactNode;
   defaultDate?: string;
   defaultTime?: string;
   defaultCourt?: number;
+  session?: ClassSession;
 }) {
-  const { data, addClass } = useStore();
+  const { data, addClass, updateClass } = useStore();
+  const editing = Boolean(session);
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(defaultDate ?? todayKey());
   const [time, setTime] = useState(defaultTime ?? "18:00");
@@ -38,6 +41,17 @@ export function ClassDialog({
   const [level, setLevel] = useState<LevelCategory>("intermedio");
   const [studentIds, setStudentIds] = useState<string[]>([]);
   const [isTrial, setIsTrial] = useState(false);
+
+  const resetFromSession = () => {
+    if (!session) return;
+    setDate(session.date);
+    setTime(session.time);
+    setCourt(String(session.court));
+    setCoachId(session.coachId ?? "");
+    setLevel(session.level);
+    setStudentIds(session.studentIds);
+    setIsTrial(session.isTrial ?? false);
+  };
 
   const candidates = useMemo(
     () => data.students.filter((s) => s.active && levelCategory(s.level) === level),
