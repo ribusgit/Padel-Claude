@@ -75,15 +75,22 @@ export function ClassDialog({
       toast.error("Registra un profesor antes de crear clases");
       return;
     }
-    const clash = data.classes.some((c) => c.date === date && c.time === time && c.court === Number(court));
+    const clash = data.classes.some(
+      (c) => c.id !== session?.id && c.date === date && c.time === time && c.court === Number(court),
+    );
     if (clash) {
       toast.error(`La pista ${court} ya está ocupada a las ${time}`);
       return;
     }
-    void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds, isTrial });
-    toast.success("Clase programada");
+    if (editing && session) {
+      void updateClass(session.id, { date, time, court: Number(court), coachId, level, studentIds, isTrial });
+      toast.success("Clase actualizada");
+    } else {
+      void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds, isTrial });
+      toast.success("Clase programada");
+    }
     setOpen(false);
-    setStudentIds([]);
+    if (!editing) setStudentIds([]);
   };
 
   return (
@@ -91,6 +98,7 @@ export function ClassDialog({
       open={open}
       onOpenChange={(o) => {
         setOpen(o);
+        if (o && session) resetFromSession();
         if (o && defaultDate) setDate(defaultDate);
         if (o && defaultTime) setTime(defaultTime);
         if (o && defaultCourt) setCourt(String(defaultCourt));
@@ -99,7 +107,7 @@ export function ClassDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Programar clase</DialogTitle>
+          <DialogTitle>{editing ? "Editar clase" : "Programar clase"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
