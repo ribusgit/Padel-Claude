@@ -212,8 +212,8 @@ function SchedulePage() {
                         className="group absolute z-10 overflow-hidden rounded-lg border border-primary/30 bg-primary/10 px-2 py-1"
                         style={{ top: top + 2, height, left: `calc(${leftPct}% + 2px)`, width: `calc(${widthPct}% - 4px)` }}
                       >
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="truncate text-xs font-bold">
+                        <div className="flex items-start justify-between gap-1">
+                          <span className="break-words text-[10px] font-bold leading-tight">
                             Pista {c.court} · {c.time}–{classEndTime(c.time, c.durationMin || 60)}
                           </span>
                           <span className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
