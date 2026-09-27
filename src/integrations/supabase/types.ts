@@ -94,6 +94,7 @@ export type Database = {
           date: string
           duration_min: number
           id: string
+          is_trial: boolean
           level: string
           student_ids: string[]
           time: string
@@ -106,6 +107,7 @@ export type Database = {
           date: string
           duration_min?: number
           id?: string
+          is_trial?: boolean
           level: string
           student_ids?: string[]
           time: string
@@ -118,6 +120,7 @@ export type Database = {
           date?: string
           duration_min?: number
           id?: string
+          is_trial?: boolean
           level?: string
           student_ids?: string[]
           time?: string
