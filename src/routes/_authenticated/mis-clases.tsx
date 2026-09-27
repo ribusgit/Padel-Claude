@@ -61,7 +61,7 @@ function MyClasses() {
                 <header className="flex items-center gap-3 border-b border-border bg-secondary/60 px-4 py-3">
                   <span className="font-display text-xl font-bold">{c.time}</span>
                   <span className="font-semibold">Pista {c.court}</span>
-                  <LevelBadge category={c.level} />
+                  <LevelBadge category={c.level} />{c.isTrial && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">Prueba · gratis</span>}
                   <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
                     <Users className="size-3.5" /> {marked}/{students.length}
                   </span>
