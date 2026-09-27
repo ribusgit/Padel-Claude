@@ -15,6 +15,7 @@ import {
   MAX_STUDENTS_PER_CLASS,
   levelCategory,
   todayKey,
+  type ClassSession,
   type LevelCategory,
 } from "@/lib/padel";
 
