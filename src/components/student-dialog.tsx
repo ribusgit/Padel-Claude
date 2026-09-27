@@ -88,7 +88,7 @@ export function StudentDialog({ trigger, onCreated }: { trigger: ReactNode; onCr
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Tarifa</Label>
-              <Select value={plan} onValueChange={(v) => setPlan(v as Plan)}>
+              <Select value={plan} onValueChange={(v) => { setPlan(v as Plan); if (v === "prueba") setPayment("pagado"); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {(Object.keys(PLAN_LABELS) as Plan[]).map((p) => (
@@ -97,7 +97,9 @@ export function StudentDialog({ trigger, onCreated }: { trigger: ReactNode; onCr
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
+            {plan === "prueba" ? (
+              <p className="self-end rounded-md bg-primary/10 p-2 text-xs text-primary">Sin coste: no genera cuota.</p>
+            ) : <div className="space-y-1.5">
               <Label>Pago del mes</Label>
               <Select value={payment} onValueChange={(v) => setPayment(v as PaymentStatus)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -106,7 +108,7 @@ export function StudentDialog({ trigger, onCreated }: { trigger: ReactNode; onCr
                   <SelectItem value="pendiente">Pendiente</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div>}
           </div>
           <Button type="submit" className="w-full" size="lg">Guardar alumno</Button>
         </form>

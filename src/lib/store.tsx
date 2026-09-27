@@ -182,6 +182,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         level: c.level as LevelCategory,
         studentIds: c.student_ids ?? [],
         attendance: (c.attendance ?? {}) as Record<string, boolean>,
+        isTrial: c.is_trial ?? false,
       })),
       payments: (payments.data ?? []).map((p) => ({
         id: p.id,
@@ -234,6 +235,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         "1x": Number((feePlans.data ?? []).find((f) => f.plan === "1x")?.amount ?? PLAN_PRICES["1x"]),
         "2x": Number((feePlans.data ?? []).find((f) => f.plan === "2x")?.amount ?? PLAN_PRICES["2x"]),
         particular: Number((feePlans.data ?? []).find((f) => f.plan === "particular")?.amount ?? PLAN_PRICES.particular),
+        prueba: 0,
       },
       bizumPhone: settings.data?.bizum_phone ?? "",
     });
@@ -294,7 +296,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .select()
           .single();
         if (error) throw error;
-        await supabase.from("payments").insert({
+        if (input.plan !== "prueba") await supabase.from("payments").insert({
           student_id: row.id,
           month: monthKey(),
           amount: data.feePlans[input.plan] ?? PLAN_PRICES[input.plan],
@@ -400,6 +402,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           level: input.level,
           student_ids: input.studentIds,
           attendance: {},
+          is_trial: input.isTrial ?? false,
         });
         if (error) throw error;
         await refresh();
@@ -414,6 +417,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (patch.level !== undefined) payload["level"] = patch.level;
         if (patch.studentIds !== undefined) payload["student_ids"] = patch.studentIds;
         if (patch.attendance !== undefined) payload["attendance"] = patch.attendance;
+        if (patch.isTrial !== undefined) payload["is_trial"] = patch.isTrial;
         const { error } = await supabase.from("classes").update(payload).eq("id", id);
         if (error) throw error;
         await refresh();
