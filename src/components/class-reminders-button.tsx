@@ -4,6 +4,7 @@ import { es } from "date-fns/locale";
 import { Check, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -41,8 +42,11 @@ export function ClassRemindersButton({
     .map((id) => data.students.find((s) => s.id === id))
     .filter((s): s is NonNullable<typeof s> => Boolean(s));
 
+  const defaultTemplate = classReminder("{nombre}", session.time, session.court, coach, dayLabel);
+  const [template, setTemplate] = useState(defaultTemplate);
+
   const send = (student: (typeof students)[number]) => {
-    const body = classReminder(student.name, session.time, session.court, coach, dayLabel);
+    const body = template.split("{nombre}").join(student.name.split(" ")[0] ?? student.name);
     const digits = student.phone.replace(/\D/g, "");
     const url = digits
       ? `https://wa.me/${digits}?text=${encodeURIComponent(body)}`
@@ -92,6 +96,28 @@ export function ClassRemindersButton({
             {dayLabel} · {session.time} · Pista {session.court} · {coach}
           </DialogDescription>
         </DialogHeader>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Mensaje (editable)</p>
+            <button
+              type="button"
+              className="text-xs text-primary hover:underline"
+              onClick={() => setTemplate(defaultTemplate)}
+            >
+              Restaurar texto estándar
+            </button>
+          </div>
+          <Textarea
+            value={template}
+            onChange={(e) => setTemplate(e.target.value)}
+            className="min-h-32 text-sm"
+            maxLength={800}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Escribe {"{nombre}"} donde quieras que aparezca el nombre de cada alumno.
+          </p>
+        </div>
 
         {students.length === 0 ? (
           <p className="text-sm text-muted-foreground">Esta clase todavía no tiene alumnos apuntados.</p>
