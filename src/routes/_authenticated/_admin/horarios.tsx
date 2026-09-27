@@ -123,7 +123,7 @@ function SchedulePage() {
                         </div>
                       )}
                       {classes.length === 0 ? (
-                        ongoing.length > 0 ? null : dateKey >= todayKey() ? (
+                        ongoing.length >= 4 ? null : dateKey >= todayKey() ? (
                           <ClassDialog
                             defaultDate={dateKey}
                             defaultTime={hour}
