@@ -15,6 +15,7 @@ import {
   MAX_STUDENTS_PER_CLASS,
   levelCategory,
   todayKey,
+  type ClassSession,
   type LevelCategory,
 } from "@/lib/padel";
 
@@ -23,13 +24,16 @@ export function ClassDialog({
   defaultDate,
   defaultTime,
   defaultCourt,
+  session,
 }: {
   trigger: ReactNode;
   defaultDate?: string;
   defaultTime?: string;
   defaultCourt?: number;
+  session?: ClassSession;
 }) {
-  const { data, addClass } = useStore();
+  const { data, addClass, updateClass } = useStore();
+  const editing = Boolean(session);
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(defaultDate ?? todayKey());
   const [time, setTime] = useState(defaultTime ?? "18:00");
@@ -38,6 +42,17 @@ export function ClassDialog({
   const [level, setLevel] = useState<LevelCategory>("intermedio");
   const [studentIds, setStudentIds] = useState<string[]>([]);
   const [isTrial, setIsTrial] = useState(false);
+
+  const resetFromSession = () => {
+    if (!session) return;
+    setDate(session.date);
+    setTime(session.time);
+    setCourt(String(session.court));
+    setCoachId(session.coachId ?? "");
+    setLevel(session.level);
+    setStudentIds(session.studentIds);
+    setIsTrial(session.isTrial ?? false);
+  };
 
   const candidates = useMemo(
     () => data.students.filter((s) => s.active && levelCategory(s.level) === level),
@@ -61,15 +76,22 @@ export function ClassDialog({
       toast.error("Registra un profesor antes de crear clases");
       return;
     }
-    const clash = data.classes.some((c) => c.date === date && c.time === time && c.court === Number(court));
+    const clash = data.classes.some(
+      (c) => c.id !== session?.id && c.date === date && c.time === time && c.court === Number(court),
+    );
     if (clash) {
       toast.error(`La pista ${court} ya está ocupada a las ${time}`);
       return;
     }
-    void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds, isTrial });
-    toast.success("Clase programada");
+    if (editing && session) {
+      void updateClass(session.id, { date, time, court: Number(court), coachId, level, studentIds, isTrial });
+      toast.success("Clase actualizada");
+    } else {
+      void addClass({ date, time, durationMin: 60, court: Number(court), coachId, level, studentIds, isTrial });
+      toast.success("Clase programada");
+    }
     setOpen(false);
-    setStudentIds([]);
+    if (!editing) setStudentIds([]);
   };
 
   return (
@@ -77,6 +99,7 @@ export function ClassDialog({
       open={open}
       onOpenChange={(o) => {
         setOpen(o);
+        if (o && session) resetFromSession();
         if (o && defaultDate) setDate(defaultDate);
         if (o && defaultTime) setTime(defaultTime);
         if (o && defaultCourt) setCourt(String(defaultCourt));
@@ -85,7 +108,7 @@ export function ClassDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Programar clase</DialogTitle>
+          <DialogTitle>{editing ? "Editar clase" : "Programar clase"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
