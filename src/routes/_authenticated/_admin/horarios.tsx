@@ -137,7 +137,7 @@ function SchedulePage() {
       </p>
 
       <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-        <div className="min-w-[820px]">
+        <div className="min-w-[1180px]">
           {/* Cabecera de días */}
           <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-border">
             <div className="sticky left-0 z-20 bg-card p-2 text-xs font-medium text-muted-foreground">Hora</div>
