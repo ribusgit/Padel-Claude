@@ -63,6 +63,7 @@ interface StoreApi {
 
   addNote: (studentId: string, note: Omit<ProgressNote, "id">) => Promise<void>;
   addCoach: (c: Omit<Coach, "id">) => Promise<Coach | null>;
+  deleteCoach: (id: string) => Promise<void>;
   addClass: (c: Omit<ClassSession, "id" | "attendance">) => Promise<void>;
   updateClass: (id: string, patch: Partial<ClassSession>) => Promise<void>;
   deleteClass: (id: string) => Promise<void>;
@@ -391,6 +392,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (error) throw error;
         await refresh();
         return { ...input, id: row.id };
+      },
+      deleteCoach: async (id) => {
+        // Desasignar sus clases para no romper la relación
+        const { error: unassignError } = await supabase.from("classes").update({ coach_id: null }).eq("coach_id", id);
+        if (unassignError) throw unassignError;
+        const { error } = await supabase.from("coaches").delete().eq("id", id);
+        if (error) throw error;
+        await refresh();
       },
       addClass: async (input) => {
         const { error } = await supabase.from("classes").insert({
