@@ -108,6 +108,25 @@ function StudentsPage() {
         </div>
       </div>
 
+      {notStarted.length > 0 && (
+        <section className="mb-5 rounded-2xl border border-warning/30 bg-card p-4">
+          <h2 className="text-sm font-semibold text-warning">Aún no han empezado ({notStarted.length})</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">Alumnos activos sin ninguna clase asignada.</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {notStarted.map((s) => (
+              <Link
+                key={s.id}
+                to="/alumnos/$id"
+                params={{ id: s.id }}
+                className="rounded-full border border-border bg-secondary px-3 py-1.5 text-sm font-medium hover:bg-accent"
+              >
+                {s.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {list.length === 0 ? (
         <EmptyState title="Sin resultados" description="Prueba con otro filtro o búsqueda." />
       ) : (
@@ -144,6 +163,11 @@ function StudentsPage() {
                   <p className="truncate font-semibold">{s.name}</p>
                   <p className="truncate text-xs text-muted-foreground">
                     {PLAN_LABELS[s.plan]} · {s.phone}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {nextClass.has(s.id)
+                      ? `Próxima clase: ${format(new Date(nextClass.get(s.id)!.date + "T00:00:00"), "EEE d MMM", { locale: es })} · ${nextClass.get(s.id)!.time} · Pista ${nextClass.get(s.id)!.court}`
+                      : "Sin clase asignada"}
                   </p>
                   <div className="mt-1.5 flex flex-wrap gap-1.5 sm:hidden">
                     <LevelBadge level={s.level} />
