@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LevelBadge } from "@/components/padel-ui";
@@ -47,6 +48,7 @@ export function ClassDialog({
   const [studentIds, setStudentIds] = useState<string[]>([]);
   const [isTrial, setIsTrial] = useState(false);
   const [duration, setDuration] = useState(60);
+  const [plan, setPlan] = useState("");
 
   const resetFromSession = () => {
     if (!session) return;
@@ -58,6 +60,7 @@ export function ClassDialog({
     setStudentIds(session.studentIds);
     setIsTrial(session.isTrial ?? false);
     setDuration(session.durationMin || 60);
+    setPlan(session.plan ?? "");
   };
 
   const candidates = useMemo(
@@ -94,10 +97,10 @@ export function ClassDialog({
       return;
     }
     if (editing && session) {
-      void updateClass(session.id, { date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial });
+      void updateClass(session.id, { date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan });
       toast.success("Clase actualizada");
     } else {
-      void addClass({ date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial });
+      void addClass({ date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan });
       toast.success("Clase programada");
     }
     setOpen(false);
@@ -235,6 +238,17 @@ export function ClassDialog({
                 })}
               </div>
             )}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="plan">Desarrollo</Label>
+            <Textarea
+              id="plan"
+              value={plan}
+              onChange={(e) => setPlan(e.target.value)}
+              placeholder="Ejercicios y desarrollo de la clase…"
+              rows={5}
+              className="resize-y"
+            />
           </div>
           <label className="flex items-center gap-3 rounded-md border border-border p-3 text-sm">
             <input type="checkbox" className="size-4 accent-primary" checked={isTrial} onChange={(e) => setIsTrial(e.target.checked)} />
