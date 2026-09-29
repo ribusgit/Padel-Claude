@@ -93,6 +93,7 @@ export type Database = {
           created_at: string
           date: string
           duration_min: number
+          exercise_id: string | null
           id: string
           is_trial: boolean
           level: string
@@ -107,6 +108,7 @@ export type Database = {
           created_at?: string
           date: string
           duration_min?: number
+          exercise_id?: string | null
           id?: string
           is_trial?: boolean
           level: string
@@ -121,6 +123,7 @@ export type Database = {
           created_at?: string
           date?: string
           duration_min?: number
+          exercise_id?: string | null
           id?: string
           is_trial?: boolean
           level?: string
@@ -134,6 +137,13 @@ export type Database = {
             columns: ["coach_id"]
             isOneToOne: false
             referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classes_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
             referencedColumns: ["id"]
           },
         ]
