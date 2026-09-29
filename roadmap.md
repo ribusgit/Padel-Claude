@@ -18,3 +18,5 @@
 - [x] Calendario personal en el portal del alumno
 - [ ] Ejercicios del 2.º y 3.º trimestre en Pista
 - [ ] Asignar un ejercicio del nivel a cada clase del calendario
+- [ ] Aviso de próxima clase en el portal del alumno con WhatsApp del profesor
+- [ ] Calendario propio del profesor para ver y ajustar sus clases
