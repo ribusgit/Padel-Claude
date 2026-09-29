@@ -1,0 +1,1 @@
+ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS plan text NOT NULL DEFAULT ''::text;

@@ -133,6 +133,12 @@ function MyClasses() {
                     })}
                   </ul>
                 )}
+                {c.plan && (
+                  <div className="border-t border-border px-4 py-3">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Desarrollo</p>
+                    <p className="whitespace-pre-wrap text-sm text-muted-foreground">{c.plan}</p>
+                  </div>
+                )}
                 <ClassWhiteboard session={c} students={students} />
               </section>
             );
