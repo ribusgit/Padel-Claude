@@ -57,6 +57,16 @@ function PistaPage() {
   );
   const candidates = data.students.filter((s) => s.active && levelCategory(s.level) === level);
   const effectiveCoach = isAdmin ? coach : (coachId ?? "");
+  // Calendario compartido: clases de todos los profesores desde hoy.
+  const shared = useMemo(
+    () =>
+      data.classes
+        .filter((c) => c.date >= todayKey())
+        .sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)))
+        .slice(0, 20),
+    [data.classes],
+  );
+
 
   const conflict = (date: string) =>
     data.classes.some(
@@ -189,7 +199,36 @@ function PistaPage() {
           <Send className="size-4" /> Publicar todo
         </Button>
       </div>
+      <section className="mb-6 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          Calendario compartido
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Clases de todos los profesores, ordenadas por día.
+        </p>
+        {shared.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">Aún no hay clases publicadas.</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {shared.map((c) => (
+              <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl bg-secondary/60 p-2.5">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold capitalize">
+                    {format(parseISO(c.date), "EEE d MMM", { locale: es })} · {c.time}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    Pista {c.court} · {data.coaches.find((x) => x.id === c.coachId)?.name ?? "Sin profesor"}
+                  </p>
+                </div>
+                <span className="shrink-0 text-xs font-medium text-primary">{LEVEL_LABELS[c.level]}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <ol className="space-y-2">
+
         {plan.map((ex, i) => {
           const date = dates[i]!;
           const done = published.has(i);

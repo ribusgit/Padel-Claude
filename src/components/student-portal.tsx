@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { CheckCircle2, ChevronDown, Clock3, Dumbbell, Sparkles, Wallet } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, Dumbbell, Sparkles, UserCog, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
+import { Button } from "@/components/ui/button";
 import { StatCard, EmptyState, LevelBadge } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
+import { StudentProfileDialog } from "@/components/student-profile-dialog";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
 import { WhatsAppButton } from "@/components/whatsapp-dialog";
+
 import { useExercises } from "@/lib/exercises";
-import { PLAN_LABELS, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
+import { PLAN_LABELS, classEndTime, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
 
 const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const monthLabel = (m: string) => {
@@ -71,16 +74,45 @@ export function StudentPortal() {
     <>
       <PageHeader title={`Hola, ${student.name.split(" ")[0] ?? userName}`} subtitle="Tu portal de alumno" />
 
-      <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
-        <StudentAvatar name={student.name} photoPath={student.photoPath} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold">{student.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {PLAN_LABELS[student.plan]}{currentFee > 0 ? ` · ${currentFee} €/mes` : ""}
-          </p>
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <div className="flex items-center gap-3">
+          <StudentAvatar name={student.name} photoPath={student.photoPath} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-semibold">{student.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {PLAN_LABELS[student.plan]}{currentFee > 0 ? ` · ${currentFee} €/mes` : ""}
+            </p>
+          </div>
+          <LevelBadge level={student.level} category={levelCategory(student.level)} />
         </div>
-        <LevelBadge level={student.level} category={levelCategory(student.level)} />
-      </div>
+        <dl className="mt-3 space-y-1 border-t border-border pt-3 text-sm">
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Nombre</dt>
+            <dd className="truncate font-medium">{student.name}</dd>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Correo</dt>
+            <dd className="truncate font-medium">{student.email || "—"}</dd>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Teléfono</dt>
+            <dd className="truncate font-medium">{student.phone || "—"}</dd>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Nivel</dt>
+            <dd className="font-medium">{student.level.toFixed(1)}</dd>
+          </div>
+        </dl>
+        <StudentProfileDialog
+          student={student}
+          trigger={
+            <Button variant="outline" className="mt-3 h-11 w-full">
+              <UserCog className="size-4" /> Cambiar mis datos
+            </Button>
+          }
+        />
+      </section>
+
 
       {upcoming[0] && (() => {
         const next = upcoming[0].cls;
@@ -144,14 +176,37 @@ export function StudentPortal() {
                 <p className="text-xs font-semibold uppercase tracking-widest text-primary first-letter:uppercase">
                   {format(parseISO(date), "EEEE d 'de' MMMM", { locale: es })}
                 </p>
-                <ul className="mt-2 space-y-1">
-                  {list.map((c) => (
-                    <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
-                      <span className="font-medium">{c.time} · {c.durationMin} min · Pista {c.court}</span>
-                      <span className="truncate text-xs text-muted-foreground">{data.coaches.find((x) => x.id === c.coachId)?.name ?? ""}</span>
-                    </li>
-                  ))}
+                <ul className="mt-2 space-y-2">
+                  {list.map((c) => {
+                    const coach = data.coaches.find((x) => x.id === c.coachId);
+                    return (
+                      <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold">
+                            {c.time}–{classEndTime(c.time, c.durationMin)}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            Pista {c.court}{coach ? ` · ${coach.name}` : ""}
+                          </p>
+                        </div>
+                        {coach?.phone && (
+                          <WhatsAppButton
+                            iconOnly
+                            variant="ghost"
+                            label={`Avisar a ${coach.name}`}
+                            message={{
+                              to: coach.name,
+                              phone: coach.phone,
+                              kind: "Aviso del alumno",
+                              body: `Hola ${coach.name.split(" ")[0]}, soy ${student.name}. Sobre la clase del ${format(parseISO(c.date), "d 'de' MMMM", { locale: es })} a las ${c.time} (Pista ${c.court}): `,
+                            }}
+                          />
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
+
               </div>
             ))}
           </div>

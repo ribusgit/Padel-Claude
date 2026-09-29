@@ -5,6 +5,8 @@ import { es } from "date-fns/locale";
 import { CalendarPlus, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { ClassDialog } from "@/components/class-dialog";
+import { ClassRemindersButton } from "@/components/class-reminders-button";
+
 import { LevelBadge } from "@/components/padel-ui";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
@@ -64,17 +66,28 @@ function CoachCalendar() {
                   {list.map((c) => {
                     const ex = c.plan?.split("\n")[0];
                     return (
-                      <li key={c.id} className="flex items-center gap-3 rounded-xl bg-secondary/60 p-2.5">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold">{c.time}–{classEndTime(c.time, c.durationMin)} · Pista {c.court}</p>
-                          <p className="truncate text-xs text-muted-foreground">{c.studentIds.length}/4 alumnos{ex ? ` · ${ex}` : ""}</p>
+                      <li key={c.id} className="rounded-xl bg-secondary/60 p-2.5">
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold">
+                              {c.time}–{classEndTime(c.time, c.durationMin)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Pista {c.court} · {c.studentIds.length}/4 alumnos
+                            </p>
+                            {ex && <p className="truncate text-xs text-muted-foreground">{ex}</p>}
+                          </div>
+                          <div className="flex shrink-0 items-center gap-1">
+                            <LevelBadge category={c.level} />
+                            {c.studentIds.length > 0 && <ClassRemindersButton session={c} iconOnly />}
+                            <ClassDialog session={c} trigger={<Button size="icon" variant="ghost" aria-label="Editar clase"><Pencil className="size-4" /></Button>} />
+                          </div>
                         </div>
-                        <LevelBadge category={c.level} />
-                        <ClassDialog session={c} trigger={<Button size="icon" variant="ghost" aria-label="Editar clase"><Pencil className="size-4" /></Button>} />
                       </li>
                     );
                   })}
                 </ul>
+
               )}
             </section>
           );
