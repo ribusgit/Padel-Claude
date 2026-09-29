@@ -1,0 +1,1 @@
+ALTER TABLE public.classes ADD COLUMN exercise_id uuid REFERENCES public.exercises(id) ON DELETE SET NULL;

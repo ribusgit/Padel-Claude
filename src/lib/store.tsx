@@ -185,6 +185,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         attendance: (c.attendance ?? {}) as Record<string, boolean>,
         isTrial: c.is_trial ?? false,
         plan: c.plan ?? "",
+        exerciseId: c.exercise_id ?? undefined,
       })),
       payments: (payments.data ?? []).map((p) => ({
         id: p.id,
@@ -414,6 +415,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           attendance: {},
           is_trial: input.isTrial ?? false,
           plan: input.plan ?? "",
+          exercise_id: input.exerciseId || null,
         });
         if (error) throw error;
         await refresh();

@@ -38,6 +38,7 @@ function PistaPage() {
   const { data, isAdmin, coachId, addClass } = useStore();
   const [level, setLevel] = useState<LevelCategory>("iniciacion");
   const [total, setTotal] = useState<12 | 23>(12);
+  const [trimester, setTrimester] = useState(1);
   const [size, setSize] = useState<2 | 3 | 4>(4);
   const [start, setStart] = useState(todayKey());
   const [time, setTime] = useState("18:00");
@@ -49,7 +50,7 @@ function PistaPage() {
 
   const { byLevel, items } = useExercises();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const plan = useMemo(() => planFrom(byLevel(level), total), [level, total, items]);
+  const plan = useMemo(() => planFrom(byLevel(level, trimester), total), [level, total, trimester, items]);
   const dates = useMemo(
     () => plan.map((_, i) => format(addDays(parseISO(start), i * 7), "yyyy-MM-dd")),
     [plan, start],
@@ -84,7 +85,7 @@ function PistaPage() {
         continue;
       }
       try {
-        await addClass({ date, time, durationMin: 60, court, coachId: effectiveCoach, level, studentIds: studentIds.slice(0, size), plan: `${plan[i]!.title}\n\n${plan[i]!.description}${plan[i]!.videoUrl ? `\n\nVídeo: ${plan[i]!.videoUrl}` : ""}`.trim() });
+        await addClass({ date, time, durationMin: 60, court, coachId: effectiveCoach, level, studentIds: studentIds.slice(0, size), exerciseId: plan[i]!.id.includes("-") && plan[i]!.id.length === 36 ? plan[i]!.id : undefined, plan: `${plan[i]!.title}\n\n${plan[i]!.description}${plan[i]!.videoUrl ? `\n\nVídeo: ${plan[i]!.videoUrl}` : ""}`.trim() });
         done.add(i);
         ok++;
       } catch {
@@ -115,6 +116,14 @@ function PistaPage() {
           <div className="flex flex-wrap gap-2">
             {(Object.keys(LEVEL_LABELS) as LevelCategory[]).map((l) => (
               <button key={l} className={chip(level === l)} onClick={() => { setLevel(l); setStudentIds([]); setPublished(new Set()); }}>{LEVEL_LABELS[l]}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Trimestre</p>
+          <div className="flex gap-2">
+            {[1, 2, 3].map((t) => (
+              <button key={t} className={chip(trimester === t)} onClick={() => { setTrimester(t); setPublished(new Set()); }}>{t}.º</button>
             ))}
           </div>
         </div>
@@ -175,7 +184,7 @@ function PistaPage() {
       </div>
 
       <div className="mb-3 mt-6 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{LEVEL_LABELS[level]} · {total} clases</h2>
+        <h2 className="text-lg font-semibold">{LEVEL_LABELS[level]} · {trimester}.º trimestre · {total} clases</h2>
         <Button disabled={busy} onClick={() => void publish(plan.map((_, i) => i))}>
           <Send className="size-4" /> Publicar todo
         </Button>

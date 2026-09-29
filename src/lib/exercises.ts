@@ -9,6 +9,7 @@ export type Exercise = {
   title: string;
   description: string;
   videoUrl: string;
+  trimester: number;
 };
 
 /** Ejercicios guardados por el profesor; si un nivel está vacío se usa el banco por defecto. */
@@ -26,6 +27,7 @@ export function useExercises() {
         title: r.title,
         description: r.description,
         videoUrl: r.video_url,
+        trimester: r.trimester,
       })),
     );
     setLoading(false);
@@ -35,10 +37,10 @@ export function useExercises() {
     void reload();
   }, [reload]);
 
-  const byLevel = (level: LevelCategory): Exercise[] => {
-    const list = items.filter((e) => e.level === level);
+  const byLevel = (level: LevelCategory, trimester = 1): Exercise[] => {
+    const list = items.filter((e) => e.level === level && e.trimester === trimester);
     if (list.length) return list;
-    return EXERCISE_BANK[level].map((t, i) => ({ id: `default-${i}`, level, position: i, title: t, description: "", videoUrl: "" }));
+    return EXERCISE_BANK[level].map((t, i) => ({ id: `default-${i}`, level, position: i, title: t, description: "", videoUrl: "", trimester }));
   };
 
   return { items, loading, reload, byLevel };
@@ -48,7 +50,7 @@ export function useExercises() {
 export function planFrom(list: Exercise[], total: number): Exercise[] {
   return Array.from({ length: total }, (_, i) => {
     if (i === total - 1 || !list.length)
-      return { id: `final-${i}`, level: list[0]?.level ?? "iniciacion", position: i, title: "Evaluación final del trimestre", description: "Repaso de todo lo trabajado y valoración del nivel de cada alumno.", videoUrl: "" };
+      return { id: `final-${i}`, level: list[0]?.level ?? "iniciacion", position: i, title: "Evaluación final del trimestre", description: "Repaso de todo lo trabajado y valoración del nivel de cada alumno.", videoUrl: "", trimester: list[0]?.trimester ?? 1 };
     const e = list[i % list.length]!;
     return i >= list.length ? { ...e, title: `${e.title} (repaso)` } : e;
   });

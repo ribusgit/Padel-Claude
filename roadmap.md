@@ -16,3 +16,7 @@
 - [x] Sección de ejercicios del profesor (por nivel, explicación y vídeo) usada en Pista
 - [x] Profesor crea sus propias clases desde su inicio (horario, nivel, desarrollo) → calendario
 - [x] Calendario personal en el portal del alumno
+- [x] Ejercicios del 2.º y 3.º trimestre en Pista
+- [x] Asignar un ejercicio del nivel a cada clase del calendario
+- [x] Aviso de próxima clase en el portal del alumno con WhatsApp del profesor
+- [x] Calendario propio del profesor para ver y ajustar sus clases

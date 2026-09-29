@@ -39,7 +39,8 @@ type NavTo =
   | "/informes"
   | "/pizarra"
   | "/pista"
-  | "/ejercicios";
+  | "/ejercicios"
+  | "/mi-calendario";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
 const ADMIN_NAV: NavItem[] = [
@@ -62,6 +63,7 @@ const ADMIN_NAV: NavItem[] = [
 const COACH_NAV: NavItem[] = [
   { to: "/panel", label: "Inicio", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
+  { to: "/mi-calendario", label: "Mi calendario", icon: CalendarDays },
   { to: "/pista", label: "Pista", icon: Dumbbell },
   { to: "/ejercicios", label: "Ejercicios", icon: ListChecks },
   { to: "/alumnos", label: "Alumnos", icon: Users },
