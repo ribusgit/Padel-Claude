@@ -210,6 +210,42 @@ export type Database = {
         }
         Relationships: []
       }
+      exercises: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          level: string
+          position: number
+          title: string
+          updated_at: string
+          video_url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          level: string
+          position?: number
+          title: string
+          updated_at?: string
+          video_url?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          level?: string
+          position?: number
+          title?: string
+          updated_at?: string
+          video_url?: string
+        }
+        Relationships: []
+      }
       fee_plans: {
         Row: {
           amount: number

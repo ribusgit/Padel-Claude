@@ -13,3 +13,6 @@
 - [x] Ejercicios por nivel visibles en el portal del alumno antes de la clase
 - [x] Panel de alumnos: quién está en cada clase y quién aún no ha empezado
 - [x] Botón WhatsApp en cada clase para avisar al profesor (desplazamiento)
+- [x] Sección de ejercicios del profesor (por nivel, explicación y vídeo) usada en Pista
+- [x] Profesor crea sus propias clases desde su inicio (horario, nivel, desarrollo) → calendario
+- [x] Calendario personal en el portal del alumno

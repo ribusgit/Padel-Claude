@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useExercises, planFrom } from "@/lib/exercises";
 import { useMemo, useState } from "react";
 import { addDays, format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
-import { Check, Send } from "lucide-react";
+import { Check, PlayCircle, Send, Pencil } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
@@ -11,7 +12,6 @@ import {
   COURTS,
   HALF_HOUR_SLOTS,
   LEVEL_LABELS,
-  buildExercisePlan,
   classesOverlap,
   levelCategory,
   todayKey,
@@ -47,7 +47,9 @@ function PistaPage() {
   const [published, setPublished] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
 
-  const plan = useMemo(() => buildExercisePlan(level, total), [level, total]);
+  const { byLevel, items } = useExercises();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const plan = useMemo(() => planFrom(byLevel(level), total), [level, total, items]);
   const dates = useMemo(
     () => plan.map((_, i) => format(addDays(parseISO(start), i * 7), "yyyy-MM-dd")),
     [plan, start],
@@ -82,7 +84,7 @@ function PistaPage() {
         continue;
       }
       try {
-        await addClass({ date, time, durationMin: 60, court, coachId: effectiveCoach, level, studentIds: studentIds.slice(0, size) });
+        await addClass({ date, time, durationMin: 60, court, coachId: effectiveCoach, level, studentIds: studentIds.slice(0, size), plan: `${plan[i]!.title}\n\n${plan[i]!.description}${plan[i]!.videoUrl ? `\n\nVídeo: ${plan[i]!.videoUrl}` : ""}`.trim() });
         done.add(i);
         ok++;
       } catch {
@@ -101,7 +103,11 @@ function PistaPage() {
 
   return (
     <>
-      <PageHeader title="Pista" subtitle="Trimestre de ejercicios de pádel" />
+      <PageHeader
+        title="Pista"
+        subtitle="Trimestre de ejercicios de pádel"
+        action={<Button asChild variant="secondary"><Link to="/ejercicios"><Pencil className="size-4" /> Editar ejercicios</Link></Button>}
+      />
 
       <div className="grid gap-4 rounded-2xl border border-border bg-card p-4 md:grid-cols-3">
         <div>
@@ -183,7 +189,13 @@ function PistaPage() {
             <li key={i} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
               <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-secondary font-display text-sm font-bold">{i + 1}</span>
               <div className="min-w-0 flex-1">
-                <p className="font-medium">{ex}</p>
+                <p className="font-medium">{ex.title}</p>
+                {ex.description && <p className="mt-0.5 text-sm text-muted-foreground">{ex.description}</p>}
+                {ex.videoUrl && (
+                  <a href={ex.videoUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                    <PlayCircle className="size-3.5" /> Ver vídeo
+                  </a>
+                )}
                 <p className="text-xs text-muted-foreground">
                   {format(parseISO(date), "EEE d MMM", { locale: es })} · {time} · Pista {court}
                   {busyCourt && <span className="ml-2 text-warning">Pista ocupada</span>}
