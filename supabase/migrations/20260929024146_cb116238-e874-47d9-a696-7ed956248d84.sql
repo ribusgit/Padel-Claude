@@ -1,0 +1,1 @@
+CREATE POLICY "coach inserts own class" ON public.classes FOR INSERT TO authenticated WITH CHECK (coach_id = private.my_coach_id());

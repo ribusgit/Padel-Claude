@@ -14,6 +14,7 @@ import {
   Package,
   PenTool,
   Sparkles,
+  Dumbbell,
 
   type LucideIcon,
 } from "lucide-react";
@@ -35,13 +36,15 @@ type NavTo =
   | "/mis-clases"
   | "/mensajes"
   | "/informes"
-  | "/pizarra";
+  | "/pizarra"
+  | "/pista";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
 const ADMIN_NAV: NavItem[] = [
   { to: "/panel", label: "Panel", icon: LayoutDashboard },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
+  { to: "/pista", label: "Pista", icon: Dumbbell },
   { to: "/horarios", label: "Horarios", icon: CalendarClock },
   { to: "/reservas", label: "Pistas", icon: LandPlot },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
@@ -56,6 +59,7 @@ const ADMIN_NAV: NavItem[] = [
 const COACH_NAV: NavItem[] = [
   { to: "/panel", label: "Inicio", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
+  { to: "/pista", label: "Pista", icon: Dumbbell },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];
@@ -146,7 +150,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Navegación inferior en móvil */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-sidebar/95 backdrop-blur md:hidden">
-        <ul className="grid grid-cols-4">
+        <ul className="grid auto-cols-fr grid-flow-col overflow-x-auto">
           {nav.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <Link
