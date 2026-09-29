@@ -37,13 +37,13 @@ export function ClassDialog({
   defaultCourt?: number;
   session?: ClassSession;
 }) {
-  const { data, addClass, updateClass } = useStore();
+  const { data, addClass, updateClass, isAdmin, coachId: myCoachId } = useStore();
   const editing = Boolean(session);
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(defaultDate ?? todayKey());
   const [time, setTime] = useState(defaultTime ?? "18:00");
   const [court, setCourt] = useState(defaultCourt ? String(defaultCourt) : "1");
-  const [coachId, setCoachId] = useState(data.coaches[0]?.id ?? "");
+  const [coachId, setCoachId] = useState(isAdmin ? (data.coaches[0]?.id ?? "") : (myCoachId ?? ""));
   const [level, setLevel] = useState<LevelCategory>("intermedio");
   const [studentIds, setStudentIds] = useState<string[]>([]);
   const [isTrial, setIsTrial] = useState(false);
@@ -174,14 +174,14 @@ export function ClassDialog({
             </div>
             <div className="space-y-1.5">
               <Label>Profesor</Label>
-              <Select value={coachId} onValueChange={setCoachId}>
+              {!isAdmin ? <p className="flex h-10 items-center rounded-md border border-border px-3 text-sm">{data.coaches.find((c) => c.id === coachId)?.name ?? "Tú"}</p> : <Select value={coachId} onValueChange={setCoachId}>
                 <SelectTrigger><SelectValue placeholder="Elegir" /></SelectTrigger>
                 <SelectContent>
                   {data.coaches.map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </Select>}
             </div>
           </div>
           <div className="space-y-1.5">
