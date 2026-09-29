@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, levelCategory, type LevelCategory } from "@/lib/padel";
+import { LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, levelCategory, todayKey, type LevelCategory } from "@/lib/padel";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -45,6 +45,26 @@ function StudentsPage() {
       .filter((s) => !term || s.name.toLowerCase().includes(term) || s.email.toLowerCase().includes(term) || s.phone.includes(term))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [data.students, q, filter]);
+
+  // Próxima clase de cada alumno y quién aún no tiene ninguna (ni pasada ni futura).
+  const { nextClass, notStarted } = useMemo(() => {
+    const today = todayKey();
+    const next = new Map<string, { date: string; time: string; court: number }>();
+    const hasAny = new Set<string>();
+    for (const c of data.classes) {
+      for (const sid of c.studentIds) {
+        hasAny.add(sid);
+        if (c.date >= today) {
+          const cur = next.get(sid);
+          if (!cur || (c.date + c.time) < (cur.date + cur.time)) next.set(sid, { date: c.date, time: c.time, court: c.court });
+        }
+      }
+    }
+    return {
+      nextClass: next,
+      notStarted: data.students.filter((s) => s.active && !hasAny.has(s.id)).sort((a, b) => a.name.localeCompare(b.name)),
+    };
+  }, [data.classes, data.students]);
 
   return (
     <>
@@ -88,6 +108,25 @@ function StudentsPage() {
         </div>
       </div>
 
+      {notStarted.length > 0 && (
+        <section className="mb-5 rounded-2xl border border-warning/30 bg-card p-4">
+          <h2 className="text-sm font-semibold text-warning">Aún no han empezado ({notStarted.length})</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">Alumnos activos sin ninguna clase asignada.</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {notStarted.map((s) => (
+              <Link
+                key={s.id}
+                to="/alumnos/$id"
+                params={{ id: s.id }}
+                className="rounded-full border border-border bg-secondary px-3 py-1.5 text-sm font-medium hover:bg-accent"
+              >
+                {s.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {list.length === 0 ? (
         <EmptyState title="Sin resultados" description="Prueba con otro filtro o búsqueda." />
       ) : (
@@ -124,6 +163,11 @@ function StudentsPage() {
                   <p className="truncate font-semibold">{s.name}</p>
                   <p className="truncate text-xs text-muted-foreground">
                     {PLAN_LABELS[s.plan]} · {s.phone}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {nextClass.has(s.id)
+                      ? `Próxima clase: ${format(new Date(nextClass.get(s.id)!.date + "T00:00:00"), "EEE d MMM", { locale: es })} · ${nextClass.get(s.id)!.time} · Pista ${nextClass.get(s.id)!.court}`
+                      : "Sin clase asignada"}
                   </p>
                   <div className="mt-1.5 flex flex-wrap gap-1.5 sm:hidden">
                     <LevelBadge level={s.level} />

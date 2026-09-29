@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { CheckCircle2, ChevronDown, Clock3, Sparkles, Wallet } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, Dumbbell, Sparkles, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { StatCard, EmptyState, LevelBadge } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
-import { PLAN_LABELS, isTechniqueReport, levelCategory } from "@/lib/padel";
+import { EXERCISE_BANK, PLAN_LABELS, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
 
 const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const monthLabel = (m: string) => {
@@ -44,6 +44,19 @@ export function StudentPortal() {
     .filter((m) => m.studentId === student.id && isTechniqueReport(m.comment))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
 
+  // Próximas clases del alumno con el ejercicio que toca, según las clases ya hechas de ese nivel.
+  const upcoming = data.classes
+    .filter((c) => c.studentIds.includes(student.id) && c.date >= todayKey())
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+    .slice(0, 4)
+    .map((c) => {
+      const bank = EXERCISE_BANK[c.level];
+      const done = data.classes.filter(
+        (x) => x.level === c.level && x.studentIds.includes(student.id) && (x.date < c.date || (x.date === c.date && x.time < c.time)),
+      ).length;
+      return { cls: c, exercise: bank[done % bank.length] };
+    });
+
   return (
     <>
       <PageHeader title={`Hola, ${student.name.split(" ")[0] ?? userName}`} subtitle="Tu portal de alumno" />
@@ -58,6 +71,28 @@ export function StudentPortal() {
         </div>
         <LevelBadge level={student.level} category={levelCategory(student.level)} />
       </div>
+
+      {upcoming.length > 0 && (
+        <section className="mt-4">
+          <h2 className="font-display text-lg font-semibold">Tus próximas clases y ejercicios</h2>
+          <ul className="mt-3 space-y-2">
+            {upcoming.map(({ cls, exercise }) => (
+              <li key={cls.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3.5">
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Dumbbell className="size-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{exercise}</p>
+                  <p className="text-xs capitalize text-muted-foreground">
+                    {format(parseISO(cls.date), "EEEE d 'de' MMMM", { locale: es })} · {cls.time} · Pista {cls.court}
+                  </p>
+                </div>
+                <LevelBadge category={cls.level} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         <StatCard label="Cuota mensual" value={currentFee > 0 ? `${currentFee} €` : "—"} icon={Wallet} tone="primary" />

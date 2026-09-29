@@ -63,6 +63,20 @@ function MyClasses() {
                   <span className="font-semibold">Pista {c.court}</span>
                   <LevelBadge category={c.level} />{c.isTrial && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">Prueba · gratis</span>}
                   <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
+                    {coach?.phone && (
+                      <WhatsAppButton
+                        iconOnly
+                        variant="ghost"
+                        className="size-9 rounded-full"
+                        label={`Avisar a ${coach.name} de tu desplazamiento`}
+                        message={{
+                          to: coach.name,
+                          phone: coach.phone,
+                          kind: "Aviso de desplazamiento",
+                          body: `Hola ${coach.name.split(" ")[0]}, voy de camino a la clase de las ${c.time} (Pista ${c.court}). Llego en unos minutos.`,
+                        }}
+                      />
+                    )}
                     <Users className="size-3.5" /> {marked}/{students.length}
                   </span>
                 </header>
