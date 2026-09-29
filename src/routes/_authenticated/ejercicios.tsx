@@ -28,13 +28,15 @@ export const Route = createFileRoute("/_authenticated/ejercicios")({
 function ExercisesPage() {
   const { items, loading, reload } = useExercises();
   const [level, setLevel] = useState<LevelCategory>("iniciacion");
+  const [trimester, setTrimester] = useState(1);
   const [draft, setDraft] = useState({ title: "", description: "", videoUrl: "" });
-  const list = items.filter((e) => e.level === level);
+  const list = items.filter((e) => e.level === level && e.trimester === trimester);
 
   const add = async () => {
     if (!draft.title.trim()) { toast.error("Escribe el nombre del ejercicio"); return; }
     const { error } = await supabase.from("exercises").insert({
       level,
+      trimester,
       position: (list.at(-1)?.position ?? -1) + 1,
       title: draft.title.trim(),
       description: draft.description.trim(),
@@ -70,10 +72,14 @@ function ExercisesPage() {
         {(Object.keys(LEVEL_LABELS) as LevelCategory[]).map((l) => (
           <button key={l} className={chip(level === l)} onClick={() => setLevel(l)}>{LEVEL_LABELS[l]}</button>
         ))}
+        <span className="mx-1 w-px bg-border" />
+        {[1, 2, 3].map((t) => (
+          <button key={t} className={chip(trimester === t)} onClick={() => setTrimester(t)}>{t}.º trimestre</button>
+        ))}
       </div>
 
       <div className="mb-6 space-y-2 rounded-2xl border border-border bg-card p-4">
-        <p className="text-sm font-semibold">Nuevo ejercicio de {LEVEL_LABELS[level]}</p>
+        <p className="text-sm font-semibold">Nuevo ejercicio de {LEVEL_LABELS[level]} · {trimester}.º trimestre</p>
         <Input placeholder="Nombre" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
         <Textarea placeholder="Explicación" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
         <Input placeholder="Enlace del vídeo (YouTube, etc.)" value={draft.videoUrl} onChange={(e) => setDraft({ ...draft, videoUrl: e.target.value })} />

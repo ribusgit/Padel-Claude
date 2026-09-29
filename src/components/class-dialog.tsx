@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LevelBadge } from "@/components/padel-ui";
+import { useExercises } from "@/lib/exercises";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
@@ -49,6 +50,8 @@ export function ClassDialog({
   const [isTrial, setIsTrial] = useState(false);
   const [duration, setDuration] = useState(60);
   const [plan, setPlan] = useState("");
+  const [exerciseId, setExerciseId] = useState("");
+  const { items: exercises } = useExercises();
 
   const resetFromSession = () => {
     if (!session) return;
@@ -61,6 +64,7 @@ export function ClassDialog({
     setIsTrial(session.isTrial ?? false);
     setDuration(session.durationMin || 60);
     setPlan(session.plan ?? "");
+    setExerciseId(session.exerciseId ?? "");
   };
 
   const candidates = useMemo(
@@ -97,10 +101,10 @@ export function ClassDialog({
       return;
     }
     if (editing && session) {
-      void updateClass(session.id, { date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan });
+      void updateClass(session.id, { date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan, exerciseId });
       toast.success("Clase actualizada");
     } else {
-      void addClass({ date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan });
+      void addClass({ date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan, exerciseId });
       toast.success("Clase programada");
     }
     setOpen(false);
@@ -238,6 +242,28 @@ export function ClassDialog({
                 })}
               </div>
             )}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="exercise">Ejercicio de la sesión</Label>
+            <select
+              id="exercise"
+              value={exerciseId}
+              onChange={(e) => {
+                const ex = exercises.find((x) => x.id === e.target.value);
+                setExerciseId(e.target.value);
+                if (ex && !plan.trim()) setPlan(`${ex.title}\n\n${ex.description}${ex.videoUrl ? `\n\nVídeo: ${ex.videoUrl}` : ""}`);
+              }}
+              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            >
+              <option value="">Sin ejercicio asignado</option>
+              {[1, 2, 3].map((t) => (
+                <optgroup key={t} label={`${t}.º trimestre`}>
+                  {exercises.filter((x) => x.level === level && x.trimester === t).map((x) => (
+                    <option key={x.id} value={x.id}>{x.position + 1}. {x.title}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="plan">Desarrollo</Label>
