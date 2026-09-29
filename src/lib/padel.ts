@@ -228,7 +228,11 @@ export function minToTime(min: number) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
+/** Muestra la hora en formato HH:MM (la base puede guardarla como HH:MM:SS). */
+export const hhmm = (time: string) => time.slice(0, 5);
+
 export function classEndTime(time: string, durationMin: number) {
+
   return minToTime(timeToMin(time) + durationMin);
 }
 
