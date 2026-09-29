@@ -117,7 +117,10 @@ function PistaPage() {
     );
 
   const publish = async (indices: number[]) => {
-    if (!effectiveCoach) return toast.error("Elige un profesor");
+    if (!effectiveCoach) {
+      toast.error("Elige un profesor");
+      return;
+    }
     setBusy(true);
     let ok = 0;
     let skipped = 0;
