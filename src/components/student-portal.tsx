@@ -13,7 +13,7 @@ import { useStore } from "@/lib/store";
 import { WhatsAppButton } from "@/components/whatsapp-dialog";
 
 import { useExercises } from "@/lib/exercises";
-import { PLAN_LABELS, classEndTime, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
+import { PLAN_LABELS, classEndTime, hhmm, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
 
 const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const monthLabel = (m: string) => {
@@ -155,7 +155,7 @@ export function StudentPortal() {
                   {exercise.description && <p className="text-xs text-muted-foreground">{exercise.description}</p>}
                   {exercise.videoUrl && <a href={exercise.videoUrl} target="_blank" rel="noreferrer" className="text-xs font-semibold text-primary">Ver vídeo</a>}
                   <p className="text-xs capitalize text-muted-foreground">
-                    {format(parseISO(cls.date), "EEEE d 'de' MMMM", { locale: es })} · {cls.time} · Pista {cls.court}
+                    {format(parseISO(cls.date), "EEEE d 'de' MMMM", { locale: es })} · {hhmm(cls.time)} · Pista {cls.court}
                   </p>
                 </div>
                 <LevelBadge category={cls.level} />
@@ -183,7 +183,7 @@ export function StudentPortal() {
                       <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                         <div className="min-w-0">
                           <p className="text-sm font-semibold">
-                            {c.time}–{classEndTime(c.time, c.durationMin)}
+                            {hhmm(c.time)}–{classEndTime(c.time, c.durationMin)}
                           </p>
                           <p className="truncate text-xs text-muted-foreground">
                             Pista {c.court}{coach ? ` · ${coach.name}` : ""}
@@ -198,7 +198,7 @@ export function StudentPortal() {
                               to: coach.name,
                               phone: coach.phone,
                               kind: "Aviso del alumno",
-                              body: `Hola ${coach.name.split(" ")[0]}, soy ${student.name}. Sobre la clase del ${format(parseISO(c.date), "d 'de' MMMM", { locale: es })} a las ${c.time} (Pista ${c.court}): `,
+                              body: `Hola ${coach.name.split(" ")[0]}, soy ${student.name}. Sobre la clase del ${format(parseISO(c.date), "d 'de' MMMM", { locale: es })} a las ${hhmm(c.time)} (Pista ${c.court}): `,
                             }}
                           />
                         )}

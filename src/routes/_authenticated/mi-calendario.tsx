@@ -10,7 +10,7 @@ import { ClassRemindersButton } from "@/components/class-reminders-button";
 import { LevelBadge } from "@/components/padel-ui";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
-import { classEndTime, todayKey } from "@/lib/padel";
+import { classEndTime, hhmm, todayKey } from "@/lib/padel";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mi-calendario")({
@@ -70,7 +70,7 @@ function CoachCalendar() {
                         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                           <div className="min-w-0">
                             <p className="text-sm font-semibold">
-                              {c.time}–{classEndTime(c.time, c.durationMin)}
+                              {hhmm(c.time)}–{classEndTime(c.time, c.durationMin)}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               Pista {c.court} · {c.studentIds.length}/4 alumnos

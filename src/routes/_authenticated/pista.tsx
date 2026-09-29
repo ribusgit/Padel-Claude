@@ -13,6 +13,7 @@ import {
   HALF_HOUR_SLOTS,
   LEVEL_LABELS,
   classesOverlap,
+  hhmm,
   levelCategory,
   todayKey,
   type LevelCategory,
@@ -214,7 +215,7 @@ function PistaPage() {
               <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl bg-secondary/60 p-2.5">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold capitalize">
-                    {format(parseISO(c.date), "EEE d MMM", { locale: es })} · {c.time}
+                    {format(parseISO(c.date), "EEE d MMM", { locale: es })} · {hhmm(c.time)}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">
                     Pista {c.court} · {data.coaches.find((x) => x.id === c.coachId)?.name ?? "Sin profesor"}
