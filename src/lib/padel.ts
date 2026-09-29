@@ -53,6 +53,8 @@ export interface ClassSession {
   attendance: Record<string, boolean>;
   /** Clase de prueba, sin coste para el alumno. */
   isTrial?: boolean | undefined;
+  /** Desarrollo de la clase (texto libre, se muestra tal cual). */
+  plan?: string | undefined;
 }
 
 export type PaymentMethod = "tarjeta" | "bizum" | "manual";
