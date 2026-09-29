@@ -185,6 +185,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         attendance: (c.attendance ?? {}) as Record<string, boolean>,
         isTrial: c.is_trial ?? false,
         plan: c.plan ?? "",
+        exerciseId: c.exercise_id ?? undefined,
       })),
       payments: (payments.data ?? []).map((p) => ({
         id: p.id,
@@ -321,6 +322,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (patch.email !== undefined) payload["email"] = patch.email;
         if (patch.level !== undefined) payload["level"] = patch.level;
         if (patch.plan !== undefined) payload["plan"] = patch.plan;
+        if (patch.exerciseId !== undefined) payload["exercise_id"] = patch.exerciseId || null;
         if (patch.active !== undefined) payload["active"] = patch.active;
         if (patch.paymentStatus !== undefined) payload["payment_status"] = patch.paymentStatus;
         const { error } = await supabase.from("students").update(payload).eq("id", id);
@@ -414,6 +416,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           attendance: {},
           is_trial: input.isTrial ?? false,
           plan: input.plan ?? "",
+          exercise_id: input.exerciseId || null,
         });
         if (error) throw error;
         await refresh();
