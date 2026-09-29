@@ -96,6 +96,7 @@ export type Database = {
           id: string
           is_trial: boolean
           level: string
+          plan: string
           student_ids: string[]
           time: string
         }
@@ -109,6 +110,7 @@ export type Database = {
           id?: string
           is_trial?: boolean
           level: string
+          plan?: string
           student_ids?: string[]
           time: string
         }
@@ -122,6 +124,7 @@ export type Database = {
           id?: string
           is_trial?: boolean
           level?: string
+          plan?: string
           student_ids?: string[]
           time?: string
         }
