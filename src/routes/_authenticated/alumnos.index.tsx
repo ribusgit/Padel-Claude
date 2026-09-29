@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, levelCategory, type LevelCategory } from "@/lib/padel";
+import { LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, levelCategory, todayKey, type LevelCategory } from "@/lib/padel";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -45,6 +45,26 @@ function StudentsPage() {
       .filter((s) => !term || s.name.toLowerCase().includes(term) || s.email.toLowerCase().includes(term) || s.phone.includes(term))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [data.students, q, filter]);
+
+  // Próxima clase de cada alumno y quién aún no tiene ninguna (ni pasada ni futura).
+  const { nextClass, notStarted } = useMemo(() => {
+    const today = todayKey();
+    const next = new Map<string, { date: string; time: string; court: number }>();
+    const hasAny = new Set<string>();
+    for (const c of data.classes) {
+      for (const sid of c.studentIds) {
+        hasAny.add(sid);
+        if (c.date >= today) {
+          const cur = next.get(sid);
+          if (!cur || (c.date + c.time) < (cur.date + cur.time)) next.set(sid, { date: c.date, time: c.time, court: c.court });
+        }
+      }
+    }
+    return {
+      nextClass: next,
+      notStarted: data.students.filter((s) => s.active && !hasAny.has(s.id)).sort((a, b) => a.name.localeCompare(b.name)),
+    };
+  }, [data.classes, data.students]);
 
   return (
     <>
