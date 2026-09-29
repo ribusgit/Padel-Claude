@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { CheckCircle2, ChevronDown, Clock3, Dumbbell, Sparkles, Wallet } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, Dumbbell, Sparkles, UserCog, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
+import { Button } from "@/components/ui/button";
 import { StatCard, EmptyState, LevelBadge } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
+import { StudentProfileDialog } from "@/components/student-profile-dialog";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
 import { WhatsAppButton } from "@/components/whatsapp-dialog";
+
 import { useExercises } from "@/lib/exercises";
 import { PLAN_LABELS, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
 
@@ -71,16 +74,45 @@ export function StudentPortal() {
     <>
       <PageHeader title={`Hola, ${student.name.split(" ")[0] ?? userName}`} subtitle="Tu portal de alumno" />
 
-      <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
-        <StudentAvatar name={student.name} photoPath={student.photoPath} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold">{student.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {PLAN_LABELS[student.plan]}{currentFee > 0 ? ` · ${currentFee} €/mes` : ""}
-          </p>
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <div className="flex items-center gap-3">
+          <StudentAvatar name={student.name} photoPath={student.photoPath} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-semibold">{student.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {PLAN_LABELS[student.plan]}{currentFee > 0 ? ` · ${currentFee} €/mes` : ""}
+            </p>
+          </div>
+          <LevelBadge level={student.level} category={levelCategory(student.level)} />
         </div>
-        <LevelBadge level={student.level} category={levelCategory(student.level)} />
-      </div>
+        <dl className="mt-3 space-y-1 border-t border-border pt-3 text-sm">
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Nombre</dt>
+            <dd className="truncate font-medium">{student.name}</dd>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Correo</dt>
+            <dd className="truncate font-medium">{student.email || "—"}</dd>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Teléfono</dt>
+            <dd className="truncate font-medium">{student.phone || "—"}</dd>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <dt className="text-muted-foreground">Nivel</dt>
+            <dd className="font-medium">{student.level.toFixed(1)}</dd>
+          </div>
+        </dl>
+        <StudentProfileDialog
+          student={student}
+          trigger={
+            <Button variant="outline" className="mt-3 h-11 w-full">
+              <UserCog className="size-4" /> Cambiar mis datos
+            </Button>
+          }
+        />
+      </section>
+
 
       {upcoming[0] && (() => {
         const next = upcoming[0].cls;
