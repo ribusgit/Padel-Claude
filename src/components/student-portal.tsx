@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { CheckCircle2, ChevronDown, Clock3, Sparkles, Wallet } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, Dumbbell, Sparkles, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { StatCard, EmptyState, LevelBadge } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
-import { PLAN_LABELS, isTechniqueReport, levelCategory } from "@/lib/padel";
+import { EXERCISE_BANK, PLAN_LABELS, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
 
 const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const monthLabel = (m: string) => {
@@ -43,6 +43,19 @@ export function StudentPortal() {
   const latestReport = data.media
     .filter((m) => m.studentId === student.id && isTechniqueReport(m.comment))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+
+  // Próximas clases del alumno con el ejercicio que toca, según las clases ya hechas de ese nivel.
+  const upcoming = data.classes
+    .filter((c) => c.studentIds.includes(student.id) && c.date >= todayKey())
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+    .slice(0, 4)
+    .map((c) => {
+      const bank = EXERCISE_BANK[c.level];
+      const done = data.classes.filter(
+        (x) => x.level === c.level && x.studentIds.includes(student.id) && (x.date < c.date || (x.date === c.date && x.time < c.time)),
+      ).length;
+      return { cls: c, exercise: bank[done % bank.length] };
+    });
 
   return (
     <>
