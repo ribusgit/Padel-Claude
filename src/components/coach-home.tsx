@@ -72,7 +72,7 @@ export function CoachHome() {
             </div>
           </div>
           {upcoming.length === 0 ? (
-            <EmptyState title="No tienes clases programadas" description="Crea una con "Nueva clase" o espera a que el administrador te asigne una." />
+            <EmptyState title="No tienes clases programadas" description="Crea una con Nueva clase o espera a que el administrador te asigne una." />
           ) : (
             <ul className="space-y-2">
               {upcoming.map((c) => (
