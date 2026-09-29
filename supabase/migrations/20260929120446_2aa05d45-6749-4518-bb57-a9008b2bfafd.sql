@@ -1,0 +1,1 @@
+ALTER TABLE public.exercises ADD COLUMN trimester smallint NOT NULL DEFAULT 1;

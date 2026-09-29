@@ -219,6 +219,7 @@ export type Database = {
           level: string
           position: number
           title: string
+          trimester: number
           updated_at: string
           video_url: string
         }
@@ -230,6 +231,7 @@ export type Database = {
           level: string
           position?: number
           title: string
+          trimester?: number
           updated_at?: string
           video_url?: string
         }
@@ -241,6 +243,7 @@ export type Database = {
           level?: string
           position?: number
           title?: string
+          trimester?: number
           updated_at?: string
           video_url?: string
         }
