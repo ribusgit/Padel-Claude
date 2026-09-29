@@ -220,6 +220,7 @@ export type Database = {
           position: number
           title: string
           updated_at: string
+          video_url: string
         }
         Insert: {
           created_at?: string
@@ -230,6 +231,7 @@ export type Database = {
           position?: number
           title: string
           updated_at?: string
+          video_url?: string
         }
         Update: {
           created_at?: string
@@ -240,6 +242,7 @@ export type Database = {
           position?: number
           title?: string
           updated_at?: string
+          video_url?: string
         }
         Relationships: []
       }
