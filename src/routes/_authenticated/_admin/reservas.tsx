@@ -26,9 +26,9 @@ import {
 export const Route = createFileRoute("/_authenticated/_admin/reservas")({
   head: () => ({
     meta: [
-      { title: "Reservas de pistas — Escuela de Pádel" },
+      { title: "Reservas de pistas — Padel Time" },
       { name: "description", content: "Cuadrante horario de las pistas: clases de la escuela y alquiler libre, sin duplicidades." },
-      { property: "og:title", content: "Reservas de pistas — Escuela de Pádel" },
+      { property: "og:title", content: "Reservas de pistas — Padel Time" },
       { property: "og:description", content: "Cuadrante horario de las pistas: clases de la escuela y alquiler libre, sin duplicidades." },
     ],
   }),

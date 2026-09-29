@@ -183,17 +183,17 @@ export function WhatsAppButton({
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function paymentReminder(name: string, _amount?: number, _month?: string) {
-  return `Hola ${name} 👋\n\nTienes un aviso sobre tu cuota en la Escuela de Pádel.\n\nEntra en tu portal para verlo y pagar de forma segura:\nhttps://www.anochde.com/auth\n\n¡Gracias!\n\n— Escuela de Pádel`;
+  return `Hola ${name} 👋\n\nTienes un aviso sobre tu cuota en la Padel Time.\n\nEntra en tu portal para verlo y pagar de forma segura:\nhttps://www.anochde.com/auth\n\n¡Gracias!\n\n— Padel Time`;
 }
 
 export function classReminder(name: string, time: string, court: number, coach: string, dayLabel: string) {
-  return `Hola ${name} 👋\n\nRecuerda tu clase de ${dayLabel} a las ${time} en la Pista ${court} con el profesor ${coach}.\n\nVen 10 minutos antes para calentar. ¡Te esperamos!\n\n— Escuela de Pádel`;
+  return `Hola ${name} 👋\n\nRecuerda tu clase de ${dayLabel} a las ${time} en la Pista ${court} con el profesor ${coach}.\n\nVen 10 minutos antes para calentar. ¡Te esperamos!\n\n— Padel Time`;
 }
 
 export function generalReminder(name: string) {
-  return `Hola ${name} 👋\n\nTe escribimos desde la Escuela de Pádel para recordarte tus próximas clases y mantenerte al día.\n\n¿Alguna duda? Responde a este mensaje.\n\n— Escuela de Pádel`;
+  return `Hola ${name} 👋\n\nTe escribimos desde la Padel Time para recordarte tus próximas clases y mantenerte al día.\n\n¿Alguna duda? Responde a este mensaje.\n\n— Padel Time`;
 }
 
 export function mediaReminder(name: string, title: string, comment: string) {
-  return `Hola ${name} 👋\n\nTu profesor ha subido un nuevo análisis de técnica: «${title}».\n\n${comment || "Revísalo antes de la próxima clase."}\n\n— Escuela de Pádel`;
+  return `Hola ${name} 👋\n\nTu profesor ha subido un nuevo análisis de técnica: «${title}».\n\n${comment || "Revísalo antes de la próxima clase."}\n\n— Padel Time`;
 }

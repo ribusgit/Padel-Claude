@@ -19,9 +19,9 @@ import { PLAN_LABELS, PAYMENT_METHOD_LABELS, monthKey } from "@/lib/padel";
 export const Route = createFileRoute("/_authenticated/_admin/pagos")({
   head: () => ({
     meta: [
-      { title: "Pagos y mensualidades — Escuela de Pádel" },
+      { title: "Pagos y mensualidades — Padel Time" },
       { name: "description", content: "Control de cuotas del mes: quién ha pagado y quién tiene saldo pendiente." },
-      { property: "og:title", content: "Pagos y mensualidades — Escuela de Pádel" },
+      { property: "og:title", content: "Pagos y mensualidades — Padel Time" },
       { property: "og:description", content: "Control de cuotas del mes: quién ha pagado y quién tiene saldo pendiente." },
     ],
   }),

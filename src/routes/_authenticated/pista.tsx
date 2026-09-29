@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/pista")({
   head: () => ({
     meta: [
-      { title: "Pista — Trimestre de ejercicios · Escuela de Pádel" },
+      { title: "Pista — Trimestre de ejercicios · Padel Time" },
       { name: "description", content: "Plan trimestral de ejercicios de pádel por nivel, listo para publicar en el calendario." },
       { property: "og:title", content: "Pista — Trimestre de ejercicios" },
       { property: "og:description", content: "Plan trimestral de ejercicios de pádel por nivel, listo para publicar en el calendario." },

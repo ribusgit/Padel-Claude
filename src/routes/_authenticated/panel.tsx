@@ -17,9 +17,9 @@ import { COURTS, todayKey } from "@/lib/padel";
 export const Route = createFileRoute("/_authenticated/panel")({
   head: () => ({
     meta: [
-      { title: "Panel de control — Escuela de Pádel" },
+      { title: "Panel de control — Padel Time" },
       { name: "description", content: "Resumen diario de alumnos, clases, pistas y pagos de tu escuela de pádel." },
-      { property: "og:title", content: "Panel de control — Escuela de Pádel" },
+      { property: "og:title", content: "Panel de control — Padel Time" },
       { property: "og:description", content: "Resumen diario de alumnos, clases, pistas y pagos de tu escuela de pádel." },
     ],
   }),

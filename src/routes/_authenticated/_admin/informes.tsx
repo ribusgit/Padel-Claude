@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/_admin/informes")({
   head: () => ({
     meta: [
-      { title: "Informes de técnica · Escuela de Pádel" },
+      { title: "Informes de técnica · Padel Time" },
       { name: "description", content: "Revisión de los análisis de técnica generados con IA para todos los alumnos." },
-      { property: "og:title", content: "Informes de técnica · Escuela de Pádel" },
+      { property: "og:title", content: "Informes de técnica · Padel Time" },
       { property: "og:description", content: "Panel del administrador con los informes de técnica generados con IA." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

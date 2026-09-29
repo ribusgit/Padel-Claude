@@ -73,7 +73,7 @@ function Logo() {
         <span className="size-3.5 rounded-full border-2 border-primary-foreground" />
       </span>
       <div className="leading-tight">
-        <p className="font-display text-base font-bold tracking-tight">Escuela de Pádel</p>
+        <p className="font-display text-base font-bold tracking-tight">Padel Time</p>
         <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Gestión</p>
       </div>
     </div>

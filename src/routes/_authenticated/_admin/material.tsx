@@ -27,12 +27,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/_admin/material")({
   head: () => ({
     meta: [
-      { title: "Material y presupuesto · Escuela de Pádel" },
+      { title: "Material y presupuesto · Padel Time" },
       {
         name: "description",
         content: "Inventario de material de la escuela de pádel y control del presupuesto mensual de gasto.",
       },
-      { property: "og:title", content: "Material y presupuesto · Escuela de Pádel" },
+      { property: "og:title", content: "Material y presupuesto · Padel Time" },
       { property: "og:description", content: "Controla el material comprado y cuánto queda del presupuesto del mes." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

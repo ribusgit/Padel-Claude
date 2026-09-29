@@ -30,9 +30,9 @@ import { LEVEL_OPTIONS, LEVEL_LABELS, PLAN_LABELS, PLAN_PRICES, formatLevel, lev
 export const Route = createFileRoute("/_authenticated/alumnos/$id")({
   head: () => ({
     meta: [
-      { title: "Ficha de alumno — Escuela de Pádel" },
+      { title: "Ficha de alumno — Padel Time" },
       { name: "description", content: "Datos, historial de asistencia y notas de progreso del alumno." },
-      { property: "og:title", content: "Ficha de alumno — Escuela de Pádel" },
+      { property: "og:title", content: "Ficha de alumno — Padel Time" },
       { property: "og:description", content: "Datos, historial de asistencia y notas de progreso del alumno." },
     ],
   }),
