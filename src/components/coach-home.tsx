@@ -5,6 +5,8 @@ import { CalendarDays, ChevronRight, Clipboard, Clock, MessageCircleWarning, Not
 import { Avatar, EmptyState, LevelBadge } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, classReminder } from "@/components/whatsapp-dialog";
+import { ClassDialog } from "@/components/class-dialog";
+import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { todayKey } from "@/lib/padel";
 
@@ -62,12 +64,15 @@ export function CoachHome() {
             <h2 className="flex items-center gap-2 text-lg font-semibold">
               <CalendarDays className="size-4 text-primary" /> Próximas clases
             </h2>
+            <div className="flex items-center gap-3">
+            <ClassDialog trigger={<Button size="sm">Nueva clase</Button>} />
             <Link to="/mis-clases" className="flex items-center text-sm text-primary">
               Mis clases de hoy <ChevronRight className="size-4" />
             </Link>
+            </div>
           </div>
           {upcoming.length === 0 ? (
-            <EmptyState title="No tienes clases programadas" description="Cuando el administrador te asigne clases aparecerán aquí." />
+            <EmptyState title="No tienes clases programadas" description="Crea una con "Nueva clase" o espera a que el administrador te asigne una." />
           ) : (
             <ul className="space-y-2">
               {upcoming.map((c) => (

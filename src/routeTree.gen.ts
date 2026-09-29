@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
+import { Route as AuthenticatedEjerciciosRouteImport } from './routes/_authenticated/ejercicios'
 import { Route as AuthenticatedMisClasesRouteImport } from './routes/_authenticated/mis-clases'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPistaRouteImport } from './routes/_authenticated/pista'
@@ -46,6 +47,11 @@ const AuthRoute = AuthRouteImport.update({
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/_admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEjerciciosRoute = AuthenticatedEjerciciosRouteImport.update({
+  id: '/ejercicios',
+  path: '/ejercicios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMisClasesRoute = AuthenticatedMisClasesRouteImport.update({
@@ -142,6 +148,7 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/ejercicios': typeof AuthenticatedEjerciciosRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/pista': typeof AuthenticatedPistaRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/ejercicios': typeof AuthenticatedEjerciciosRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/pista': typeof AuthenticatedPistaRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/ejercicios': typeof AuthenticatedEjerciciosRoute
   '/_authenticated/mis-clases': typeof AuthenticatedMisClasesRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/pista': typeof AuthenticatedPistaRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/ejercicios'
     | '/mis-clases'
     | '/panel'
     | '/pista'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/ejercicios'
     | '/mis-clases'
     | '/panel'
     | '/pista'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/_admin'
+    | '/_authenticated/ejercicios'
     | '/_authenticated/mis-clases'
     | '/_authenticated/panel'
     | '/_authenticated/pista'
@@ -302,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ejercicios': {
+      id: '/_authenticated/ejercicios'
+      path: '/ejercicios'
+      fullPath: '/ejercicios'
+      preLoaderRoute: typeof AuthenticatedEjerciciosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mis-clases': {
@@ -452,6 +471,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedEjerciciosRoute: typeof AuthenticatedEjerciciosRoute
   AuthenticatedMisClasesRoute: typeof AuthenticatedMisClasesRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedPistaRoute: typeof AuthenticatedPistaRoute
@@ -462,6 +482,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedEjerciciosRoute: AuthenticatedEjerciciosRoute,
   AuthenticatedMisClasesRoute: AuthenticatedMisClasesRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedPistaRoute: AuthenticatedPistaRoute,

@@ -8,7 +8,8 @@ import { StudentAvatar } from "@/components/student-avatar";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
-import { EXERCISE_BANK, PLAN_LABELS, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
+import { useExercises } from "@/lib/exercises";
+import { PLAN_LABELS, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
 
 const MONTHS_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const monthLabel = (m: string) => {
@@ -20,6 +21,7 @@ const monthLabel = (m: string) => {
 export function StudentPortal() {
   const { data, studentId, userName } = useStore();
   const [reportOpen, setReportOpen] = useState(false);
+  const { byLevel } = useExercises();
   const student = data.students.find((s) => s.id === studentId);
 
   if (!student) {
@@ -50,12 +52,19 @@ export function StudentPortal() {
     .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
     .slice(0, 4)
     .map((c) => {
-      const bank = EXERCISE_BANK[c.level];
+      const bank = byLevel(c.level);
       const done = data.classes.filter(
         (x) => x.level === c.level && x.studentIds.includes(student.id) && (x.date < c.date || (x.date === c.date && x.time < c.time)),
       ).length;
-      return { cls: c, exercise: bank[done % bank.length] };
+      return { cls: c, exercise: bank[done % bank.length]! };
     });
+
+  const myCalendar = Object.entries(
+    data.classes
+      .filter((c) => c.studentIds.includes(student.id) && c.date >= todayKey())
+      .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+      .reduce<Record<string, typeof data.classes>>((acc, c) => ((acc[c.date] ??= []).push(c), acc), {}),
+  ).slice(0, 14);
 
   return (
     <>
@@ -82,7 +91,9 @@ export function StudentPortal() {
                   <Dumbbell className="size-5" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{exercise}</p>
+                  <p className="truncate font-medium">{exercise.title}</p>
+                  {exercise.description && <p className="text-xs text-muted-foreground">{exercise.description}</p>}
+                  {exercise.videoUrl && <a href={exercise.videoUrl} target="_blank" rel="noreferrer" className="text-xs font-semibold text-primary">Ver vídeo</a>}
                   <p className="text-xs capitalize text-muted-foreground">
                     {format(parseISO(cls.date), "EEEE d 'de' MMMM", { locale: es })} · {cls.time} · Pista {cls.court}
                   </p>
@@ -93,6 +104,31 @@ export function StudentPortal() {
           </ul>
         </section>
       )}
+
+      <section className="mt-6">
+        <h2 className="font-display text-lg font-semibold">Mi calendario</h2>
+        {myCalendar.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">Aún no tienes clases programadas.</p>
+        ) : (
+          <div className="mt-3 space-y-3">
+            {myCalendar.map(([date, list]) => (
+              <div key={date} className="rounded-2xl border border-border bg-card p-3">
+                <p className="text-xs font-semibold uppercase tracking-widest text-primary first-letter:uppercase">
+                  {format(parseISO(date), "EEEE d 'de' MMMM", { locale: es })}
+                </p>
+                <ul className="mt-2 space-y-1">
+                  {list.map((c) => (
+                    <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
+                      <span className="font-medium">{c.time} · {c.durationMin} min · Pista {c.court}</span>
+                      <span className="truncate text-xs text-muted-foreground">{data.coaches.find((x) => x.id === c.coachId)?.name ?? ""}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         <StatCard label="Cuota mensual" value={currentFee > 0 ? `${currentFee} €` : "—"} icon={Wallet} tone="primary" />
