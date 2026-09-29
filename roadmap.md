@@ -20,3 +20,6 @@
 - [x] Asignar un ejercicio del nivel a cada clase del calendario
 - [x] Aviso de próxima clase en el portal del alumno con WhatsApp del profesor
 - [x] Calendario propio del profesor para ver y ajustar sus clases
+- [ ] Perfil editable en el portal del alumno (nombre, correo, nivel)
+- [ ] Crear clase desde el calendario del profesor y verificar en calendario general y Pista
+- [ ] Calendario del profesor y del alumno bien en móvil, con horarios y botón de WhatsApp
