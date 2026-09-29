@@ -32,7 +32,7 @@ function ExercisesPage() {
   const list = items.filter((e) => e.level === level);
 
   const add = async () => {
-    if (!draft.title.trim()) return toast.error("Escribe el nombre del ejercicio");
+    if (!draft.title.trim()) { toast.error("Escribe el nombre del ejercicio"); return; }
     const { error } = await supabase.from("exercises").insert({
       level,
       position: (list.at(-1)?.position ?? -1) + 1,
@@ -40,7 +40,7 @@ function ExercisesPage() {
       description: draft.description.trim(),
       video_url: draft.videoUrl.trim(),
     });
-    if (error) return toast.error("No se pudo guardar");
+    if (error) { toast.error("No se pudo guardar"); return; }
     setDraft({ title: "", description: "", videoUrl: "" });
     toast.success("Ejercicio añadido");
     void reload();
@@ -98,7 +98,7 @@ function ExerciseRow({ e, n, onUp, onDown, onDelete, onSaved }: { e: Exercise; n
   const [f, setF] = useState({ title: e.title, description: e.description, videoUrl: e.videoUrl });
   const save = async () => {
     const { error } = await supabase.from("exercises").update({ title: f.title, description: f.description, video_url: f.videoUrl }).eq("id", e.id);
-    if (error) return toast.error("No se pudo guardar");
+    if (error) { toast.error("No se pudo guardar"); return; }
     setEdit(false);
     onSaved();
   };
