@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { ListChecks, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import {
   LayoutDashboard,
@@ -37,7 +37,8 @@ type NavTo =
   | "/mensajes"
   | "/informes"
   | "/pizarra"
-  | "/pista";
+  | "/pista"
+  | "/ejercicios";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
 const ADMIN_NAV: NavItem[] = [
@@ -45,6 +46,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/calendario", label: "Clases", icon: CalendarDays },
   { to: "/pista", label: "Pista", icon: Dumbbell },
+  { to: "/ejercicios", label: "Ejercicios", icon: ListChecks },
   { to: "/horarios", label: "Horarios", icon: CalendarClock },
   { to: "/reservas", label: "Pistas", icon: LandPlot },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
@@ -60,6 +62,7 @@ const COACH_NAV: NavItem[] = [
   { to: "/panel", label: "Inicio", icon: LayoutDashboard },
   { to: "/mis-clases", label: "Mis clases", icon: Clipboard },
   { to: "/pista", label: "Pista", icon: Dumbbell },
+  { to: "/ejercicios", label: "Ejercicios", icon: ListChecks },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];
