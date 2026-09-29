@@ -1,7 +1,7 @@
 {
-  "name": "Escuela de Pádel",
-  "short_name": "Pádel",
-  "description": "Gestión de la Escuela de Pádel: alumnos, clases, pistas, pagos y análisis de técnica.",
+  "name": "Padel Time",
+  "short_name": "Padel Time",
+  "description": "Gestión de Padel Time: alumnos, clases, pistas, pagos y análisis de técnica.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

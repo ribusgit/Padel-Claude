@@ -5,13 +5,13 @@ import heroCourt from "@/assets/home-padel.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Escuela de Pádel — Gestión del club, clases y alumnos" },
+      { title: "Padel Time — Gestión del club, clases y alumnos" },
       {
         name: "description",
         content:
           "La escuela de pádel, en una sola pantalla: alumnos, clases, pistas, cuotas y seguimiento técnico de cada jugador.",
       },
-      { property: "og:title", content: "Escuela de Pádel — Gestión del club, clases y alumnos" },
+      { property: "og:title", content: "Padel Time — Gestión del club, clases y alumnos" },
       {
         property: "og:description",
         content:
@@ -38,7 +38,7 @@ function HomePage() {
     <div className="min-h-screen bg-background">
       <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-5 md:px-10">
         <span className="font-display text-lg font-extrabold tracking-tight text-white">
-          Escuela de <span className="text-primary">Pádel</span>
+          Padel <span className="text-primary">Time</span>
         </span>
         <Link
           to="/auth"
@@ -121,7 +121,7 @@ function HomePage() {
       </section>
 
       <footer className="border-t border-border px-5 py-8 text-center text-xs text-muted-foreground md:px-10">
-        Escuela de Pádel · Gestión de clases, pistas y alumnos
+        Padel Time · Gestión de clases, pistas y alumnos
       </footer>
     </div>
   );

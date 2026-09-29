@@ -14,9 +14,9 @@ import { todayKey } from "@/lib/padel";
 export const Route = createFileRoute("/_authenticated/mis-clases")({
   head: () => ({
     meta: [
-      { title: "Mis clases de hoy — Escuela de Pádel" },
+      { title: "Mis clases de hoy — Padel Time" },
       { name: "description", content: "Vista de pista del profesor: clases del día y asistencia de un toque." },
-      { property: "og:title", content: "Mis clases de hoy — Escuela de Pádel" },
+      { property: "og:title", content: "Mis clases de hoy — Padel Time" },
       { property: "og:description", content: "Vista de pista del profesor: clases del día y asistencia de un toque." },
     ],
   }),

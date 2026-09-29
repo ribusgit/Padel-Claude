@@ -5,12 +5,12 @@ import { CourtWhiteboard } from "@/components/court-whiteboard";
 export const Route = createFileRoute("/_authenticated/pizarra")({
   head: () => ({
     meta: [
-      { title: "Pizarra táctica — Escuela de Pádel" },
+      { title: "Pizarra táctica — Padel Time" },
       {
         name: "description",
         content: "Dibuja jugadas y correcciones sobre una pista de pádel con Apple Pencil o con el dedo.",
       },
-      { property: "og:title", content: "Pizarra táctica — Escuela de Pádel" },
+      { property: "og:title", content: "Pizarra táctica — Padel Time" },
       {
         property: "og:description",
         content: "Dibuja jugadas y correcciones sobre una pista de pádel con Apple Pencil o con el dedo.",

@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 /**
- * App nativa (iOS) de la Escuela de Pádel.
+ * App nativa (iOS) de la Padel Time.
  *
  * La web usa renderizado en servidor (SSR), así que la app nativa carga
  * directamente el sitio publicado en https://www.anochde.com. Ventaja: cada vez
@@ -10,7 +10,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  */
 const config: CapacitorConfig = {
   appId: "com.anochde.escuelapadel",
-  appName: "Escuela de Pádel",
+  appName: "Padel Time",
   webDir: "native/www",
   ios: {
     contentInset: "always",

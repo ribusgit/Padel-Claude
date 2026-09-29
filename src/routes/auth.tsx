@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Acceso — Escuela de Pádel" },
+      { title: "Acceso — Padel Time" },
       { name: "description", content: "Entra con tu cuenta de administrador o profesor de la escuela de pádel." },
-      { property: "og:title", content: "Acceso — Escuela de Pádel" },
+      { property: "og:title", content: "Acceso — Padel Time" },
       { property: "og:description", content: "Entra con tu cuenta de administrador o profesor de la escuela de pádel." },
     ],
   }),
@@ -95,7 +95,7 @@ function AuthPage() {
           <span className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground glow-lime">
             <span className="size-4 rounded-full border-2 border-primary-foreground" />
           </span>
-          <h1 className="mt-4 font-display text-2xl font-bold">Escuela de Pádel</h1>
+          <h1 className="mt-4 font-display text-2xl font-bold">Padel Time</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "bootstrap"
               ? "Crea la cuenta del propietario de la escuela"

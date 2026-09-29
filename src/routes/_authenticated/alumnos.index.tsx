@@ -21,9 +21,9 @@ import { es } from "date-fns/locale";
 export const Route = createFileRoute("/_authenticated/alumnos/")({
   head: () => ({
     meta: [
-      { title: "Alumnos — Escuela de Pádel" },
+      { title: "Alumnos — Padel Time" },
       { name: "description", content: "Base de datos de alumnos con nivel, tarifa, estado de pago y progreso." },
-      { property: "og:title", content: "Alumnos — Escuela de Pádel" },
+      { property: "og:title", content: "Alumnos — Padel Time" },
       { property: "og:description", content: "Base de datos de alumnos con nivel, tarifa, estado de pago y progreso." },
     ],
   }),

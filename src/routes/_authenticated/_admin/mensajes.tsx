@@ -12,9 +12,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/_admin/mensajes")({
   head: () => ({
     meta: [
-      { title: "Mensajes de WhatsApp · Escuela de Pádel" },
+      { title: "Mensajes de WhatsApp · Padel Time" },
       { name: "description", content: "Historial de recordatorios y avisos de WhatsApp enviados a los alumnos." },
-      { property: "og:title", content: "Mensajes de WhatsApp · Escuela de Pádel" },
+      { property: "og:title", content: "Mensajes de WhatsApp · Padel Time" },
       { property: "og:description", content: "Seguimiento de los avisos enviados a alumnos por WhatsApp." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -16,9 +16,9 @@ import { HALF_HOUR_SLOTS, classEndTime, timeToMin, todayKey, type ClassSession }
 export const Route = createFileRoute("/_authenticated/_admin/horarios")({
   head: () => ({
     meta: [
-      { title: "Horarios de clases — Escuela de Pádel" },
+      { title: "Horarios de clases — Padel Time" },
       { name: "description", content: "Parrilla semanal de clases por día, hora, pista y profesor. Sincronizada con el cuadrante de pistas." },
-      { property: "og:title", content: "Horarios de clases — Escuela de Pádel" },
+      { property: "og:title", content: "Horarios de clases — Padel Time" },
       { property: "og:description", content: "Parrilla semanal de clases por día, hora, pista y profesor. Sincronizada con el cuadrante de pistas." },
     ],
   }),

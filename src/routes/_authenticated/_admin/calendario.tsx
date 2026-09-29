@@ -16,9 +16,9 @@ import { LEVEL_LABELS, MAX_STUDENTS_PER_CLASS, type LevelCategory } from "@/lib/
 export const Route = createFileRoute("/_authenticated/_admin/calendario")({
   head: () => ({
     meta: [
-      { title: "Calendario de clases — Escuela de Pádel" },
+      { title: "Calendario de clases — Padel Time" },
       { name: "description", content: "Programa clases por día, hora, pista, profesor y nivel, con máximo 4 alumnos." },
-      { property: "og:title", content: "Calendario de clases — Escuela de Pádel" },
+      { property: "og:title", content: "Calendario de clases — Padel Time" },
       { property: "og:description", content: "Programa clases por día, hora, pista, profesor y nivel, con máximo 4 alumnos." },
     ],
   }),
