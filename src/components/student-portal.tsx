@@ -72,6 +72,28 @@ export function StudentPortal() {
         <LevelBadge level={student.level} category={levelCategory(student.level)} />
       </div>
 
+      {upcoming.length > 0 && (
+        <section className="mt-4">
+          <h2 className="font-display text-lg font-semibold">Tus próximas clases y ejercicios</h2>
+          <ul className="mt-3 space-y-2">
+            {upcoming.map(({ cls, exercise }) => (
+              <li key={cls.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3.5">
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Dumbbell className="size-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{exercise}</p>
+                  <p className="text-xs capitalize text-muted-foreground">
+                    {format(parseISO(cls.date), "EEEE d 'de' MMMM", { locale: es })} · {cls.time} · Pista {cls.court}
+                  </p>
+                </div>
+                <LevelBadge category={cls.level} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <div className="mt-4 grid grid-cols-2 gap-3">
         <StatCard label="Cuota mensual" value={currentFee > 0 ? `${currentFee} €` : "—"} icon={Wallet} tone="primary" />
         <StatCard
