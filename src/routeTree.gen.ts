@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
 import { Route as AuthenticatedEjerciciosRouteImport } from './routes/_authenticated/ejercicios'
+import { Route as AuthenticatedMiCalendarioRouteImport } from './routes/_authenticated/mi-calendario'
 import { Route as AuthenticatedMisClasesRouteImport } from './routes/_authenticated/mis-clases'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPistaRouteImport } from './routes/_authenticated/pista'
@@ -54,6 +55,12 @@ const AuthenticatedEjerciciosRoute = AuthenticatedEjerciciosRouteImport.update({
   path: '/ejercicios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMiCalendarioRoute =
+  AuthenticatedMiCalendarioRouteImport.update({
+    id: '/mi-calendario',
+    path: '/mi-calendario',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMisClasesRoute = AuthenticatedMisClasesRouteImport.update({
   id: '/mis-clases',
   path: '/mis-clases',
@@ -149,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/ejercicios': typeof AuthenticatedEjerciciosRoute
+  '/mi-calendario': typeof AuthenticatedMiCalendarioRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/pista': typeof AuthenticatedPistaRoute
@@ -170,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/ejercicios': typeof AuthenticatedEjerciciosRoute
+  '/mi-calendario': typeof AuthenticatedMiCalendarioRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/pista': typeof AuthenticatedPistaRoute
@@ -194,6 +203,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/ejercicios': typeof AuthenticatedEjerciciosRoute
+  '/_authenticated/mi-calendario': typeof AuthenticatedMiCalendarioRoute
   '/_authenticated/mis-clases': typeof AuthenticatedMisClasesRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/pista': typeof AuthenticatedPistaRoute
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/ejercicios'
+    | '/mi-calendario'
     | '/mis-clases'
     | '/panel'
     | '/pista'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/ejercicios'
+    | '/mi-calendario'
     | '/mis-clases'
     | '/panel'
     | '/pista'
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/_admin'
     | '/_authenticated/ejercicios'
+    | '/_authenticated/mi-calendario'
     | '/_authenticated/mis-clases'
     | '/_authenticated/panel'
     | '/_authenticated/pista'
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/ejercicios'
       fullPath: '/ejercicios'
       preLoaderRoute: typeof AuthenticatedEjerciciosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mi-calendario': {
+      id: '/_authenticated/mi-calendario'
+      path: '/mi-calendario'
+      fullPath: '/mi-calendario'
+      preLoaderRoute: typeof AuthenticatedMiCalendarioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mis-clases': {
@@ -472,6 +492,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedEjerciciosRoute: typeof AuthenticatedEjerciciosRoute
+  AuthenticatedMiCalendarioRoute: typeof AuthenticatedMiCalendarioRoute
   AuthenticatedMisClasesRoute: typeof AuthenticatedMisClasesRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedPistaRoute: typeof AuthenticatedPistaRoute
@@ -483,6 +504,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedEjerciciosRoute: AuthenticatedEjerciciosRoute,
+  AuthenticatedMiCalendarioRoute: AuthenticatedMiCalendarioRoute,
   AuthenticatedMisClasesRoute: AuthenticatedMisClasesRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedPistaRoute: AuthenticatedPistaRoute,
