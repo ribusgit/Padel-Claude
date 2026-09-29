@@ -322,7 +322,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (patch.email !== undefined) payload["email"] = patch.email;
         if (patch.level !== undefined) payload["level"] = patch.level;
         if (patch.plan !== undefined) payload["plan"] = patch.plan;
-        if (patch.exerciseId !== undefined) payload["exercise_id"] = patch.exerciseId || null;
         if (patch.active !== undefined) payload["active"] = patch.active;
         if (patch.paymentStatus !== undefined) payload["payment_status"] = patch.paymentStatus;
         const { error } = await supabase.from("students").update(payload).eq("id", id);
