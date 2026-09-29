@@ -10,6 +10,6 @@
 - [x] Home pública de la web con botón "Entrar" (el panel vive en /panel)
 
 - [ ] Envío automático por WhatsApp Business (bloqueado: falta dar de alta el número)
-- [ ] Ejercicios por nivel visibles en el portal del alumno antes de la clase
-- [ ] Panel de alumnos: quién está en cada clase y quién aún no ha empezado
-- [ ] Botón WhatsApp en cada clase para avisar al profesor (desplazamiento)
+- [x] Ejercicios por nivel visibles en el portal del alumno antes de la clase
+- [x] Panel de alumnos: quién está en cada clase y quién aún no ha empezado
+- [x] Botón WhatsApp en cada clase para avisar al profesor (desplazamiento)
