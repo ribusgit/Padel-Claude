@@ -38,7 +38,7 @@ function HomePage() {
     <div className="min-h-screen bg-background">
       <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-5 md:px-10">
         <span className="font-display text-lg font-extrabold tracking-tight text-white">
-          Escuela de <span className="text-primary">Pádel</span>
+          Padel <span className="text-primary">Time</span>
         </span>
         <Link
           to="/auth"
