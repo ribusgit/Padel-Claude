@@ -8,6 +8,7 @@ import { StudentAvatar } from "@/components/student-avatar";
 import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
+import { WhatsAppButton } from "@/components/whatsapp-dialog";
 import { useExercises } from "@/lib/exercises";
 import { PLAN_LABELS, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
 
@@ -80,6 +81,33 @@ export function StudentPortal() {
         </div>
         <LevelBadge level={student.level} category={levelCategory(student.level)} />
       </div>
+
+      {upcoming[0] && (() => {
+        const next = upcoming[0].cls;
+        const coach = data.coaches.find((x) => x.id === next.coachId);
+        const when = next.date === todayKey() ? "Hoy" : format(parseISO(next.date), "EEEE d 'de' MMMM", { locale: es });
+        return (
+          <div role="status" className="mt-4 flex items-center gap-3 rounded-2xl border border-primary/40 bg-primary/10 p-4">
+            <Clock3 className="size-5 shrink-0 text-primary" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Tu próxima clase</p>
+              <p className="font-semibold first-letter:uppercase">{when} · {next.time} · Pista {next.court}</p>
+              {coach && <p className="text-xs text-muted-foreground">Con {coach.name}</p>}
+            </div>
+            {coach?.phone && (
+              <WhatsAppButton
+                label="Avisar al profesor"
+                message={{
+                  to: coach.name,
+                  phone: coach.phone,
+                  kind: "Aviso del alumno",
+                  body: `Hola ${coach.name.split(" ")[0]}, soy ${student.name}. Sobre la clase de ${when.toLowerCase()} a las ${next.time} (Pista ${next.court}): `,
+                }}
+              />
+            )}
+          </div>
+        );
+      })()}
 
       {upcoming.length > 0 && (
         <section className="mt-4">
