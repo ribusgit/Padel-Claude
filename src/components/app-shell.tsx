@@ -1,4 +1,4 @@
-import { ListChecks, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import {
   LayoutDashboard,
@@ -15,6 +15,7 @@ import {
   PenTool,
   Sparkles,
   Dumbbell,
+  ListChecks,
 
   type LucideIcon,
 } from "lucide-react";
