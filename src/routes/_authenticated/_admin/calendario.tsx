@@ -149,12 +149,28 @@ function CalendarPage() {
                         <Users className="size-3.5" /> {c.studentIds.length}/{MAX_STUDENTS_PER_CLASS}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                       Profesor:{" "}
                       {coach ? (
-                        <Link to="/profesores/$id" params={{ id: coach.id }} className="text-foreground underline-offset-2 hover:underline">
-                          {coach.name}
-                        </Link>
+                        <>
+                          <Link to="/profesores/$id" params={{ id: coach.id }} className="text-foreground underline-offset-2 hover:underline">
+                            {coach.name}
+                          </Link>
+                          {coach.phone && (
+                            <WhatsAppButton
+                              iconOnly
+                              variant="ghost"
+                              className="size-7 rounded-full"
+                              label={`Avisar a ${coach.name} de un desplazamiento`}
+                              message={{
+                                to: coach.name,
+                                phone: coach.phone,
+                                kind: "Aviso de desplazamiento",
+                                body: `Hola ${coach.name.split(" ")[0]}, te aviso sobre la clase de las ${c.time} (Pista ${c.court}) del ${format(parseISO(c.date), "d 'de' MMMM", { locale: es })}: `,
+                              }}
+                            />
+                          )}
+                        </>
                       ) : (
                         "—"
                       )}
