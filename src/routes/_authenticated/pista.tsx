@@ -11,6 +11,7 @@ import {
   COURTS,
   HALF_HOUR_SLOTS,
   LEVEL_LABELS,
+  buildExercisePlan,
   classesOverlap,
   levelCategory,
   todayKey,
@@ -32,58 +33,6 @@ export const Route = createFileRoute("/_authenticated/pista")({
   component: PistaPage,
 });
 
-const BANK: Record<LevelCategory, string[]> = {
-  iniciacion: [
-    "Empuñadura continental y posición de espera",
-    "Derecha de fondo: peloteo cruzado",
-    "Revés de fondo: peloteo paralelo",
-    "Volea de derecha en red",
-    "Volea de revés en red",
-    "Saque reglamentario y resto básico",
-    "Salida de pared lateral de derecha",
-    "Salida de pared de fondo",
-    "Globo defensivo desde el fondo",
-    "Bandeja básica",
-    "Desplazamientos: subir a la red y bajar",
-    "Juego de puntos con reglas sencillas",
-  ],
-  intermedio: [
-    "Control de dirección: cruzado vs paralelo",
-    "Volea profunda y bloqueo",
-    "Bandeja con dirección a la reja",
-    "Doble pared y contrapared",
-    "Globo ofensivo para recuperar la red",
-    "Chiquita al pie del rival",
-    "Transiciones fondo-red en pareja",
-    "Remate por 3 (salida lateral)",
-    "Resto a los pies del que sube",
-    "Posicionamiento en pareja defensiva",
-    "Bajada de pared agresiva",
-    "Partido condicionado por objetivos",
-  ],
-  avanzado: [
-    "Víbora con efecto lateral",
-    "Remate por 4 y x3 alternos",
-    "Rulo y smash plano",
-    "Bajada de pared con aceleración",
-    "Volea de dejada y contrapié",
-    "Táctica: ocupación del centro",
-    "Defensa de remate por 3",
-    "Juego de ritmo: cambios de velocidad",
-    "Globo al revés del rival zurdo/diestro",
-    "Presión en red y cierre del punto",
-    "Situaciones de partido: 30-40",
-    "Partido de competición con análisis",
-  ],
-};
-
-function buildPlan(level: LevelCategory, total: number) {
-  const bank = BANK[level];
-  return Array.from({ length: total }, (_, i) => {
-    if (i === total - 1) return "Evaluación final del trimestre";
-    return bank[i % bank.length] + (i >= bank.length ? " (repaso)" : "");
-  });
-}
 
 function PistaPage() {
   const { data, isAdmin, coachId, addClass } = useStore();
@@ -98,7 +47,7 @@ function PistaPage() {
   const [published, setPublished] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
 
-  const plan = useMemo(() => buildPlan(level, total), [level, total]);
+  const plan = useMemo(() => buildExercisePlan(level, total), [level, total]);
   const dates = useMemo(
     () => plan.map((_, i) => format(addDays(parseISO(start), i * 7), "yyyy-MM-dd")),
     [plan, start],
