@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { ExternalLink, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -268,8 +269,16 @@ export function ClassDialog({
               ))}
             </select>
             {selectedExercise && (
-              <div className="mt-2">
+              <div className="mt-2 space-y-2">
                 <ExerciseDiagram title={selectedExercise.title} diagramType={selectedExercise.diagramType} />
+                <a
+                  href={selectedExercise.videoUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(`${selectedExercise.title} pádel ejercicio`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-10 items-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground"
+                >
+                  <PlayCircle className="size-4" /> Ver ejercicio en YouTube <ExternalLink className="size-3.5" />
+                </a>
               </div>
             )}
           </div>
