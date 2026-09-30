@@ -98,7 +98,7 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
     <figure className="w-full overflow-hidden rounded-lg border border-border bg-secondary/40" aria-label={`Esquema ilustrativo: ${title}`}>
       <svg viewBox="0 0 220 124" className="block w-full" role="img" aria-hidden="true">
         <defs>
-          <marker id="ball-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <marker id="ball-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
             <path d="M0 0 L8 4 L0 8 z" className="fill-primary" />
           </marker>
         </defs>
