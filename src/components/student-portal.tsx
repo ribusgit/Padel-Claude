@@ -125,6 +125,7 @@ export function StudentPortal() {
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">Tu próxima clase</p>
               <p className="font-semibold first-letter:uppercase">{when} · {next.time} · Pista {next.court}</p>
               {coach && <p className="text-xs text-muted-foreground">Con {coach.name}</p>}
+              {next.plan && <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{next.plan}</p>}
             </div>
             {coach?.phone && (
               <WhatsAppButton
@@ -188,6 +189,7 @@ export function StudentPortal() {
                           <p className="truncate text-xs text-muted-foreground">
                             Pista {c.court}{coach ? ` · ${coach.name}` : ""}
                           </p>
+                          {c.plan && <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{c.plan}</p>}
                         </div>
                         {coach?.phone && (
                           <WhatsAppButton
