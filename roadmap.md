@@ -25,3 +25,4 @@
 - [ ] Calendario del profesor y del alumno bien en móvil, con horarios y botón de WhatsApp
 - [ ] Calendario compartido: clases de varios profesores juntas en Pista
 - [x] Desarrollo visual por sesión con esquema de pista y enlace operativo a YouTube
+- [x] Profesor crea ejercicios con texto, vídeo y gráfico y los asigna a sesiones

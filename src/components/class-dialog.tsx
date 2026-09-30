@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LevelBadge } from "@/components/padel-ui";
+import { ExerciseDiagram } from "@/components/session-development";
 import { useExercises } from "@/lib/exercises";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,7 @@ export function ClassDialog({
   const [plan, setPlan] = useState("");
   const [exerciseId, setExerciseId] = useState("");
   const { items: exercises } = useExercises();
+  const selectedExercise = exercises.find((exercise) => exercise.id === exerciseId);
 
   const resetFromSession = () => {
     if (!session) return;
@@ -198,6 +200,7 @@ export function ClassDialog({
                   onClick={() => {
                     setLevel(l);
                     setStudentIds([]);
+                    setExerciseId("");
                   }}
                   className={cn(
                     "rounded-xl border px-2 py-2 text-left transition-colors",
@@ -264,6 +267,11 @@ export function ClassDialog({
                 </optgroup>
               ))}
             </select>
+            {selectedExercise && (
+              <div className="mt-2">
+                <ExerciseDiagram title={selectedExercise.title} diagramType={selectedExercise.diagramType} />
+              </div>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="plan">Desarrollo</Label>

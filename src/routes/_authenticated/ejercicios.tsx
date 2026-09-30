@@ -6,8 +6,9 @@ import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ExerciseDiagram } from "@/components/session-development";
 import { supabase } from "@/integrations/supabase/client";
-import { useExercises, type Exercise } from "@/lib/exercises";
+import { useExercises, type Exercise, type ExerciseDiagramType } from "@/lib/exercises";
 import { LEVEL_LABELS, type LevelCategory } from "@/lib/padel";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +30,7 @@ function ExercisesPage() {
   const { items, loading, reload } = useExercises();
   const [level, setLevel] = useState<LevelCategory>("iniciacion");
   const [trimester, setTrimester] = useState(1);
-  const [draft, setDraft] = useState({ title: "", description: "", videoUrl: "" });
+  const [draft, setDraft] = useState<{ title: string; description: string; videoUrl: string; diagramType: ExerciseDiagramType }>({ title: "", description: "", videoUrl: "", diagramType: "auto" });
   const list = items.filter((e) => e.level === level && e.trimester === trimester);
 
   const add = async () => {
@@ -41,9 +42,10 @@ function ExercisesPage() {
       title: draft.title.trim(),
       description: draft.description.trim(),
       video_url: draft.videoUrl.trim(),
+      diagram_type: draft.diagramType,
     });
     if (error) { toast.error("No se pudo guardar"); return; }
-    setDraft({ title: "", description: "", videoUrl: "" });
+    setDraft({ title: "", description: "", videoUrl: "", diagramType: "auto" });
     toast.success("Ejercicio añadido");
     void reload();
   };
@@ -83,6 +85,8 @@ function ExercisesPage() {
         <Input placeholder="Nombre" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
         <Textarea placeholder="Explicación" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
         <Input placeholder="Enlace del vídeo (YouTube, etc.)" value={draft.videoUrl} onChange={(e) => setDraft({ ...draft, videoUrl: e.target.value })} />
+        <DiagramPicker value={draft.diagramType} onChange={(diagramType) => setDraft({ ...draft, diagramType })} />
+        <ExerciseDiagram title={draft.title || "Nuevo ejercicio"} diagramType={draft.diagramType} />
         <Button onClick={() => void add()}><Plus className="size-4" /> Añadir</Button>
       </div>
 
@@ -101,9 +105,9 @@ function ExercisesPage() {
 
 function ExerciseRow({ e, n, onUp, onDown, onDelete, onSaved }: { e: Exercise; n: number; onUp: () => void; onDown: () => void; onDelete: () => void; onSaved: () => void }) {
   const [edit, setEdit] = useState(false);
-  const [f, setF] = useState({ title: e.title, description: e.description, videoUrl: e.videoUrl });
+  const [f, setF] = useState({ title: e.title, description: e.description, videoUrl: e.videoUrl, diagramType: e.diagramType });
   const save = async () => {
-    const { error } = await supabase.from("exercises").update({ title: f.title, description: f.description, video_url: f.videoUrl }).eq("id", e.id);
+    const { error } = await supabase.from("exercises").update({ title: f.title, description: f.description, video_url: f.videoUrl, diagram_type: f.diagramType }).eq("id", e.id);
     if (error) { toast.error("No se pudo guardar"); return; }
     setEdit(false);
     onSaved();
@@ -118,12 +122,15 @@ function ExerciseRow({ e, n, onUp, onDown, onDelete, onSaved }: { e: Exercise; n
               <Input value={f.title} onChange={(x) => setF({ ...f, title: x.target.value })} />
               <Textarea value={f.description} onChange={(x) => setF({ ...f, description: x.target.value })} />
               <Input value={f.videoUrl} placeholder="Enlace del vídeo" onChange={(x) => setF({ ...f, videoUrl: x.target.value })} />
+               <DiagramPicker value={f.diagramType} onChange={(diagramType) => setF({ ...f, diagramType })} />
+               <ExerciseDiagram title={f.title || e.title} diagramType={f.diagramType} />
               <Button size="sm" onClick={() => void save()}><Save className="size-4" /> Guardar</Button>
             </>
           ) : (
             <button className="block text-left" onClick={() => setEdit(true)}>
               <p className="font-medium">{e.title}</p>
               {e.description && <p className="text-sm text-muted-foreground">{e.description}</p>}
+              <div className="mt-2 max-w-sm"><ExerciseDiagram title={e.title} diagramType={e.diagramType} /></div>
             </button>
           )}
           {!edit && e.videoUrl && (
@@ -139,5 +146,28 @@ function ExerciseRow({ e, n, onUp, onDown, onDelete, onSaved }: { e: Exercise; n
         </div>
       </div>
     </li>
+  );
+}
+
+const DIAGRAM_OPTIONS: Array<{ value: ExerciseDiagramType; label: string }> = [
+  { value: "auto", label: "Automático" },
+  { value: "rally", label: "Peloteo" },
+  { value: "serve", label: "Saque" },
+  { value: "net", label: "Volea / red" },
+  { value: "lob", label: "Globo / defensa" },
+];
+
+function DiagramPicker({ value, onChange }: { value: ExerciseDiagramType; onChange: (value: ExerciseDiagramType) => void }) {
+  return (
+    <div>
+      <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Gráfico de pista</p>
+      <div className="flex flex-wrap gap-2">
+        {DIAGRAM_OPTIONS.map((option) => (
+          <Button key={option.value} type="button" size="sm" variant={value === option.value ? "default" : "secondary"} onClick={() => onChange(option.value)}>
+            {option.label}
+          </Button>
+        ))}
+      </div>
+    </div>
   );
 }
