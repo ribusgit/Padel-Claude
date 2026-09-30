@@ -41,30 +41,93 @@ function variantFor(text: string): Exclude<ExerciseDiagramType, "auto"> {
   return "rally";
 }
 
+type CourtPlayer = { x: number; y: number; label: string; team: "a" | "b" };
+
+const COURT_LAYOUTS: Record<Exclude<ExerciseDiagramType, "auto">, { players: CourtPlayer[]; path: string; ball: [number, number] }> = {
+  // Saque: sacador en esquina, resto diagonal; bola hacia el cuadro de saque contrario
+  serve: {
+    players: [
+      { x: 178, y: 86, label: "A1", team: "a" },
+      { x: 150, y: 62, label: "A2", team: "a" },
+      { x: 42, y: 34, label: "B1", team: "b" },
+      { x: 66, y: 56, label: "B2", team: "b" },
+    ],
+    path: "M170 82 C140 66 110 50 66 30",
+    ball: [62, 28],
+  },
+  // Juego de red: ambas parejas en la red, trayectoria de volea/remate
+  net: {
+    players: [
+      { x: 122, y: 66, label: "A1", team: "a" },
+      { x: 122, y: 88, label: "A2", team: "a" },
+      { x: 98, y: 32, label: "B1", team: "b" },
+      { x: 98, y: 56, label: "B2", team: "b" },
+    ],
+    path: "M124 72 C112 62 106 52 96 40",
+    ball: [93, 37],
+  },
+  // Globo: defensa en fondo, pareja rival en red, arco alto por encima
+  lob: {
+    players: [
+      { x: 172, y: 78, label: "A1", team: "a" },
+      { x: 172, y: 96, label: "A2", team: "a" },
+      { x: 96, y: 34, label: "B1", team: "b" },
+      { x: 96, y: 58, label: "B2", team: "b" },
+    ],
+    path: "M168 82 C150 18 110 12 52 40",
+    ball: [48, 42],
+  },
+  // Fondo de pista: rally cruzado entre fondos
+  rally: {
+    players: [
+      { x: 176, y: 74, label: "A1", team: "a" },
+      { x: 158, y: 92, label: "A2", team: "a" },
+      { x: 44, y: 40, label: "B1", team: "b" },
+      { x: 62, y: 22, label: "B2", team: "b" },
+    ],
+    path: "M172 76 C130 60 90 46 50 34",
+    ball: [46, 32],
+  },
+};
+
 export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string; diagramType?: ExerciseDiagramType }) {
   const variant = diagramType === "auto" ? variantFor(title) : diagramType;
-  const paths = {
-    serve: "M35 160 C75 128 115 105 166 76",
-    net: "M54 135 C91 103 124 96 174 62",
-    lob: "M38 151 C76 35 130 35 178 145",
-    rally: "M38 145 C78 116 132 92 178 61",
-  } as const;
-  const players: Array<[number, number]> = variant === "net" ? [[54, 95], [78, 95], [164, 54], [187, 54]] : [[45, 148], [76, 148], [159, 48], [190, 48]];
+  const { players, path, ball } = COURT_LAYOUTS[variant];
 
   return (
-    <div className="relative aspect-[2/1] w-full overflow-hidden rounded-lg border border-primary/30 bg-primary/10" aria-label={`Esquema ilustrativo: ${title}`} role="img">
-      <svg viewBox="0 0 224 112" className="absolute inset-0 size-full text-primary" aria-hidden="true">
-        <rect x="8" y="8" width="208" height="96" rx="3" fill="none" stroke="currentColor" strokeWidth="2" />
-        <line x1="112" y1="8" x2="112" y2="104" stroke="currentColor" strokeWidth="1.5" opacity=".55" />
-        <line x1="8" y1="56" x2="216" y2="56" stroke="currentColor" strokeWidth="3" />
-        <line x1="72" y1="8" x2="72" y2="104" stroke="currentColor" strokeWidth="1" opacity=".5" />
-        <line x1="152" y1="8" x2="152" y2="104" stroke="currentColor" strokeWidth="1" opacity=".5" />
-        <path d={paths[variant]} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="6 5" transform="scale(1 .56)" />
-        <circle cx={variant === "lob" ? 100 : 145} cy={variant === "lob" ? 28 : 48} r="4" fill="currentColor" />
-        {players.map(([x, y], index) => <circle key={index} cx={x} cy={y * .56} r="5" fill={index < 2 ? "currentColor" : "var(--color-foreground)"} />)}
+    <figure className="w-full overflow-hidden rounded-lg border border-border bg-secondary/40" aria-label={`Esquema ilustrativo: ${title}`}>
+      <svg viewBox="0 0 220 124" className="block w-full" role="img" aria-hidden="true">
+        <defs>
+          <marker id="ball-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L8 4 L0 8 z" className="fill-primary" />
+          </marker>
+        </defs>
+        {/* Pista 20×10 m vista desde arriba */}
+        <rect x="10" y="10" width="200" height="104" rx="4" className="fill-primary/10 stroke-foreground/40" strokeWidth="1.5" />
+        {/* Red */}
+        <line x1="110" y1="10" x2="110" y2="114" className="stroke-foreground" strokeWidth="2.5" />
+        {/* Líneas de saque */}
+        <line x1="141" y1="10" x2="141" y2="114" className="stroke-foreground/30" strokeWidth="1" />
+        <line x1="79" y1="10" x2="79" y2="114" className="stroke-foreground/30" strokeWidth="1" />
+        {/* Línea central de saque */}
+        <line x1="141" y1="62" x2="79" y2="62" className="stroke-foreground/30" strokeWidth="1" />
+        {/* Recorrido de la bola */}
+        <path d={path} fill="none" className="stroke-primary" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="7 5" markerEnd="url(#ball-arrow)" />
+        <circle cx={ball[0]} cy={ball[1]} r="4" className="fill-primary stroke-background" strokeWidth="1.5" />
+        {/* Jugadores */}
+        {players.map((p) => (
+          <g key={p.label}>
+            <circle cx={p.x} cy={p.y} r="8.5" className={p.team === "a" ? "fill-primary stroke-background" : "fill-foreground stroke-background"} strokeWidth="1.5" />
+            <text x={p.x} y={p.y + 3} textAnchor="middle" className="fill-background" fontSize="7.5" fontWeight="700">{p.label}</text>
+          </g>
+        ))}
       </svg>
-      <span className="absolute bottom-2 left-2 rounded bg-background/80 px-2 py-1 text-[10px] font-semibold uppercase text-foreground">Esquema de pista</span>
-    </div>
+      <figcaption className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-3 py-2 text-[10px] font-medium text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-primary" /> Tu pareja</span>
+        <span className="inline-flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-foreground" /> Rivales</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-0.5 w-4 rounded bg-primary" /> Recorrido de la bola</span>
+      </figcaption>
+    </figure>
   );
 }
 
