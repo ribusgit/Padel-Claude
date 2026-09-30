@@ -252,6 +252,21 @@ export function ClassDialog({
             )}
           </div>
           <div className="space-y-1.5">
+            <Label htmlFor="drawing">Gráfico propio (galería)</Label>
+            <select
+              id="drawing"
+              value={drawingId}
+              onChange={(e) => setDrawingId(e.target.value)}
+              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            >
+              <option value="">Usar el gráfico automático del ejercicio</option>
+              {drawings.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}
+            </select>
+            {drawings.find((d) => d.id === drawingId) && (
+              <img src={drawings.find((d) => d.id === drawingId)!.url} alt="Gráfico elegido" className="mt-2 w-full rounded-lg border border-border object-contain" />
+            )}
+          </div>
+          <div className="space-y-1.5">
             <Label htmlFor="exercise">Ejercicio de la sesión</Label>
             <select
               id="exercise"
