@@ -10,7 +10,10 @@ export type Exercise = {
   description: string;
   videoUrl: string;
   trimester: number;
+  diagramType: ExerciseDiagramType;
 };
+
+export type ExerciseDiagramType = "auto" | "rally" | "serve" | "net" | "lob";
 
 /** Ejercicios guardados por el profesor; si un nivel está vacío se usa el banco por defecto. */
 export function useExercises() {
@@ -28,6 +31,7 @@ export function useExercises() {
         description: r.description,
         videoUrl: r.video_url,
         trimester: r.trimester,
+        diagramType: r.diagram_type as ExerciseDiagramType,
       })),
     );
     setLoading(false);
@@ -40,7 +44,7 @@ export function useExercises() {
   const byLevel = (level: LevelCategory, trimester = 1): Exercise[] => {
     const list = items.filter((e) => e.level === level && e.trimester === trimester);
     if (list.length) return list;
-    return EXERCISE_BANK[level].map((t, i) => ({ id: `default-${i}`, level, position: i, title: t, description: "", videoUrl: "", trimester }));
+    return EXERCISE_BANK[level].map((t, i) => ({ id: `default-${i}`, level, position: i, title: t, description: "", videoUrl: "", trimester, diagramType: "auto" }));
   };
 
   return { items, loading, reload, byLevel };
@@ -50,7 +54,7 @@ export function useExercises() {
 export function planFrom(list: Exercise[], total: number): Exercise[] {
   return Array.from({ length: total }, (_, i) => {
     if (i === total - 1 || !list.length)
-      return { id: `final-${i}`, level: list[0]?.level ?? "iniciacion", position: i, title: "Evaluación final del trimestre", description: "Repaso de todo lo trabajado y valoración del nivel de cada alumno.", videoUrl: "", trimester: list[0]?.trimester ?? 1 };
+      return { id: `final-${i}`, level: list[0]?.level ?? "iniciacion", position: i, title: "Evaluación final del trimestre", description: "Repaso de todo lo trabajado y valoración del nivel de cada alumno.", videoUrl: "", trimester: list[0]?.trimester ?? 1, diagramType: "rally" };
     const e = list[i % list.length]!;
     return i >= list.length ? { ...e, title: `${e.title} (repaso)` } : e;
   });

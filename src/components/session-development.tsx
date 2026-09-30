@@ -1,5 +1,5 @@
 import { ExternalLink, PlayCircle } from "lucide-react";
-import type { Exercise } from "@/lib/exercises";
+import type { Exercise, ExerciseDiagramType } from "@/lib/exercises";
 import type { ClassSession } from "@/lib/padel";
 
 const YOUTUBE_URL = /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+/i;
@@ -33,7 +33,7 @@ function planParts(plan: string) {
   return parts;
 }
 
-function variantFor(text: string) {
+function variantFor(text: string): Exclude<ExerciseDiagramType, "auto"> {
   const normalized = text.toLocaleLowerCase("es");
   if (/saque|resto|servicio/.test(normalized)) return "serve";
   if (/volea|red|bandeja|víbora|remate/.test(normalized)) return "net";
@@ -41,8 +41,8 @@ function variantFor(text: string) {
   return "rally";
 }
 
-function CourtDiagram({ title }: { title: string }) {
-  const variant = variantFor(title);
+export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string; diagramType?: ExerciseDiagramType }) {
+  const variant = diagramType === "auto" ? variantFor(title) : diagramType;
   const paths = {
     serve: "M35 160 C75 128 115 105 166 76",
     net: "M54 135 C91 103 124 96 174 62",
@@ -78,7 +78,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
     <div className="mt-3 rounded-lg border border-border bg-secondary/60 p-3">
       <p className="text-[10px] font-semibold uppercase text-muted-foreground">Desarrollo</p>
       <div className={compact ? "mt-2 space-y-2" : "mt-2 grid gap-3 sm:grid-cols-[minmax(160px,0.8fr)_minmax(0,1.2fr)]"}>
-        <CourtDiagram title={title} />
+        <ExerciseDiagram title={title} diagramType={exercise?.diagramType ?? "auto"} />
         <div className="min-w-0">
           {exercise && <p className="text-sm font-semibold text-foreground">{exercise.title}</p>}
           {session.plan && (

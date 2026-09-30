@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Render class development through the shared `SessionDevelopment` UI so court diagrams and YouTube links stay consistent across calendars and portals.
+- Store each exercise diagram as a semantic preset (`auto`, `rally`, `serve`, `net`, or `lob`) so editors and session views render the same graphic.
