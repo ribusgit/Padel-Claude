@@ -220,6 +220,7 @@ function PistaPage() {
                   <p className="truncate text-xs text-muted-foreground">
                     Pista {c.court} · {data.coaches.find((x) => x.id === c.coachId)?.name ?? "Sin profesor"}
                   </p>
+                  {c.plan && <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{c.plan}</p>}
                 </div>
                 <span className="shrink-0 text-xs font-medium text-primary">{LEVEL_LABELS[c.level]}</span>
               </li>

@@ -74,7 +74,12 @@ function CoachCalendar() {
                             <p className="text-xs text-muted-foreground">
                               Pista {c.court} · {c.studentIds.length}/4 alumnos
                             </p>
-                            {ex && <p className="truncate text-xs text-muted-foreground">{ex}</p>}
+                            {c.plan && (
+                              <div className="mt-1.5">
+                                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Desarrollo</p>
+                                <p className="whitespace-pre-wrap text-xs text-muted-foreground">{c.plan}</p>
+                              </div>
+                            )}
                           </div>
                           <div className="flex shrink-0 items-center gap-1">
                             <LevelBadge category={c.level} />
