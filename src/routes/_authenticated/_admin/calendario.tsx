@@ -203,6 +203,12 @@ function CalendarPage() {
                         </span>
                       ))}
                     </div>
+                    {c.plan && (
+                      <div className="mt-3 rounded-xl bg-secondary/60 p-3">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Desarrollo</p>
+                        <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{c.plan}</p>
+                      </div>
+                    )}
                   </div>
                   <div className="flex w-11 shrink-0 flex-col">
                     <ClassDialog

@@ -64,7 +64,6 @@ function CoachCalendar() {
               ) : (
                 <ul className="space-y-2">
                   {list.map((c) => {
-                    const ex = c.plan?.split("\n")[0];
                     return (
                       <li key={c.id} className="rounded-xl bg-secondary/60 p-2.5">
                         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
