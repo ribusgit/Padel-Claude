@@ -8,7 +8,9 @@ import { PageHeader } from "@/components/app-shell";
 import { LevelBadge, EmptyState } from "@/components/padel-ui";
 import { WhatsAppButton, classReminder } from "@/components/whatsapp-dialog";
 import { ClassDialog } from "@/components/class-dialog";
+import { SessionDevelopment } from "@/components/session-development";
 import { Button } from "@/components/ui/button";
+import { useExercises } from "@/lib/exercises";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LEVEL_LABELS, MAX_STUDENTS_PER_CLASS, type LevelCategory } from "@/lib/padel";
@@ -29,6 +31,7 @@ type Filter = "todos" | LevelCategory;
 
 function CalendarPage() {
   const { data, deleteClass } = useStore();
+  const { items: exercises } = useExercises();
   const [selected, setSelected] = useState(() => new Date());
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [filter, setFilter] = useState<Filter>("todos");
@@ -203,12 +206,7 @@ function CalendarPage() {
                         </span>
                       ))}
                     </div>
-                    {c.plan && (
-                      <div className="mt-3 rounded-xl bg-secondary/60 p-3">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Desarrollo</p>
-                        <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{c.plan}</p>
-                      </div>
-                    )}
+                    <SessionDevelopment session={c} exercises={exercises} />
                   </div>
                   <div className="flex w-11 shrink-0 flex-col">
                     <ClassDialog

@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Render class development through the shared `SessionDevelopment` UI so court diagrams and YouTube links stay consistent across calendars and portals.

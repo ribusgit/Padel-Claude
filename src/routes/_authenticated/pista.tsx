@@ -6,6 +6,7 @@ import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import { Check, PlayCircle, Send, Pencil } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
+import { SessionDevelopment } from "@/components/session-development";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import {
@@ -220,7 +221,7 @@ function PistaPage() {
                   <p className="truncate text-xs text-muted-foreground">
                     Pista {c.court} · {data.coaches.find((x) => x.id === c.coachId)?.name ?? "Sin profesor"}
                   </p>
-                  {c.plan && <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{c.plan}</p>}
+                  <SessionDevelopment session={c} exercises={items} compact />
                 </div>
                 <span className="shrink-0 text-xs font-medium text-primary">{LEVEL_LABELS[c.level]}</span>
               </li>

@@ -6,10 +6,12 @@ import { CalendarPlus, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { ClassDialog } from "@/components/class-dialog";
 import { ClassRemindersButton } from "@/components/class-reminders-button";
+import { SessionDevelopment } from "@/components/session-development";
 
 import { LevelBadge } from "@/components/padel-ui";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
+import { useExercises } from "@/lib/exercises";
 import { classEndTime, hhmm, todayKey } from "@/lib/padel";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/_authenticated/mi-calendario")({
 
 function CoachCalendar() {
   const { data, coachId, isAdmin, loading } = useStore();
+  const { items: exercises } = useExercises();
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const today = todayKey();
@@ -74,12 +77,7 @@ function CoachCalendar() {
                             <p className="text-xs text-muted-foreground">
                               Pista {c.court} · {c.studentIds.length}/4 alumnos
                             </p>
-                            {c.plan && (
-                              <div className="mt-1.5">
-                                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Desarrollo</p>
-                                <p className="whitespace-pre-wrap text-xs text-muted-foreground">{c.plan}</p>
-                              </div>
-                            )}
+                            <SessionDevelopment session={c} exercises={exercises} compact />
                           </div>
                           <div className="flex shrink-0 items-center gap-1">
                             <LevelBadge category={c.level} />

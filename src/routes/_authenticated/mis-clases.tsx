@@ -7,6 +7,8 @@ import { LevelBadge, Avatar, EmptyState } from "@/components/padel-ui";
 import { StudentAvatar } from "@/components/student-avatar";
 import { WhatsAppButton, classReminder } from "@/components/whatsapp-dialog";
 import { ClassWhiteboard } from "@/components/class-whiteboard";
+import { SessionDevelopment } from "@/components/session-development";
+import { useExercises } from "@/lib/exercises";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { todayKey } from "@/lib/padel";
@@ -25,6 +27,7 @@ export const Route = createFileRoute("/_authenticated/mis-clases")({
 
 function MyClasses() {
   const { data, markAttendance, coachId, userName, loading, isAdmin } = useStore();
+  const { items: exercises } = useExercises();
   const today = todayKey();
 
   const classes = data.classes
@@ -147,10 +150,9 @@ function MyClasses() {
                     })}
                   </ul>
                 )}
-                {c.plan && (
+                {(c.plan || c.exerciseId) && (
                   <div className="border-t border-border px-4 py-3">
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Desarrollo</p>
-                    <p className="whitespace-pre-wrap text-sm text-muted-foreground">{c.plan}</p>
+                    <SessionDevelopment session={c} exercises={exercises} />
                   </div>
                 )}
                 <ClassWhiteboard session={c} students={students} />

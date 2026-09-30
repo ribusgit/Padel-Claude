@@ -11,6 +11,7 @@ import { PayFeeButton } from "@/components/pay-fee-button";
 import { BizumDialog } from "@/components/bizum-dialog";
 import { useStore } from "@/lib/store";
 import { WhatsAppButton } from "@/components/whatsapp-dialog";
+import { SessionDevelopment } from "@/components/session-development";
 
 import { useExercises } from "@/lib/exercises";
 import { PLAN_LABELS, classEndTime, hhmm, isTechniqueReport, levelCategory, todayKey } from "@/lib/padel";
@@ -25,7 +26,7 @@ const monthLabel = (m: string) => {
 export function StudentPortal() {
   const { data, studentId, userName } = useStore();
   const [reportOpen, setReportOpen] = useState(false);
-  const { byLevel } = useExercises();
+  const { byLevel, items: exercises } = useExercises();
   const student = data.students.find((s) => s.id === studentId);
 
   if (!student) {
@@ -60,7 +61,7 @@ export function StudentPortal() {
       const done = data.classes.filter(
         (x) => x.level === c.level && x.studentIds.includes(student.id) && (x.date < c.date || (x.date === c.date && x.time < c.time)),
       ).length;
-      return { cls: c, exercise: bank[done % bank.length]! };
+      return { cls: c, exercise: exercises.find((item) => item.id === c.exerciseId) ?? bank[done % bank.length]! };
     });
 
   const myCalendar = Object.entries(
@@ -125,7 +126,7 @@ export function StudentPortal() {
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">Tu próxima clase</p>
               <p className="font-semibold first-letter:uppercase">{when} · {next.time} · Pista {next.court}</p>
               {coach && <p className="text-xs text-muted-foreground">Con {coach.name}</p>}
-              {next.plan && <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{next.plan}</p>}
+               <SessionDevelopment session={next} exercises={exercises} compact />
             </div>
             {coach?.phone && (
               <WhatsAppButton
@@ -189,7 +190,7 @@ export function StudentPortal() {
                           <p className="truncate text-xs text-muted-foreground">
                             Pista {c.court}{coach ? ` · ${coach.name}` : ""}
                           </p>
-                          {c.plan && <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{c.plan}</p>}
+                           <SessionDevelopment session={c} exercises={exercises} compact />
                         </div>
                         {coach?.phone && (
                           <WhatsAppButton
