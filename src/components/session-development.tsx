@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { useDrawings } from "@/lib/drawings";
 import { ExternalLink, PlayCircle } from "lucide-react";
 import type { Exercise, ExerciseDiagramType } from "@/lib/exercises";
