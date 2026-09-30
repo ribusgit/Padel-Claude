@@ -92,6 +92,7 @@ export type Database = {
           court: number
           created_at: string
           date: string
+          drawing_id: string | null
           duration_min: number
           exercise_id: string | null
           id: string
@@ -107,6 +108,7 @@ export type Database = {
           court: number
           created_at?: string
           date: string
+          drawing_id?: string | null
           duration_min?: number
           exercise_id?: string | null
           id?: string
@@ -122,6 +124,7 @@ export type Database = {
           court?: number
           created_at?: string
           date?: string
+          drawing_id?: string | null
           duration_min?: number
           exercise_id?: string | null
           id?: string
@@ -137,6 +140,13 @@ export type Database = {
             columns: ["coach_id"]
             isOneToOne: false
             referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classes_drawing_id_fkey"
+            columns: ["drawing_id"]
+            isOneToOne: false
+            referencedRelation: "court_drawings"
             referencedColumns: ["id"]
           },
           {
@@ -217,6 +227,30 @@ export type Database = {
           name?: string
           phone?: string
           specialty?: string
+        }
+        Relationships: []
+      }
+      court_drawings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          path: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          path: string
+          title?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          path?: string
+          title?: string
         }
         Relationships: []
       }
