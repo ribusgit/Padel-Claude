@@ -1,3 +1,4 @@
+import { useDrawings } from "@/lib/drawings";
 import { ExternalLink, PlayCircle } from "lucide-react";
 import type { Exercise, ExerciseDiagramType } from "@/lib/exercises";
 import type { ClassSession } from "@/lib/padel";
@@ -135,13 +136,18 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
   const exercise = exercises.find((item) => item.id === session.exerciseId);
   const title = exercise?.title || session.plan?.split("\n").find((line) => line.trim()) || "Ejercicio de la sesión";
   const video = youtubeUrl(session.plan ?? "", title, exercise);
-  if (!session.plan && !exercise) return null;
+  const drawing = useDrawings().find((d) => d.id === session.drawingId);
+  if (!session.plan && !exercise && !drawing) return null;
 
   return (
     <div className="mt-3 rounded-lg border border-border bg-secondary/60 p-3">
       <p className="text-[10px] font-semibold uppercase text-muted-foreground">Desarrollo</p>
       <div className={compact ? "mt-2 space-y-2" : "mt-2 grid gap-3 sm:grid-cols-[minmax(160px,0.8fr)_minmax(0,1.2fr)]"}>
-        <ExerciseDiagram title={title} diagramType={exercise?.diagramType ?? "auto"} />
+        {drawing ? (
+          <img src={drawing.url} alt={drawing.title} className="w-full rounded-lg border border-border bg-background object-contain" />
+        ) : (
+          <ExerciseDiagram title={title} diagramType={exercise?.diagramType ?? "auto"} />
+        )}
         <div className="min-w-0">
           {exercise && <p className="text-sm font-semibold text-foreground">{exercise.title}</p>}
           {session.plan && (
