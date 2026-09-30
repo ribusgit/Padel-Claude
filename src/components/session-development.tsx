@@ -47,7 +47,7 @@ function CourtDiagram({ title }: { title: string }) {
     lob: "M38 151 C76 35 130 35 178 145",
     rally: "M38 145 C78 116 132 92 178 61",
   } as const;
-  const players = variant === "net" ? [[54, 95], [78, 95], [164, 54], [187, 54]] : [[45, 148], [76, 148], [159, 48], [190, 48]];
+  const players: Array<[number, number]> = variant === "net" ? [[54, 95], [78, 95], [164, 54], [187, 54]] : [[45, 148], [76, 148], [159, 48], [190, 48]];
 
   return (
     <div className="relative aspect-[2/1] w-full overflow-hidden rounded-lg border border-primary/30 bg-primary/10" aria-label={`Esquema ilustrativo: ${title}`} role="img">

@@ -150,9 +150,11 @@ function MyClasses() {
                     })}
                   </ul>
                 )}
-                <div className="border-t border-border px-4 py-3">
-                  <SessionDevelopment session={c} exercises={exercises} />
-                </div>
+                {(c.plan || c.exerciseId) && (
+                  <div className="border-t border-border px-4 py-3">
+                    <SessionDevelopment session={c} exercises={exercises} />
+                  </div>
+                )}
                 <ClassWhiteboard session={c} students={students} />
               </section>
             );
