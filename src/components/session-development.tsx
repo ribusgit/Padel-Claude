@@ -4,14 +4,16 @@ import type { ClassSession } from "@/lib/padel";
 
 const YOUTUBE_URL = /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+/i;
 
-function youtubeUrl(plan: string, exercise?: Exercise) {
+function youtubeUrl(plan: string, title: string, exercise?: Exercise) {
   const candidate = exercise?.videoUrl || plan.match(YOUTUBE_URL)?.[0] || "";
-  if (!candidate) return "";
+  if (!candidate) return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} pádel ejercicio`)}`;
   try {
     const url = new URL(candidate);
-    return url.hostname === "youtu.be" || url.hostname.endsWith("youtube.com") ? url.toString() : "";
+    return url.hostname === "youtu.be" || url.hostname.endsWith("youtube.com")
+      ? url.toString()
+      : `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} pádel ejercicio`)}`;
   } catch {
-    return "";
+    return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} pádel ejercicio`)}`;
   }
 }
 
@@ -69,7 +71,7 @@ function CourtDiagram({ title }: { title: string }) {
 export function SessionDevelopment({ session, exercises, compact = false }: { session: ClassSession; exercises: Exercise[]; compact?: boolean }) {
   const exercise = exercises.find((item) => item.id === session.exerciseId);
   const title = exercise?.title || session.plan?.split("\n").find((line) => line.trim()) || "Ejercicio de la sesión";
-  const video = youtubeUrl(session.plan ?? "", exercise);
+  const video = youtubeUrl(session.plan ?? "", title, exercise);
   if (!session.plan && !exercise) return null;
 
   return (
