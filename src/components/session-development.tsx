@@ -126,12 +126,12 @@ function Player({ p, hits, dur, delay, i }: { p: CourtPlayer; hits: boolean; dur
             <rect x="-3.6" y="-6" width="7.2" height="8" rx="2.4" fill={shirt} stroke="#0b0d0a" strokeWidth="0.6" />
             <path d="M-3 -4 L-5.5 0.5" stroke="#e8b48a" strokeWidth="1.7" strokeLinecap="round" />
             {/* Brazo con raqueta */}
-            <g transform="translate(3 -4)">
-              {hits && <animateTransform attributeName="transform" type="rotate" values="3 -4 0;3 -4 -70;3 -4 30;3 -4 0" additive="replace" keyTimes="0;0.3;0.42;1" dur={dur} begin={delay} repeatCount="indefinite" />}
+            <g transform="translate(3 -4)"><g>
+              {hits && <animateTransform attributeName="transform" type="rotate" values="0;-70;30;0" keyTimes="0;0.3;0.42;1" dur={dur} begin={delay} repeatCount="indefinite" />}
               <path d="M0 0 L4 -3" stroke="#e8b48a" strokeWidth="1.7" strokeLinecap="round" />
               <path d="M4 -3 L6 -4.5" stroke="#18181b" strokeWidth="1.6" strokeLinecap="round" />
               <ellipse cx="8.4" cy="-6.6" rx="3" ry="3.6" transform="rotate(-40 8.4 -6.6)" fill="#27272a" stroke={shirt} strokeWidth="0.8" />
-            </g>
+            </g></g>
             {/* Cabeza */}
             <circle cx="0" cy="-9.5" r="3.2" fill="#e8b48a" stroke="#0b0d0a" strokeWidth="0.5" />
             <path d="M-3.1 -10 A3.2 3.2 0 0 1 3.1 -10 Z" fill="#3b2a1d" />
