@@ -78,7 +78,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
     <div className="mt-3 rounded-lg border border-border bg-secondary/60 p-3">
       <p className="text-[10px] font-semibold uppercase text-muted-foreground">Desarrollo</p>
       <div className={compact ? "mt-2 space-y-2" : "mt-2 grid gap-3 sm:grid-cols-[minmax(160px,0.8fr)_minmax(0,1.2fr)]"}>
-        <ExerciseDiagram title={title} diagramType={exercise?.diagramType} />
+        <ExerciseDiagram title={title} diagramType={exercise?.diagramType ?? "auto"} />
         <div className="min-w-0">
           {exercise && <p className="text-sm font-semibold text-foreground">{exercise.title}</p>}
           {session.plan && (
