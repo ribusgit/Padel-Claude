@@ -95,33 +95,66 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
   const variant = diagramType === "auto" ? variantFor(title) : diagramType;
   const { players, path, ball } = COURT_LAYOUTS[variant];
 
+  const uid = useId().replace(/:/g, "");
+  const pathId = `ball-path-${uid}`;
+  const dur = variant === "lob" ? "3s" : variant === "net" ? "1.6s" : "2.4s";
+  // Jugador más cercano al inicio y al final de la trayectoria: son quienes golpean
+  const start = path.match(/M\s*([\d.]+)\s+([\d.]+)/);
+  const sx = start ? Number(start[1]) : 0;
+  const sy = start ? Number(start[2]) : 0;
+  const dist = (p: CourtPlayer, x: number, y: number) => Math.hypot(p.x - x, p.y - y);
+  const hitterA = players.reduce((a, b) => (dist(b, sx, sy) < dist(a, sx, sy) ? b : a)).label;
+  const hitterB = players.reduce((a, b) => (dist(b, ball[0], ball[1]) < dist(a, ball[0], ball[1]) ? b : a)).label;
+
   return (
-    <figure className="w-full overflow-hidden rounded-lg border border-border bg-secondary/40" aria-label={`Esquema ilustrativo: ${title}`}>
+    <figure className="w-full overflow-hidden rounded-lg border border-border bg-secondary/40" aria-label={`Animación del ejercicio: ${title}`}>
       <svg viewBox="0 0 220 124" className="block w-full" role="img" aria-hidden="true">
         <defs>
-          <marker id="ball-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
+          <marker id={`ball-arrow-${uid}`} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
             <path d="M0 0 L8 4 L0 8 z" className="fill-primary" />
           </marker>
         </defs>
         {/* Pista 20×10 m vista desde arriba */}
         <rect x="10" y="10" width="200" height="104" rx="4" className="fill-primary/10 stroke-foreground/40" strokeWidth="1.5" />
-        {/* Red */}
         <line x1="110" y1="10" x2="110" y2="114" className="stroke-foreground" strokeWidth="2.5" />
-        {/* Líneas de saque */}
         <line x1="141" y1="10" x2="141" y2="114" className="stroke-foreground/30" strokeWidth="1" />
         <line x1="79" y1="10" x2="79" y2="114" className="stroke-foreground/30" strokeWidth="1" />
-        {/* Línea central de saque */}
         <line x1="141" y1="62" x2="79" y2="62" className="stroke-foreground/30" strokeWidth="1" />
         {/* Recorrido de la bola */}
-        <path d={path} fill="none" className="stroke-primary" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="7 5" markerEnd="url(#ball-arrow)" />
-        <circle cx={ball[0]} cy={ball[1]} r="4" className="fill-primary stroke-background" strokeWidth="1.5" />
-        {/* Jugadores */}
-        {players.map((p) => (
-          <g key={p.label}>
-            <circle cx={p.x} cy={p.y} r="8.5" className={p.team === "a" ? "fill-primary stroke-background" : "fill-foreground stroke-background"} strokeWidth="1.5" />
-            <text x={p.x} y={p.y + 3} textAnchor="middle" className="fill-background" fontSize="7.5" fontWeight="700">{p.label}</text>
-          </g>
-        ))}
+        <path id={pathId} d={path} fill="none" className="stroke-primary/50" strokeWidth="2" strokeLinecap="round" strokeDasharray="6 5" markerEnd={`url(#ball-arrow-${uid})`} />
+        {/* Muñecos jugando */}
+        {players.map((p, i) => {
+          const hits = p.label === hitterA || p.label === hitterB;
+          const body = p.team === "a" ? "stroke-primary" : "stroke-foreground";
+          const head = p.team === "a" ? "fill-primary" : "fill-foreground";
+          const swingFrom = p.label === hitterB ? "0.5" : "0";
+          return (
+            <g key={p.label} transform={`translate(${p.x} ${p.y})`}>
+              <g>
+                <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.6;0 0" dur="0.7s" begin={`${i * 0.15}s`} repeatCount="indefinite" />
+                <line x1="0" y1="-4" x2="0" y2="4" className={body} strokeWidth="2.2" strokeLinecap="round" />
+                <line x1="0" y1="4" x2="-3" y2="9" className={body} strokeWidth="2" strokeLinecap="round" />
+                <line x1="0" y1="4" x2="3" y2="9" className={body} strokeWidth="2" strokeLinecap="round" />
+                <line x1="0" y1="-2" x2="-4" y2="2" className={body} strokeWidth="1.8" strokeLinecap="round" />
+                <g>
+                  {hits && (
+                    <animateTransform attributeName="transform" type="rotate" values="0;-60;25;0" keyTimes="0;0.35;0.5;1" dur={dur} begin={`${Number(swingFrom) * parseFloat(dur)}s`} repeatCount="indefinite" />
+                  )}
+                  <line x1="0" y1="-2" x2="5" y2="-6" className={body} strokeWidth="1.8" strokeLinecap="round" />
+                  <ellipse cx="7" cy="-8" rx="2.6" ry="3.2" className="fill-background/40 stroke-foreground/80" strokeWidth="1" />
+                </g>
+                <circle cx="0" cy="-7.5" r="3.4" className={`${head} stroke-background`} strokeWidth="1" />
+              </g>
+              <text x="0" y="17" textAnchor="middle" className="fill-muted-foreground" fontSize="6" fontWeight="700">{p.label}</text>
+            </g>
+          );
+        })}
+        {/* Bola en movimiento: ida y vuelta por la trayectoria */}
+        <circle r="3.2" className="fill-primary stroke-background" strokeWidth="1.2">
+          <animateMotion dur={dur} repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1">
+            <mpath href={`#${pathId}`} />
+          </animateMotion>
+        </circle>
       </svg>
       <figcaption className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-3 py-2 text-[10px] font-medium text-muted-foreground">
         <span className="inline-flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-primary" /> Tu pareja</span>
