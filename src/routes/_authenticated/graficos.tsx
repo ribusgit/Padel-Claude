@@ -28,7 +28,10 @@ function GraficosPage() {
   const [busy, setBusy] = useState(false);
 
   async function onUpload() {
-    if (!file) return toast.error("Elige una imagen");
+    if (!file) {
+      toast.error("Elige una imagen");
+      return;
+    }
     setBusy(true);
     try {
       await uploadDrawing(file, title.trim() || file.name.replace(/\.[^.]+$/, ""));
