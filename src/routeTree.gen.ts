@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
 import { Route as AuthenticatedEjerciciosRouteImport } from './routes/_authenticated/ejercicios'
+import { Route as AuthenticatedGraficosRouteImport } from './routes/_authenticated/graficos'
 import { Route as AuthenticatedMiCalendarioRouteImport } from './routes/_authenticated/mi-calendario'
 import { Route as AuthenticatedMisClasesRouteImport } from './routes/_authenticated/mis-clases'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
@@ -53,6 +54,11 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
 const AuthenticatedEjerciciosRoute = AuthenticatedEjerciciosRouteImport.update({
   id: '/ejercicios',
   path: '/ejercicios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGraficosRoute = AuthenticatedGraficosRouteImport.update({
+  id: '/graficos',
+  path: '/graficos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMiCalendarioRoute =
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/ejercicios': typeof AuthenticatedEjerciciosRoute
+  '/graficos': typeof AuthenticatedGraficosRoute
   '/mi-calendario': typeof AuthenticatedMiCalendarioRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/panel': typeof AuthenticatedPanelRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/ejercicios': typeof AuthenticatedEjerciciosRoute
+  '/graficos': typeof AuthenticatedGraficosRoute
   '/mi-calendario': typeof AuthenticatedMiCalendarioRoute
   '/mis-clases': typeof AuthenticatedMisClasesRoute
   '/panel': typeof AuthenticatedPanelRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/ejercicios': typeof AuthenticatedEjerciciosRoute
+  '/_authenticated/graficos': typeof AuthenticatedGraficosRoute
   '/_authenticated/mi-calendario': typeof AuthenticatedMiCalendarioRoute
   '/_authenticated/mis-clases': typeof AuthenticatedMisClasesRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/ejercicios'
+    | '/graficos'
     | '/mi-calendario'
     | '/mis-clases'
     | '/panel'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/ejercicios'
+    | '/graficos'
     | '/mi-calendario'
     | '/mis-clases'
     | '/panel'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/_admin'
     | '/_authenticated/ejercicios'
+    | '/_authenticated/graficos'
     | '/_authenticated/mi-calendario'
     | '/_authenticated/mis-clases'
     | '/_authenticated/panel'
@@ -334,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/ejercicios'
       fullPath: '/ejercicios'
       preLoaderRoute: typeof AuthenticatedEjerciciosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/graficos': {
+      id: '/_authenticated/graficos'
+      path: '/graficos'
+      fullPath: '/graficos'
+      preLoaderRoute: typeof AuthenticatedGraficosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mi-calendario': {
@@ -492,6 +511,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedEjerciciosRoute: typeof AuthenticatedEjerciciosRoute
+  AuthenticatedGraficosRoute: typeof AuthenticatedGraficosRoute
   AuthenticatedMiCalendarioRoute: typeof AuthenticatedMiCalendarioRoute
   AuthenticatedMisClasesRoute: typeof AuthenticatedMisClasesRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
@@ -504,6 +524,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedEjerciciosRoute: AuthenticatedEjerciciosRoute,
+  AuthenticatedGraficosRoute: AuthenticatedGraficosRoute,
   AuthenticatedMiCalendarioRoute: AuthenticatedMiCalendarioRoute,
   AuthenticatedMisClasesRoute: AuthenticatedMisClasesRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,

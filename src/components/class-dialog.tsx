@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LevelBadge } from "@/components/padel-ui";
 import { ExerciseDiagram } from "@/components/session-development";
 import { useExercises } from "@/lib/exercises";
+import { useDrawings } from "@/lib/drawings";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
@@ -53,6 +54,8 @@ export function ClassDialog({
   const [duration, setDuration] = useState(60);
   const [plan, setPlan] = useState("");
   const [exerciseId, setExerciseId] = useState("");
+  const [drawingId, setDrawingId] = useState("");
+  const drawings = useDrawings();
   const { items: exercises } = useExercises();
   const selectedExercise = exercises.find((exercise) => exercise.id === exerciseId);
 
@@ -68,6 +71,7 @@ export function ClassDialog({
     setDuration(session.durationMin || 60);
     setPlan(session.plan ?? "");
     setExerciseId(session.exerciseId ?? "");
+    setDrawingId(session.drawingId ?? "");
   };
 
   const candidates = useMemo(
@@ -104,10 +108,10 @@ export function ClassDialog({
       return;
     }
     if (editing && session) {
-      void updateClass(session.id, { date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan, exerciseId });
+      void updateClass(session.id, { date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan, exerciseId, drawingId });
       toast.success("Clase actualizada");
     } else {
-      void addClass({ date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan, exerciseId });
+      void addClass({ date, time, durationMin: duration, court: Number(court), coachId, level, studentIds, isTrial, plan, exerciseId, drawingId });
       toast.success("Clase programada");
     }
     setOpen(false);
@@ -245,6 +249,21 @@ export function ClassDialog({
                   );
                 })}
               </div>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="drawing">Gráfico propio (galería)</Label>
+            <select
+              id="drawing"
+              value={drawingId}
+              onChange={(e) => setDrawingId(e.target.value)}
+              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            >
+              <option value="">Usar el gráfico automático del ejercicio</option>
+              {drawings.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}
+            </select>
+            {drawings.find((d) => d.id === drawingId) && (
+              <img src={drawings.find((d) => d.id === drawingId)!.url} alt="Gráfico elegido" className="mt-2 w-full rounded-lg border border-border object-contain" />
             )}
           </div>
           <div className="space-y-1.5">

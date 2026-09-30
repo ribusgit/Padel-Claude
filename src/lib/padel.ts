@@ -56,6 +56,7 @@ export interface ClassSession {
   /** Desarrollo de la clase (texto libre, se muestra tal cual). */
   plan?: string | undefined;
   exerciseId?: string | undefined;
+  drawingId?: string | undefined;
 }
 
 export type PaymentMethod = "tarjeta" | "bizum" | "manual";

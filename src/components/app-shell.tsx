@@ -16,6 +16,7 @@ import {
   Sparkles,
   Dumbbell,
   ListChecks,
+  Image,
 
   type LucideIcon,
 } from "lucide-react";
@@ -40,6 +41,7 @@ type NavTo =
   | "/pizarra"
   | "/pista"
   | "/ejercicios"
+  | "/graficos"
   | "/mi-calendario";
 type NavItem = { to: NavTo; label: string; icon: LucideIcon };
 
@@ -49,6 +51,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/calendario", label: "Clases", icon: CalendarDays },
   { to: "/pista", label: "Pista", icon: Dumbbell },
   { to: "/ejercicios", label: "Ejercicios", icon: ListChecks },
+  { to: "/graficos", label: "Gráficos", icon: Image },
   { to: "/horarios", label: "Horarios", icon: CalendarClock },
   { to: "/reservas", label: "Pistas", icon: LandPlot },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
@@ -66,6 +69,7 @@ const COACH_NAV: NavItem[] = [
   { to: "/mi-calendario", label: "Mi calendario", icon: CalendarDays },
   { to: "/pista", label: "Pista", icon: Dumbbell },
   { to: "/ejercicios", label: "Ejercicios", icon: ListChecks },
+  { to: "/graficos", label: "Gráficos", icon: Image },
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pizarra", label: "Pizarra", icon: PenTool },
 ];

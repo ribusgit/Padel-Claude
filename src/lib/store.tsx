@@ -186,6 +186,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         isTrial: c.is_trial ?? false,
         plan: c.plan ?? "",
         exerciseId: c.exercise_id ?? undefined,
+        drawingId: c.drawing_id ?? undefined,
       })),
       payments: (payments.data ?? []).map((p) => ({
         id: p.id,
@@ -416,6 +417,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           is_trial: input.isTrial ?? false,
           plan: input.plan ?? "",
           exercise_id: input.exerciseId || null,
+          drawing_id: input.drawingId || null,
         });
         if (error) throw error;
         await refresh();
@@ -432,6 +434,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (patch.attendance !== undefined) payload["attendance"] = patch.attendance;
         if (patch.isTrial !== undefined) payload["is_trial"] = patch.isTrial;
         if (patch.plan !== undefined) payload["plan"] = patch.plan;
+        if (patch.exerciseId !== undefined) payload["exercise_id"] = patch.exerciseId || null;
+        if (patch.drawingId !== undefined) payload["drawing_id"] = patch.drawingId || null;
         const { error } = await supabase.from("classes").update(payload).eq("id", id);
         if (error) throw error;
         await refresh();
