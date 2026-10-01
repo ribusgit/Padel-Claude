@@ -11,6 +11,8 @@ export type Exercise = {
   videoUrl: string;
   trimester: number;
   diagramType: ExerciseDiagramType;
+  filmPath?: string | null;
+  filmUrl?: string;
 };
 
 export type ExerciseDiagramType = "auto" | "rally" | "serve" | "net" | "lob";
@@ -22,8 +24,13 @@ export function useExercises() {
 
   const reload = useCallback(async () => {
     const { data } = await supabase.from("exercises").select("*").order("position");
+    const paths = (data ?? []).map((r) => r.film_path).filter((x): x is string => !!x);
+    const signed = paths.length ? (await supabase.storage.from("session-films").createSignedUrls(paths, 60 * 60 * 6)).data ?? [] : [];
+    const urlOf = (p: string | null) => (p ? signed.find((x) => x.path === p)?.signedUrl ?? "" : "");
     setItems(
       (data ?? []).map((r) => ({
+        filmPath: r.film_path,
+        filmUrl: urlOf(r.film_path),
         id: r.id,
         level: r.level as LevelCategory,
         position: r.position,
