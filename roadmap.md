@@ -26,3 +26,4 @@
 - [ ] Calendario compartido: clases de varios profesores juntas en Pista
 - [x] Desarrollo visual por sesión con esquema de pista y enlace operativo a YouTube
 - [x] Profesor crea ejercicios con texto, vídeo y gráfico y los asigna a sesiones
+- [ ] Adaptar los 26 desarrollos y gráficos de iniciación al programa PDF, repartidos en tres trimestres
