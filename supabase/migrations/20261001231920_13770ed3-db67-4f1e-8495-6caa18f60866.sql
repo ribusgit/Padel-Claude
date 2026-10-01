@@ -1,0 +1,3 @@
+UPDATE public.exercises e SET video_url = 'https://www.youtube.com/watch?v=' || v.id
+FROM (VALUES (1,'zh590RAVjuU'),(2,'fwCTaOUR11E'),(4,'ECbINFKlPTs'),(5,'PXUFvO8lfm0'),(8,'smU53KFcx1o'),(9,'IKdXFTLQuq4'),(10,'ewTy8UxVpDc'),(11,'qDazloD4w_0'),(12,'clXBTptF5-o'),(13,'QPCUK5t7qW8'),(17,'oz9nfN0vlY4'),(18,'kAuiDNoArvs'),(21,'PXUFvO8lfm0'),(23,'2u_KqpHJpCo'),(24,'c6_RpU4hsFY'),(25,'032VPQREE44'),(26,'ArB2jlAbH4g')) AS v(day,id)
+WHERE e.level = 'iniciacion' AND e.title LIKE 'Día ' || v.day || '.%';
