@@ -387,7 +387,8 @@ function Figure({ team, angle, leg }: { team: "a" | "b"; angle: number; leg: num
   );
 }
 
-export function ExerciseDiagram({ title, diagramType = "auto", plan = "" }: { title: string; diagramType?: ExerciseDiagramType; plan?: string }) {
+export function ExerciseDiagram(props: { title: string; diagramType?: ExerciseDiagramType; plan?: string }) {
+  const { title, plan = "" } = props;
   const film = filmFor(title, plan);
   if (film) {
     return (
@@ -397,6 +398,10 @@ export function ExerciseDiagram({ title, diagramType = "auto", plan = "" }: { ti
       </figure>
     );
   }
+  return <AnimatedDiagram {...props} />;
+}
+
+function AnimatedDiagram({ title, diagramType = "auto", plan = "" }: { title: string; diagramType?: ExerciseDiagramType; plan?: string }) {
   const variant = diagramType === "auto" ? variantFor(title, plan) : diagramType;
   const drill = DRILLS[variant];
   const visual = fromPlan(plan, visualFor(`${title} ${plan.match(/objetivo\s*:[^\n]*/i)?.[0] ?? ""}`, drill));
