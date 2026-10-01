@@ -573,7 +573,7 @@ function GroupTips({ variant, count }: { variant: Exclude<ExerciseDiagramType, "
   const rows: Array<{ label: string; text: string }> = [
     { label: "1 alumno", text: tips.one },
     { label: "2 alumnos (pareja)", text: tips.two },
-    { label: "3-4 alumnos", text: tips.three },
+    { label: "3 alumnos", text: tips.three },
   ];
   const active = n <= 1 ? 0 : n === 2 ? 1 : 2;
   return (
@@ -603,7 +603,7 @@ function DevelopmentText({ plan }: { plan: string }) {
 
         return (
           <div key={index} className="space-y-1">
-            {label && <p className={cn("font-bold text-foreground mb-0.5", /^(Objetivo|Desarrollo|Clave|Pared|Pareja|Cabeza)/i.test(label) && "text-primary")}>{label}</p>}
+            {label && <p className={cn("mb-0.5 font-bold text-foreground", /^(DÍA|Material|Objetivo|Desarrollo|Clave|Pared|Pareja|Cabeza)/i.test(label) && "text-primary")}>{label}</p>}
             <div className={cn("space-y-1", hasList && "pl-1")}>
               {lines.map((line, li) => {
                 const trimmed = line.trim();
