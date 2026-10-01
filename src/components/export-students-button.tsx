@@ -17,7 +17,7 @@ export function ExportStudentsButton() {
   const run = async () => {
     setBusy(true);
     try {
-      const XLSX = await import("xlsx");
+      const XLSX = await import("@e965/xlsx");
       const students = [...data.students].sort((a, b) => a.name.localeCompare(b.name));
       const paymentsOf = (s: Student) => data.payments.filter((p) => p.studentId === s.id);
 
