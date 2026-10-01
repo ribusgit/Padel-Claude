@@ -499,6 +499,51 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
   );
 }
 
+/* Cómo adaptar cada tipo de ejercicio según el número de alumnos (sin contar al profesor). */
+const GROUP_TIPS: Record<Exclude<ExerciseDiagramType, "auto">, { one: string; two: string; three: string }> = {
+  serve: {
+    one: "El alumno saca y sube a la red; el profesor resta y hace de rival. Trabaja el saque cruzado y la subida a volea en cada bola.",
+    two: "Cada alumno saca desde un lado por turnos y sube a la red; el profesor resta y devuelve a los dos. Cambiad de lado cada 5 saques.",
+    three: "Dos alumnos sacan y suben como pareja; el tercero resta con el profesor. Rotad los papeles cada pocos juegos para que todos saquen y resten.",
+  },
+  net: {
+    one: "El alumno volea en la red y el profesor le tira bolas desde el fondo, primero a la derecha y luego al revés. Series de 8-10 voleas con descanso.",
+    two: "Los dos alumnos voleán juntos en la red como pareja; el profesor juega desde el fondo alternando a uno y a otro. Que se llamen la bola.",
+    three: "Dos alumnos voleán en la red y el tercero juega desde el fondo con el profesor. Rotad cada 2 minutos para que todos toquen red y fondo.",
+  },
+  lob: {
+    one: "El alumno defiende en el fondo y el profesor ataca desde la red. El alumno responde todo con globos altos hasta lograr subir a la red.",
+    two: "Los dos alumnos defienden como pareja en el fondo; el profesor ataca desde la red. Cuando el globo es bueno, suben juntos a la red.",
+    three: "Dos alumnos defienden en el fondo y el tercero ataca en la red con el profesor. Rotad atacante y defensores para practicar los dos papeles.",
+  },
+  rally: {
+    one: "Peloteo cruzado alumno contra profesor, cada uno en su diagonal. Contad bolas seguidas sin fallo y poneos un reto (por ejemplo, 20).",
+    two: "Peloteo cruzado por parejas: los dos alumnos en un lado contra el profesor, que devuelve a ambos. Alternad quién golpea cada bola.",
+    three: "Dos alumnos peloteán como pareja contra el profesor y el tercer alumno. Rotad al alumno que juega con el profesor cada pocos minutos.",
+  },
+};
+
+function GroupTips({ variant, count }: { variant: Exclude<ExerciseDiagramType, "auto">; count: number }) {
+  const tips = GROUP_TIPS[variant];
+  const n = Math.min(count, 4);
+  const rows: Array<{ label: string; text: string }> = [
+    { label: "1 alumno", text: tips.one },
+    { label: "2 alumnos", text: tips.two },
+    { label: "3-4 alumnos", text: tips.three },
+  ];
+  const active = n <= 1 ? 0 : n === 2 ? 1 : 2;
+  return (
+    <div className="mt-3 space-y-1.5">
+      <p className="text-[10px] font-semibold uppercase text-muted-foreground">Según el número de alumnos</p>
+      {rows.map((row, i) => (
+        <p key={row.label} className={cn("rounded-md px-2 py-1.5 text-[11px]", i === active ? "bg-primary/15 text-foreground" : "bg-secondary text-muted-foreground")}>
+          <span className="font-semibold">{row.label}: </span>{row.text}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export function SessionDevelopment({ session, exercises, compact = false }: { session: ClassSession; exercises: Exercise[]; compact?: boolean }) {
   const exercise = exercises.find((item) => item.id === session.exerciseId);
   const title = exercise?.title || session.plan?.split("\n").find((line) => line.trim()) || "Ejercicio de la sesión";
@@ -529,6 +574,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
               <PlayCircle className="size-4" /> Ver ejercicio en YouTube <ExternalLink className="size-3.5" />
             </a>
           )}
+          <GroupTips variant={exercise?.diagramType && exercise.diagramType !== "auto" ? exercise.diagramType : variantFor(title)} count={session.studentIds.length} />
         </div>
       </div>
     </div>
