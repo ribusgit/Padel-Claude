@@ -394,16 +394,30 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
         {[2, 4, 6, 8, 12, 14, 16, 18].map((v) => (
           <polyline key={v} points={poly([[0, v], [10, v]])} stroke="#fff" strokeWidth="0.4" opacity="0.05" />
         ))}
-        {/* Cristal del fondo y laterales */}
-        <polygon points={poly([[0, 20, 0], [10, 20, 0], [10, 20, 3], [0, 20, 3]])} fill="#bfe3ff" opacity="0.14" stroke="#dbeafe" strokeOpacity="0.6" strokeWidth="0.8" />
+        {/* Paredes de la pista de pádel: cristal en el fondo, cristal + malla en los laterales */}
+        {/* Cristal del fondo (3 m) con reflejo */}
+        <polygon points={poly([[0, 20, 0], [10, 20, 0], [10, 20, 3], [0, 20, 3]])} fill="#a8d4f5" opacity="0.32" stroke="#e2f0fd" strokeOpacity="0.9" strokeWidth="1" />
+        <polygon points={poly([[0.6, 20, 0.4], [3.4, 20, 0.4], [2.2, 20, 2.8], [0.6, 20, 2.8]])} fill="#fff" opacity="0.14" />
+        <polygon points={poly([[6.2, 20, 0.4], [8.6, 20, 0.4], [7.6, 20, 2.8], [6.2, 20, 2.8]])} fill="#fff" opacity="0.1" />
+        {[0, 2.5, 5, 7.5, 10].map((u) => (
+          <polyline key={u} points={poly([[u, 20, 0], [u, 20, 3]])} stroke="#374151" strokeWidth="1.4" />
+        ))}
+        <polyline points={poly([[0, 20, 3], [10, 20, 3]])} stroke="#1f2937" strokeWidth="1.6" />
+        {/* Laterales: cristal en el fondo (hasta v=16), malla metálica hacia la red */}
         {[0, 10].map((u) => (
           <g key={u}>
-            <polygon points={poly([[u, 16, 0], [u, 20, 0], [u, 20, 3], [u, 16, 3]])} fill="#bfe3ff" opacity="0.12" stroke="#dbeafe" strokeOpacity="0.5" strokeWidth="0.6" />
-            <polygon points={poly([[u, 4, 0], [u, 16, 0], [u, 16, 3], [u, 4, 3]])} fill={`url(#fence-${uid})`} stroke="#71717a" strokeOpacity="0.6" strokeWidth="0.6" />
-            <polygon points={poly([[u, 0, 0], [u, 4, 0], [u, 4, 3], [u, 0, 3]])} fill="#bfe3ff" opacity="0.08" stroke="#dbeafe" strokeOpacity="0.35" strokeWidth="0.6" />
+            {/* Cristal lateral del fondo */}
+            <polygon points={poly([[u, 16, 0], [u, 20, 0], [u, 20, 3], [u, 16, 3]])} fill="#a8d4f5" opacity="0.3" stroke="#e2f0fd" strokeOpacity="0.85" strokeWidth="0.9" />
+            <polygon points={poly([[u, 17, 0.5], [u, 19.4, 0.5], [u, 18.6, 2.7], [u, 17, 2.7]])} fill="#fff" opacity="0.12" />
+            {/* Malla metálica de la zona de red */}
+            <polygon points={poly([[u, 4, 0], [u, 16, 0], [u, 16, 3], [u, 4, 3]])} fill={`url(#fence-${uid})`} stroke="#9ca3af" strokeOpacity="0.9" strokeWidth="0.9" />
+            {/* Cristal lateral cercano a la cámara */}
+            <polygon points={poly([[u, 0, 0], [u, 4, 0], [u, 4, 3], [u, 0, 3]])} fill="#a8d4f5" opacity="0.22" stroke="#e2f0fd" strokeOpacity="0.6" strokeWidth="0.9" />
+            {/* Postes metálicos */}
             {[4, 7, 10, 13, 16].map((v) => (
-              <polyline key={v} points={poly([[u, v, 0], [u, v, 3]])} stroke="#52525b" strokeWidth="1" />
+              <polyline key={v} points={poly([[u, v, 0], [u, v, 3]])} stroke="#374151" strokeWidth="1.3" />
             ))}
+            <polyline points={poly([[u, 0, 3], [u, 20, 3]])} stroke="#1f2937" strokeWidth="1.4" />
           </g>
         ))}
         {/* Líneas */}
