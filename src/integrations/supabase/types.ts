@@ -260,6 +260,7 @@ export type Database = {
           created_by: string | null
           description: string
           diagram_type: string
+          film_path: string | null
           id: string
           level: string
           position: number
@@ -273,6 +274,7 @@ export type Database = {
           created_by?: string | null
           description?: string
           diagram_type?: string
+          film_path?: string | null
           id?: string
           level: string
           position?: number
@@ -286,6 +288,7 @@ export type Database = {
           created_by?: string | null
           description?: string
           diagram_type?: string
+          film_path?: string | null
           id?: string
           level?: string
           position?: number

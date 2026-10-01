@@ -13,3 +13,4 @@
 - Store each exercise diagram as a semantic preset (`auto`, `rally`, `serve`, `net`, or `lob`) so editors and session views render the same graphic.
 - Custom court drawings live in the private `court-drawings` bucket + `court_drawings` table; a class's `drawing_id` overrides the exercise preset inside `SessionDevelopment`. Why: coaches' own drawings must render identically everywhere.
 - The initiation curriculum follows the uploaded 26-session academy program, distributed 9/8/9 across the three trimesters. Why: Pista, class assignment, and student views must share the approved teaching sequence.
+- Session media priority in `SessionMedia`: coach-uploaded film (`exercises.film_path`, private `session-films` bucket) > embedded YouTube from `video_url` > court diagram. Why: AI-generated padel video looked unrealistic; real footage is preferred.
