@@ -178,20 +178,20 @@ function contactPoint(team: "a" | "b", at: Pt): Pt {
 function frameAt(d: Drill, prep: ReturnType<typeof prepare>, t: number) {
   let rem = t % prep.total;
   let i = 0;
-  while (i < d.shots.length && rem >= d.shots[i].dur) { rem -= d.shots[i].dur; i++; }
+  while (i < d.shots.length && rem >= d.shots[i]!.dur) { rem -= d.shots[i]!.dur; i++; }
   const reset = i >= d.shots.length;
   const shot = reset ? undefined : d.shots[i];
-  const p = reset ? rem / RESET : rem / d.shots[i].dur;
-  const from = reset ? prep.positions[d.shots.length] : prep.positions[i];
-  const to = reset ? prep.positions[0] : prep.positions[i + 1];
+  const p = shot ? rem / shot.dur : rem / RESET;
+  const from = (reset ? prep.positions[d.shots.length] : prep.positions[i])!;
+  const to = (reset ? prep.positions[0] : prep.positions[i + 1])!;
   const k = ease(Math.min(1, p / (reset ? 1 : 0.85)));
 
   const players = d.players.map((pl) => {
-    const a = from[pl.label];
-    const b = to[pl.label];
+    const a = from[pl.label] ?? pl.at;
+    const b = to[pl.label] ?? pl.at;
     const moving = dist(a, b) > 0.05 && k < 1;
     const at: Pt = [lerp(a[0], b[0], k), lerp(a[1], b[1], k)];
-    const next = reset ? d.shots[0].by : d.shots[i + 1]?.by;
+    const next = reset ? d.shots[0]?.by : d.shots[i + 1]?.by;
     let angle = IDLE;
     if (shot?.by === pl.label) {
       if (p < 0.2) angle = lerp(BACK, FOLLOW, easeOut(p / 0.2));
@@ -207,8 +207,8 @@ function frameAt(d: Drill, prep: ReturnType<typeof prepare>, t: number) {
   let trail: Array<[number, number, number]> = [];
   let hit: { at: Pt; h: number } | null = null;
   if (shot) {
-    const H = contactPoint(prep.teams[shot.by], from[shot.by]);
-    const R = contactPoint(prep.teams[shot.to], to[shot.to]);
+    const H = contactPoint(prep.teams[shot.by] ?? "a", from[shot.by] ?? [5, 5]);
+    const R = contactPoint(prep.teams[shot.to] ?? "b", to[shot.to] ?? [5, 15]);
     const h0 = shot.h0 ?? 1;
     const at = (q: number): { g: Pt; h: number } => {
       if (shot.bounce) {
