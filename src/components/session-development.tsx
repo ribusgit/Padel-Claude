@@ -574,6 +574,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
               <PlayCircle className="size-4" /> Ver ejercicio en YouTube <ExternalLink className="size-3.5" />
             </a>
           )}
+          <GroupTips variant={exercise?.diagramType && exercise.diagramType !== "auto" ? exercise.diagramType : variantFor(title)} count={session.studentIds.length} />
         </div>
       </div>
     </div>
