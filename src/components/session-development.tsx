@@ -44,6 +44,49 @@ function variantFor(text: string): Exclude<ExerciseDiagramType, "auto"> {
   return "rally";
 }
 
+type SessionVisual = { goal: string; steps: [string, string, string]; tip: string };
+
+function visualFor(title: string, fallback: Drill): SessionVisual {
+  const text = title.toLocaleLowerCase("es");
+  if (/pared|rebote|ángulo|defensa/.test(text)) return {
+    goal: "Leer el rebote del cristal, dejar pasar la bola y golpear delante del cuerpo.",
+    steps: [
+      "El profesor envía la bola profunda para que bote antes del cristal de fondo o lateral.",
+      "El alumno se separa de la pared, acompaña el rebote y prepara la pala sin invadir la trayectoria.",
+      "Golpea después del rebote, recupera el centro de su lado y vuelve a la posición de espera.",
+    ],
+    tip: "Primero lee la pared; después muévete. No golpees mientras la bola todavía se acerca al cristal.",
+  };
+  if (/bandeja|víbora|rulo|remate/.test(text)) return {
+    goal: "Resolver el globo alto manteniendo la red y recuperando la posición con la pareja.",
+    steps: [
+      "El profesor lanza un globo alto y el alumno gira los hombros mientras retrocede de lado.",
+      "Se detiene antes de golpear y contacta la bola alta, delante y al lado del cuerpo.",
+      "Dirige el golpe al objetivo indicado y vuelve a la red; el compañero cubre el centro.",
+    ],
+    tip: /remate/.test(text) ? "Solo remata una bola corta y segura; si llega profunda, defiende." : "Control y dirección antes que velocidad; vuelve a la red después del golpe.",
+  };
+  if (/pareja|transici|situaciones|partido/.test(text)) return {
+    goal: "Moverse como pareja: defender juntos, subir juntos y proteger el centro.",
+    steps: [
+      "Los dos alumnos parten alineados y se avisan antes de jugar la bola del centro.",
+      "Quien golpea profundo o juega un buen globo inicia la subida; su compañero acompaña.",
+      "La pareja recupera la misma altura y deja libre el menor espacio posible entre ambos.",
+    ],
+    tip: "La distancia entre compañeros se mantiene: ninguno sube o baja solo.",
+  };
+  if (/derecha|revés|golpes simples/.test(text) && !/volea/.test(text)) return {
+    goal: "Golpear delante del cuerpo y recuperar el centro después de cada derecha o revés.",
+    steps: [
+      "El profesor alimenta una bola con bote y el alumno gira los hombros antes de que llegue.",
+      "El alumno impacta delante, acompaña la bola con un armado corto y dirige al objetivo.",
+      "Termina el golpe, vuelve al centro de su lado y prepara la siguiente bola.",
+    ],
+    tip: "Preparación temprana, punto de impacto delante y potencia moderada.",
+  };
+  return { goal: fallback.goal, steps: [fallback.steps[0] ?? "", fallback.steps[1] ?? "", fallback.steps[2] ?? ""], tip: fallback.tip };
+}
+
 /* ------------------------------------------------------------------ */
 /* Ejercicio animado: pista real en perspectiva (vista de televisión). */
 /* Coordenadas de pista en metros: u 0→10 (izquierda→derecha),        */
@@ -284,6 +327,7 @@ function Figure({ team, angle, leg }: { team: "a" | "b"; angle: number; leg: num
 export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string; diagramType?: ExerciseDiagramType }) {
   const variant = diagramType === "auto" ? variantFor(title) : diagramType;
   const drill = DRILLS[variant];
+  const visual = visualFor(title, drill);
   const prep = useMemo(() => prepare(drill), [drill]);
   const uid = useId().replace(/:/g, "");
   const ref = useRef<HTMLElement>(null);
@@ -472,9 +516,9 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
             <RotateCcw className="size-3.5" /> Desde el inicio
           </button>
         </div>
-        <p className="flex items-start gap-1.5 text-xs font-semibold text-foreground"><Target className="mt-0.5 size-3.5 shrink-0 text-primary" /> {drill.goal}</p>
+         <p className="flex items-start gap-1.5 text-xs font-semibold text-foreground"><Target className="mt-0.5 size-3.5 shrink-0 text-primary" /> {visual.goal}</p>
         <ol className="space-y-1">
-          {drill.steps.map((s, i) => (
+           {visual.steps.map((s, i) => (
             <li key={i}>
               <button
                 type="button"
@@ -487,7 +531,7 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
             </li>
           ))}
         </ol>
-        <p className="rounded-md bg-secondary px-2 py-1.5 text-[11px] text-foreground"><span className="font-semibold">Clave: </span>{drill.tip}</p>
+         <p className="rounded-md bg-secondary px-2 py-1.5 text-[11px] text-foreground"><span className="font-semibold">Clave: </span>{visual.tip}</p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] font-medium text-muted-foreground">
           <span className="inline-flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-primary" /> Tu pareja (A), de espaldas</span>
           <span className="inline-flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-foreground" /> Rivales (B)</span>
@@ -529,7 +573,7 @@ function GroupTips({ variant, count }: { variant: Exclude<ExerciseDiagramType, "
   const rows: Array<{ label: string; text: string }> = [
     { label: "1 alumno", text: tips.one },
     { label: "2 alumnos", text: tips.two },
-    { label: "3-4 alumnos", text: tips.three },
+    { label: "3 alumnos", text: tips.three },
   ];
   const active = n <= 1 ? 0 : n === 2 ? 1 : 2;
   return (
@@ -540,6 +584,27 @@ function GroupTips({ variant, count }: { variant: Exclude<ExerciseDiagramType, "
           <span className="font-semibold">{row.label}: </span>{row.text}
         </p>
       ))}
+    </div>
+  );
+}
+
+function DevelopmentText({ plan }: { plan: string }) {
+  const blocks = plan.split(/\n{2,}/).filter((block) => block.trim());
+  return (
+    <div className="mt-1 space-y-2 text-xs text-muted-foreground">
+      {blocks.map((block, index) => {
+        const separator = block.indexOf(":");
+        const label = separator > 0 ? block.slice(0, separator + 1) : "";
+        const body = separator > 0 ? block.slice(separator + 1).trimStart() : block;
+        return (
+          <p key={index} className={cn("whitespace-pre-wrap break-words", /^(Objetivo|Día|Material)/i.test(label) && "text-foreground")}>
+            {label && <span className="font-semibold">{label} </span>}
+            {planParts(body).map((part, partIndex) => part.href ? (
+              <a key={partIndex} href={part.href} target="_blank" rel="noreferrer" className="font-semibold text-primary underline underline-offset-2">{part.text}</a>
+            ) : <span key={partIndex}>{part.text}</span>)}
+          </p>
+        );
+      })}
     </div>
   );
 }
@@ -562,13 +627,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
         )}
         <div className="min-w-0">
           {exercise && <p className="text-sm font-semibold text-foreground">{exercise.title}</p>}
-          {session.plan && (
-            <p className="mt-1 whitespace-pre-wrap break-words text-xs text-muted-foreground">
-              {planParts(session.plan).map((part, index) => part.href ? (
-                <a key={index} href={part.href} target="_blank" rel="noreferrer" className="font-semibold text-primary underline underline-offset-2">{part.text}</a>
-              ) : <span key={index}>{part.text}</span>)}
-            </p>
-          )}
+          {session.plan && <DevelopmentText plan={session.plan} />}
           {video && (
             <a href={video} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground">
               <PlayCircle className="size-4" /> Ver ejercicio en YouTube <ExternalLink className="size-3.5" />

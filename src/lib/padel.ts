@@ -402,18 +402,15 @@ export function seedData(): AppData {
 /** Banco de ejercicios del trimestre por nivel (compartido por /pista y el portal del alumno). */
 export const EXERCISE_BANK: Record<LevelCategory, string[]> = {
   iniciacion: [
-    "Empuñadura continental y posición de espera",
-    "Derecha de fondo: peloteo cruzado",
-    "Revés de fondo: peloteo paralelo",
-    "Volea de derecha en red",
-    "Volea de revés en red",
-    "Saque reglamentario y resto básico",
-    "Salida de pared lateral de derecha",
-    "Salida de pared de fondo",
-    "Globo defensivo desde el fondo",
-    "Bandeja básica",
-    "Desplazamientos: subir a la red y bajar",
-    "Juego de puntos con reglas sencillas",
+    "Introducción al juego y derecha simple con bote",
+    "Revés simple con bote",
+    "Afianzar derecha y revés e incluir la volea de derecha",
+    "Afianzar derecha y revés e incluir la volea de revés",
+    "Golpes simples, volea, servicio y resto",
+    "Volea dirigida y transición saque-volea",
+    "Volea dirigida II",
+    "Defensa I. Salida de pared de derecha y de revés",
+    "Defensa II. Salida de pared y ángulos",
   ],
   intermedio: [
     "Control de dirección: cruzado vs paralelo",
