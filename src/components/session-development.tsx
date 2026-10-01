@@ -36,12 +36,43 @@ function planParts(plan: string) {
   return parts;
 }
 
-function variantFor(text: string): Exclude<ExerciseDiagramType, "auto"> {
-  const normalized = text.toLocaleLowerCase("es");
-  if (/saque|resto|servicio/.test(normalized)) return "serve";
-  if (/remate|smash|bandeja|víbora|volea|red|cabeza/.test(normalized)) return "net";
-  if (/globo|pared|cristal|defensa|fondo/.test(normalized)) return "lob";
-  return "rally";
+const VARIANT_WORDS: Record<Exclude<ExerciseDiagramType, "auto">, RegExp> = {
+  serve: /saque|resto|servicio|sacar/g,
+  net: /remate|smash|bandeja|víbora|volea|\bred\b|cabeza|subir a la red/g,
+  lob: /globo|pared|cristal|defensa|rebote|salida de pared/g,
+  rally: /derecha|revés|fondo|peloteo|intercambio|cruzad|paralel/g,
+};
+
+function variantFor(text: string, plan = ""): Exclude<ExerciseDiagramType, "auto"> {
+  const t = text.toLocaleLowerCase("es");
+  const p = plan.toLocaleLowerCase("es");
+  let best: Exclude<ExerciseDiagramType, "auto"> = "rally";
+  let bestScore = 0;
+  for (const [k, re] of Object.entries(VARIANT_WORDS) as [Exclude<ExerciseDiagramType, "auto">, RegExp][]) {
+    const score = (t.match(re)?.length ?? 0) * 3 + (p.match(re)?.length ?? 0);
+    if (score > bestScore) { best = k; bestScore = score; }
+  }
+  return best;
+}
+
+function cleanLine(line: string) {
+  const s = line.replace(/https?:\/\/\S+/g, "").replace(/^[\s•·*-]+/, "").replace(/\s+/g, " ").trim();
+  return s.length > 150 ? `${s.slice(0, 147).trimEnd()}…` : s;
+}
+
+function fromPlan(plan: string, visual: SessionVisual): SessionVisual {
+  if (!plan.trim()) return visual;
+  const lines = plan.split("\n").map((l) => l.trim()).filter(Boolean);
+  const goalLine = lines.find((l) => /^objetivo\s*:/i.test(l));
+  const steps = lines
+    .filter((l) => /^(ejercicio\s*\d+|\d+[.)]|[-•·*]\s)/i.test(l) && !/^objetivo|^material|^d[ií]a/i.test(l))
+    .map(cleanLine).filter((l) => l.length > 3);
+  const merged = [...steps, ...visual.steps].slice(0, 3) as [string, string, string];
+  return {
+    goal: goalLine ? cleanLine(goalLine.replace(/^objetivo\s*:\s*/i, "")) : visual.goal,
+    steps: merged,
+    tip: visual.tip,
+  };
 }
 
 type SessionVisual = { goal: string; steps: [string, string, string]; tip: string };
@@ -324,10 +355,10 @@ function Figure({ team, angle, leg }: { team: "a" | "b"; angle: number; leg: num
   );
 }
 
-export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string; diagramType?: ExerciseDiagramType }) {
-  const variant = diagramType === "auto" ? variantFor(title) : diagramType;
+export function ExerciseDiagram({ title, diagramType = "auto", plan = "" }: { title: string; diagramType?: ExerciseDiagramType; plan?: string }) {
+  const variant = diagramType === "auto" ? variantFor(title, plan) : diagramType;
   const drill = DRILLS[variant];
-  const visual = visualFor(title, drill);
+  const visual = fromPlan(plan, visualFor(`${title} ${plan.match(/objetivo\s*:[^\n]*/i)?.[0] ?? ""}`, drill));
   const prep = useMemo(() => prepare(drill), [drill]);
   const uid = useId().replace(/:/g, "");
   const ref = useRef<HTMLElement>(null);
@@ -641,7 +672,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
         {drawing ? (
           <img src={drawing.url} alt={drawing.title} className="w-full rounded-lg border border-border bg-background object-contain" />
         ) : (
-          <ExerciseDiagram title={title} diagramType={exercise?.diagramType ?? "auto"} />
+          <ExerciseDiagram title={title} diagramType={exercise?.diagramType ?? "auto"} plan={session.plan || exercise?.description || ""} />
         )}
         <div className="min-w-0">
           {exercise && <p className="text-sm font-semibold text-foreground">{exercise.title}</p>}
@@ -651,7 +682,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
               <PlayCircle className="size-4" /> Ver ejercicio en YouTube <ExternalLink className="size-3.5" />
             </a>
           )}
-          <GroupTips variant={exercise?.diagramType && exercise.diagramType !== "auto" ? exercise.diagramType : variantFor(title)} count={session.studentIds.length} />
+          <GroupTips variant={exercise?.diagramType && exercise.diagramType !== "auto" ? exercise.diagramType : variantFor(title, session.plan || exercise?.description || "")} count={session.studentIds.length} />
         </div>
       </div>
     </div>
