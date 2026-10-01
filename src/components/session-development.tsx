@@ -39,8 +39,8 @@ function planParts(plan: string) {
 function variantFor(text: string): Exclude<ExerciseDiagramType, "auto"> {
   const normalized = text.toLocaleLowerCase("es");
   if (/saque|resto|servicio/.test(normalized)) return "serve";
-  if (/volea|red|bandeja|víbora|remate/.test(normalized)) return "net";
-  if (/globo|defensa|pared|fondo/.test(normalized)) return "lob";
+  if (/remate|smash|bandeja|víbora|volea|red/.test(normalized)) return "net";
+  if (/globo|pared|cristal|defensa|fondo/.test(normalized)) return "lob";
   return "rally";
 }
 
