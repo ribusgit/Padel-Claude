@@ -667,7 +667,7 @@ function youtubeId(url: string) {
   return m?.[1] ?? null;
 }
 
-function SessionMedia({ exercise, title, plan }: { exercise?: Exercise; title: string; plan: string }) {
+function SessionMedia({ exercise, title, plan }: { exercise?: Exercise | undefined; title: string; plan: string }) {
   if (exercise?.filmUrl) {
     return (
       <figure className="w-full overflow-hidden rounded-lg border border-border bg-card">
