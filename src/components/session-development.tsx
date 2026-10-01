@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useDrawings } from "@/lib/drawings";
-import { ExternalLink, Pause, Play, PlayCircle, RotateCcw, Snail } from "lucide-react";
+import { ExternalLink, Pause, Play, PlayCircle, RotateCcw, Snail, Target } from "lucide-react";
 import type { Exercise, ExerciseDiagramType } from "@/lib/exercises";
 import type { ClassSession } from "@/lib/padel";
 import { cn } from "@/lib/utils";
@@ -458,7 +458,7 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
             <RotateCcw className="size-3.5" /> Desde el inicio
           </button>
         </div>
-        <p className="text-xs font-semibold text-foreground">🎯 {drill.goal}</p>
+        <p className="flex items-start gap-1.5 text-xs font-semibold text-foreground"><Target className="mt-0.5 size-3.5 shrink-0 text-primary" /> {drill.goal}</p>
         <ol className="space-y-1">
           {drill.steps.map((s, i) => (
             <li key={i}>
