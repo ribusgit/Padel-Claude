@@ -296,7 +296,7 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setPaused(true);
     const el = ref.current;
     if (!el || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(([e]) => { visible.current = e.isIntersecting; });
+    const io = new IntersectionObserver(([e]) => { visible.current = e?.isIntersecting ?? true; });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -321,7 +321,7 @@ export function ExerciseDiagram({ title, diagramType = "auto" }: { title: string
 
   const goToStep = (step: number) => {
     const idx = drill.shots.findIndex((s) => s.step === step);
-    if (idx >= 0) setT(prep.starts[idx] + 0.01);
+    if (idx >= 0) setT((prep.starts[idx] ?? 0) + 0.01);
   };
 
   type Item = { v: number; node: React.ReactNode };
