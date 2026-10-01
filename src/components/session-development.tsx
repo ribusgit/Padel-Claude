@@ -702,7 +702,7 @@ export function SessionDevelopment({ session, exercises, compact = false }: { se
         {drawing ? (
           <img src={drawing.url} alt={drawing.title} className="w-full rounded-lg border border-border bg-background object-contain" />
         ) : (
-          <ExerciseDiagram title={title} diagramType={exercise?.diagramType ?? "auto"} plan={session.plan || exercise?.description || ""} />
+          <SessionMedia exercise={exercise} title={title} plan={session.plan || exercise?.description || ""} />
         )}
         <div className="min-w-0">
           {exercise && <p className="text-sm font-semibold text-foreground">{exercise.title}</p>}

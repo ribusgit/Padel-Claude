@@ -121,7 +121,32 @@ function ExerciseRow({ e, n, onUp, onDown, onDelete, onSaved }: { e: Exercise; n
             <>
               <Input value={f.title} onChange={(x) => setF({ ...f, title: x.target.value })} />
               <Textarea value={f.description} onChange={(x) => setF({ ...f, description: x.target.value })} />
-              <Input value={f.videoUrl} placeholder="Enlace del vídeo" onChange={(x) => setF({ ...f, videoUrl: x.target.value })} />
+              <Input value={f.videoUrl} placeholder="Enlace del vídeo de YouTube" onChange={(x) => setF({ ...f, videoUrl: x.target.value })} />
+              <label className="block rounded-lg border border-dashed border-border p-3 text-sm">
+                <span className="font-medium">{e.filmPath ? "Cambiar vídeo propio" : "Subir vídeo grabado en vuestra pista"}</span>
+                <span className="block text-xs text-muted-foreground">Sustituye al vídeo de YouTube en la sesión (máx. 200 MB).</span>
+                <input type="file" accept="video/*" className="mt-2 block w-full text-xs" onChange={async (x) => {
+                  const file = x.target.files?.[0];
+                  if (!file) return;
+                  const path = `${e.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+                  toast.info("Subiendo vídeo…");
+                  const up = await supabase.storage.from("session-films").upload(path, file, { contentType: file.type || "video/mp4" });
+                  if (up.error) { toast.error("No se pudo subir el vídeo"); return; }
+                  const { error } = await supabase.from("exercises").update({ film_path: path }).eq("id", e.id);
+                  if (error) { toast.error("No se pudo guardar el vídeo"); return; }
+                  if (e.filmPath) await supabase.storage.from("session-films").remove([e.filmPath]);
+                  toast.success("Vídeo subido");
+                  onSaved();
+                }} />
+              </label>
+              {e.filmPath && (
+                <Button size="sm" variant="outline" onClick={async () => {
+                  await supabase.from("exercises").update({ film_path: null }).eq("id", e.id);
+                  await supabase.storage.from("session-films").remove([e.filmPath!]);
+                  toast.success("Vídeo propio quitado");
+                  onSaved();
+                }}>Quitar vídeo propio</Button>
+              )}
                <DiagramPicker value={f.diagramType} onChange={(diagramType) => setF({ ...f, diagramType })} />
                <ExerciseDiagram title={f.title || e.title} diagramType={f.diagramType} />
               <Button size="sm" onClick={() => void save()}><Save className="size-4" /> Guardar</Button>
