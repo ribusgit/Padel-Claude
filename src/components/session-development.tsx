@@ -39,7 +39,7 @@ function planParts(plan: string) {
 function variantFor(text: string): Exclude<ExerciseDiagramType, "auto"> {
   const normalized = text.toLocaleLowerCase("es");
   if (/saque|resto|servicio/.test(normalized)) return "serve";
-  if (/remate|smash|bandeja|víbora|volea|red/.test(normalized)) return "net";
+  if (/remate|smash|bandeja|víbora|volea|red|cabeza/.test(normalized)) return "net";
   if (/globo|pared|cristal|defensa|fondo/.test(normalized)) return "lob";
   return "rally";
 }
@@ -572,8 +572,8 @@ function GroupTips({ variant, count }: { variant: Exclude<ExerciseDiagramType, "
   const n = Math.min(count, 4);
   const rows: Array<{ label: string; text: string }> = [
     { label: "1 alumno", text: tips.one },
-    { label: "2 alumnos", text: tips.two },
-    { label: "3 alumnos", text: tips.three },
+    { label: "2 alumnos (pareja)", text: tips.two },
+    { label: "3-4 alumnos", text: tips.three },
   ];
   const active = n <= 1 ? 0 : n === 2 ? 1 : 2;
   return (
@@ -591,18 +591,36 @@ function GroupTips({ variant, count }: { variant: Exclude<ExerciseDiagramType, "
 function DevelopmentText({ plan }: { plan: string }) {
   const blocks = plan.split(/\n{2,}/).filter((block) => block.trim());
   return (
-    <div className="mt-1 space-y-2 text-xs text-muted-foreground">
+    <div className="mt-2 space-y-3 text-xs text-muted-foreground">
       {blocks.map((block, index) => {
         const separator = block.indexOf(":");
         const label = separator > 0 ? block.slice(0, separator + 1) : "";
         const body = separator > 0 ? block.slice(separator + 1).trimStart() : block;
+        
+        // Detect if the body contains a list (lines starting with - or numbers)
+        const lines = body.split("\n").filter(l => l.trim());
+        const hasList = lines.some(l => /^[•\-*]|\d+[.)]/.test(l.trim()));
+
         return (
-          <p key={index} className={cn("whitespace-pre-wrap break-words", /^(Objetivo|Día|Material)/i.test(label) && "text-foreground")}>
-            {label && <span className="font-semibold">{label} </span>}
-            {planParts(body).map((part, partIndex) => part.href ? (
-              <a key={partIndex} href={part.href} target="_blank" rel="noreferrer" className="font-semibold text-primary underline underline-offset-2">{part.text}</a>
-            ) : <span key={partIndex}>{part.text}</span>)}
-          </p>
+          <div key={index} className="space-y-1">
+            {label && <p className={cn("font-bold text-foreground mb-0.5", /^(Objetivo|Desarrollo|Clave|Pared|Pareja|Cabeza)/i.test(label) && "text-primary")}>{label}</p>}
+            <div className={cn("space-y-1", hasList && "pl-1")}>
+              {lines.map((line, li) => {
+                const trimmed = line.trim();
+                const isItem = /^[•\-*]|\d+[.)]/.test(trimmed);
+                return (
+                  <p key={li} className={cn(
+                    "whitespace-pre-wrap break-words leading-relaxed",
+                    isItem && "pl-4 -indent-4"
+                  )}>
+                    {planParts(line).map((part, partIndex) => part.href ? (
+                      <a key={partIndex} href={part.href} target="_blank" rel="noreferrer" className="font-semibold text-primary hover:underline underline-offset-2">{part.text}</a>
+                    ) : <span key={partIndex}>{part.text}</span>)}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
         );
       })}
     </div>
