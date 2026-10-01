@@ -3,6 +3,38 @@ import { useDrawings } from "@/lib/drawings";
 import { ExternalLink, Pause, Play, PlayCircle, RotateCcw, Snail, Target } from "lucide-react";
 import type { Exercise, ExerciseDiagramType } from "@/lib/exercises";
 import type { ClassSession } from "@/lib/padel";
+import d01 from "@/assets/sesiones/dia-01.mp4.asset.json";
+import d02 from "@/assets/sesiones/dia-02.mp4.asset.json";
+import d03 from "@/assets/sesiones/dia-03.mp4.asset.json";
+import d04 from "@/assets/sesiones/dia-04.mp4.asset.json";
+import d05 from "@/assets/sesiones/dia-05.mp4.asset.json";
+import d06 from "@/assets/sesiones/dia-06.mp4.asset.json";
+import d07 from "@/assets/sesiones/dia-07.mp4.asset.json";
+import d08 from "@/assets/sesiones/dia-08.mp4.asset.json";
+import d09 from "@/assets/sesiones/dia-09.mp4.asset.json";
+import d10 from "@/assets/sesiones/dia-10.mp4.asset.json";
+import d11 from "@/assets/sesiones/dia-11.mp4.asset.json";
+import d12 from "@/assets/sesiones/dia-12.mp4.asset.json";
+import d13 from "@/assets/sesiones/dia-13.mp4.asset.json";
+import d14 from "@/assets/sesiones/dia-14.mp4.asset.json";
+import d15 from "@/assets/sesiones/dia-15.mp4.asset.json";
+import d16 from "@/assets/sesiones/dia-16.mp4.asset.json";
+import d17 from "@/assets/sesiones/dia-17.mp4.asset.json";
+import d18 from "@/assets/sesiones/dia-18.mp4.asset.json";
+import d19 from "@/assets/sesiones/dia-19.mp4.asset.json";
+import d20 from "@/assets/sesiones/dia-20.mp4.asset.json";
+import d21 from "@/assets/sesiones/dia-21.mp4.asset.json";
+import d22 from "@/assets/sesiones/dia-22.mp4.asset.json";
+import d23 from "@/assets/sesiones/dia-23.mp4.asset.json";
+import d24 from "@/assets/sesiones/dia-24.mp4.asset.json";
+import d25 from "@/assets/sesiones/dia-25.mp4.asset.json";
+import d26 from "@/assets/sesiones/dia-26.mp4.asset.json";
+const SESSION_FILMS: Record<number, string> = {1: d01.url,2: d02.url,3: d03.url,4: d04.url,5: d05.url,6: d06.url,7: d07.url,8: d08.url,9: d09.url,10: d10.url,11: d11.url,12: d12.url,13: d13.url,14: d14.url,15: d15.url,16: d16.url,17: d17.url,18: d18.url,19: d19.url,20: d20.url,21: d21.url,22: d22.url,23: d23.url,24: d24.url,25: d25.url,26: d26.url};
+function filmFor(title: string, plan: string): { day: number; url: string } | null {
+  const m = title.match(/d[ií]a\s+(\d{1,2})\b/i) ?? plan.match(/d[ií]a\s+(\d{1,2})\b/i);
+  const day = m ? Number(m[1]) : 0;
+  return SESSION_FILMS[day] ? { day, url: SESSION_FILMS[day] } : null;
+}
 import { cn } from "@/lib/utils";
 
 const YOUTUBE_URL = /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+/i;
@@ -356,6 +388,15 @@ function Figure({ team, angle, leg }: { team: "a" | "b"; angle: number; leg: num
 }
 
 export function ExerciseDiagram({ title, diagramType = "auto", plan = "" }: { title: string; diagramType?: ExerciseDiagramType; plan?: string }) {
+  const film = filmFor(title, plan);
+  if (film) {
+    return (
+      <figure className="w-full overflow-hidden rounded-lg border border-border bg-card" aria-label={`Vídeo del ejercicio: ${title}`}>
+        <video src={film.url} className="aspect-video w-full bg-background object-cover" autoPlay muted loop playsInline controls preload="metadata" />
+        <figcaption className="px-3 py-2 text-xs text-muted-foreground">Día {film.day} · así se hace el ejercicio en pista</figcaption>
+      </figure>
+    );
+  }
   const variant = diagramType === "auto" ? variantFor(title, plan) : diagramType;
   const drill = DRILLS[variant];
   const visual = fromPlan(plan, visualFor(`${title} ${plan.match(/objetivo\s*:[^\n]*/i)?.[0] ?? ""}`, drill));
