@@ -1,13 +1,7 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+> [!NOTE]
+> Copia independiente de `ribusgit/court-mate-manager` (proyecto de Lovable) para
+> trabajar con Claude. Este repositorio NO está conectado a Lovable: los cambios
+> aquí no llegan a la app publicada salvo que se pasen expresamente al repositorio original.
 
 - Render class development through the shared `SessionDevelopment` UI so court diagrams and YouTube links stay consistent across calendars and portals.
 - Store each exercise diagram as a semantic preset (`auto`, `rally`, `serve`, `net`, or `lob`) so editors and session views render the same graphic.
