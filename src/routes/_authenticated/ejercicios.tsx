@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, PlayCircle, Plus, Save, Trash2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowDown, ArrowUp, Clapperboard, Loader2, PlayCircle, Plus, Save, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useExercises, type Exercise, type ExerciseDiagramType } from "@/lib/exercises";
 import { LEVEL_LABELS, type LevelCategory } from "@/lib/padel";
 import { cn } from "@/lib/utils";
+import { checkExerciseFilm, startExerciseFilm } from "@/lib/runway.functions";
 
 export const Route = createFileRoute("/_authenticated/ejercicios")({
   head: () => ({
@@ -26,12 +28,53 @@ export const Route = createFileRoute("/_authenticated/ejercicios")({
   component: ExercisesPage,
 });
 
+/** Genera con Runway el vídeo real de un ejercicio y espera a que quede guardado. */
+function useRunwayFilm() {
+  const start = useServerFn(startExerciseFilm);
+  const check = useServerFn(checkExerciseFilm);
+  return async (exerciseId: string, onStatus?: (text: string) => void) => {
+    const created = await start({ data: { exerciseId } });
+    if (!created.ok) throw new Error(created.message);
+    onStatus?.("En cola en Runway…");
+    for (let i = 0; i < 120; i++) {
+      await new Promise((r) => setTimeout(r, 5000));
+      const res = await check({ data: { exerciseId, taskId: created.taskId } });
+      if (!res.ok) throw new Error(res.message);
+      if (res.done) return;
+      onStatus?.(res.status === "RUNNING" ? `Generando… ${Math.round((res.progress ?? 0) * 100)}%` : "En cola en Runway…");
+    }
+    throw new Error("Runway está tardando demasiado; inténtalo más tarde");
+  };
+}
+
 function ExercisesPage() {
   const { items, loading, reload } = useExercises();
   const [level, setLevel] = useState<LevelCategory>("iniciacion");
   const [trimester, setTrimester] = useState(1);
   const [draft, setDraft] = useState<{ title: string; description: string; videoUrl: string; diagramType: ExerciseDiagramType }>({ title: "", description: "", videoUrl: "", diagramType: "auto" });
   const list = items.filter((e) => e.level === level && e.trimester === trimester);
+  const generateFilm = useRunwayFilm();
+  const [bulk, setBulk] = useState<string | null>(null);
+  const missing = list.filter((e) => !e.filmPath);
+
+  const generateMissing = async () => {
+    if (!missing.length) return;
+    if (!confirm(`Se generarán ${missing.length} vídeos de 5 s con Runway (consume créditos de tu cuenta de Runway). ¿Continuar?`)) return;
+    let done = 0;
+    for (const e of missing) {
+      setBulk(`${done + 1}/${missing.length} · ${e.title}`);
+      try {
+        await generateFilm(e.id, (t) => setBulk(`${done + 1}/${missing.length} · ${e.title} · ${t}`));
+        done++;
+      } catch (err) {
+        toast.error(`${e.title}: ${(err as Error).message}`);
+        if ((err as Error).message.includes("RUNWAYML_API_SECRET")) break;
+      }
+    }
+    setBulk(null);
+    toast.success(`${done} vídeos generados con Runway`);
+    void reload();
+  };
 
   const add = async () => {
     if (!draft.title.trim()) { toast.error("Escribe el nombre del ejercicio"); return; }
@@ -90,12 +133,24 @@ function ExercisesPage() {
         <Button onClick={() => void add()}><Plus className="size-4" /> Añadir</Button>
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold">Vídeos reales con Runway</p>
+          <p className="text-xs text-muted-foreground">Crea a partir del texto de cada ejercicio un vídeo realista que sustituye al gráfico animado en las clases. Los ejercicios con vídeo grabado por vosotros no se tocan.</p>
+          {bulk && <p className="mt-1 text-xs font-medium text-primary">{bulk}</p>}
+        </div>
+        <Button disabled={!!bulk || !missing.length} onClick={() => void generateMissing()}>
+          {bulk ? <Loader2 className="size-4 animate-spin" /> : <Clapperboard className="size-4" />}
+          {missing.length ? `Generar ${missing.length} vídeos` : "Todos tienen vídeo"}
+        </Button>
+      </div>
+
       {loading ? (
         <p className="text-sm text-muted-foreground">Cargando…</p>
       ) : (
         <ol className="space-y-2">
           {list.map((e, i) => (
-            <ExerciseRow key={e.id} e={e} n={i + 1} onUp={() => void move(i, -1)} onDown={() => void move(i, 1)} onDelete={() => void remove(e)} onSaved={() => void reload()} />
+            <ExerciseRow key={e.id} e={e} n={i + 1} generateFilm={generateFilm} busy={!!bulk} onUp={() => void move(i, -1)} onDown={() => void move(i, 1)} onDelete={() => void remove(e)} onSaved={() => void reload()} />
           ))}
         </ol>
       )}
@@ -103,9 +158,24 @@ function ExercisesPage() {
   );
 }
 
-function ExerciseRow({ e, n, onUp, onDown, onDelete, onSaved }: { e: Exercise; n: number; onUp: () => void; onDown: () => void; onDelete: () => void; onSaved: () => void }) {
+function ExerciseRow({ e, n, generateFilm, busy, onUp, onDown, onDelete, onSaved }: { e: Exercise; n: number; generateFilm: ReturnType<typeof useRunwayFilm>; busy: boolean; onUp: () => void; onDown: () => void; onDelete: () => void; onSaved: () => void }) {
   const [edit, setEdit] = useState(false);
   const [f, setF] = useState({ title: e.title, description: e.description, videoUrl: e.videoUrl, diagramType: e.diagramType });
+  const [filmStatus, setFilmStatus] = useState<string | null>(null);
+  const isRunway = e.filmPath?.startsWith("runway/");
+  const runway = async () => {
+    if (e.filmPath && !confirm(isRunway ? "¿Generar un vídeo nuevo con Runway y sustituir el actual?" : "Este ejercicio tiene un vídeo grabado por vosotros. ¿Sustituirlo por uno de Runway?")) return;
+    setFilmStatus("Preparando…");
+    try {
+      await generateFilm(e.id, setFilmStatus);
+      toast.success("Vídeo de Runway listo");
+      onSaved();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setFilmStatus(null);
+    }
+  };
   const save = async () => {
     const { error } = await supabase.from("exercises").update({ title: f.title, description: f.description, video_url: f.videoUrl, diagram_type: f.diagramType }).eq("id", e.id);
     if (error) { toast.error("No se pudo guardar"); return; }
@@ -155,8 +225,17 @@ function ExerciseRow({ e, n, onUp, onDown, onDelete, onSaved }: { e: Exercise; n
             <button className="block text-left" onClick={() => setEdit(true)}>
               <p className="font-medium">{e.title}</p>
               {e.description && <p className="text-sm text-muted-foreground">{e.description}</p>}
-              <div className="mt-2 max-w-sm"><ExerciseDiagram title={e.title} diagramType={e.diagramType} /></div>
+              {!e.filmUrl && <div className="mt-2 max-w-sm"><ExerciseDiagram title={e.title} diagramType={e.diagramType} /></div>}
             </button>
+          )}
+          {!edit && e.filmUrl && (
+            <video src={e.filmUrl} className="aspect-video w-full max-w-sm rounded-lg border border-border bg-background object-contain" controls playsInline preload="metadata" />
+          )}
+          {!e.id.startsWith("default-") && (
+            <Button size="sm" variant="secondary" disabled={!!filmStatus || busy} onClick={() => void runway()}>
+              {filmStatus ? <Loader2 className="size-4 animate-spin" /> : <Clapperboard className="size-4" />}
+              {filmStatus ?? (isRunway ? "Regenerar vídeo con Runway" : "Crear vídeo real con Runway")}
+            </Button>
           )}
           {!edit && e.videoUrl && (
             <a href={e.videoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-primary">

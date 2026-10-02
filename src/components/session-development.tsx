@@ -672,7 +672,7 @@ function SessionMedia({ exercise, title, plan }: { exercise?: Exercise | undefin
     return (
       <figure className="w-full overflow-hidden rounded-lg border border-border bg-card">
         <video src={exercise.filmUrl} className="aspect-video w-full bg-background object-contain" controls playsInline preload="metadata" />
-        <figcaption className="px-3 py-2 text-xs text-muted-foreground">Vídeo grabado en nuestra pista</figcaption>
+        <figcaption className="px-3 py-2 text-xs text-muted-foreground">{exercise.filmPath?.startsWith("runway/") ? "Vídeo del ejercicio" : "Vídeo grabado en nuestra pista"}</figcaption>
       </figure>
     );
   }
