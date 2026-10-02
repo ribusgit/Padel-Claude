@@ -1,7 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const env = z.enum(["sandbox", "live"]);
+const priceId = z.string().regex(/^[a-z0-9_-]{1,80}$/i);
 
 export const resolvePaddlePrice = createServerFn({ method: "GET" })
-  .inputValidator((data: { priceId: string; environment: "sandbox" | "live" }) => data)
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ priceId, environment: env }).parse(data))
   .handler(async ({ data }) => {
     const { gatewayFetch } = await import("@/lib/paddle.server");
     const response = await gatewayFetch(
@@ -26,7 +32,10 @@ interface PaddlePriceRow {
  * administrador cambió la tarifa, se crea un precio nuevo con ese importe.
  */
 export const ensureFeePrice = createServerFn({ method: "POST" })
-  .inputValidator((data: { priceId: string; amountEur: number; environment: "sandbox" | "live" }) => data)
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ priceId, amountEur: z.number().min(0.7).max(1000), environment: env }).parse(data),
+  )
   .handler(async ({ data }) => {
     const { gatewayFetch } = await import("@/lib/paddle.server");
     const cents = Math.round(data.amountEur * 100);
