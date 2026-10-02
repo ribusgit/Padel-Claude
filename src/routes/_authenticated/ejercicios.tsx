@@ -13,6 +13,7 @@ import { useExercises, type Exercise, type ExerciseDiagramType } from "@/lib/exe
 import { LEVEL_LABELS, type LevelCategory } from "@/lib/padel";
 import { cn } from "@/lib/utils";
 import { checkExerciseFilm, startExerciseFilm } from "@/lib/runway.functions";
+import { RUNWAY_MODELS, type RunwayModel } from "@/lib/runway-models";
 
 export const Route = createFileRoute("/_authenticated/ejercicios")({
   head: () => ({
@@ -32,11 +33,11 @@ export const Route = createFileRoute("/_authenticated/ejercicios")({
 function useRunwayFilm() {
   const start = useServerFn(startExerciseFilm);
   const check = useServerFn(checkExerciseFilm);
-  return async (exerciseId: string, onStatus?: (text: string) => void) => {
-    const created = await start({ data: { exerciseId } });
+  return async (exerciseId: string, model: RunwayModel, onStatus?: (text: string) => void) => {
+    const created = await start({ data: { exerciseId, model } });
     if (!created.ok) throw new Error(created.message);
     onStatus?.("En cola en Runway…");
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 180; i++) {
       await new Promise((r) => setTimeout(r, 5000));
       const res = await check({ data: { exerciseId, taskId: created.taskId } });
       if (!res.ok) throw new Error(res.message);
@@ -55,16 +56,18 @@ function ExercisesPage() {
   const list = items.filter((e) => e.level === level && e.trimester === trimester);
   const generateFilm = useRunwayFilm();
   const [bulk, setBulk] = useState<string | null>(null);
+  const [model, setModel] = useState<RunwayModel>("seedance2");
+  const cost = (n: number) => ((RUNWAY_MODELS[model].duration * RUNWAY_MODELS[model].creditsPerSecond * n) / 100).toFixed(2).replace(".", ",");
   const missing = list.filter((e) => !e.filmPath);
 
   const generateMissing = async () => {
     if (!missing.length) return;
-    if (!confirm(`Se generarán ${missing.length} vídeos de 5 s con Runway (consume créditos de tu cuenta de Runway). ¿Continuar?`)) return;
+    if (!confirm(`Se generarán ${missing.length} vídeos de ${RUNWAY_MODELS[model].duration} s con Runway (unos ${cost(missing.length)} $ en créditos de tu cuenta de Runway). ¿Continuar?`)) return;
     let done = 0;
     for (const e of missing) {
       setBulk(`${done + 1}/${missing.length} · ${e.title}`);
       try {
-        await generateFilm(e.id, (t) => setBulk(`${done + 1}/${missing.length} · ${e.title} · ${t}`));
+        await generateFilm(e.id, model, (t) => setBulk(`${done + 1}/${missing.length} · ${e.title} · ${t}`));
         done++;
       } catch (err) {
         toast.error(`${e.title}: ${(err as Error).message}`);
@@ -137,6 +140,14 @@ function ExercisesPage() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">Vídeos reales con Runway</p>
           <p className="text-xs text-muted-foreground">Crea a partir del texto de cada ejercicio un vídeo realista que sustituye al gráfico animado en las clases. Los ejercicios con vídeo grabado por vosotros no se tocan.</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(Object.keys(RUNWAY_MODELS) as RunwayModel[]).map((m) => (
+              <Button key={m} type="button" size="sm" variant={model === m ? "default" : "secondary"} disabled={!!bulk} onClick={() => setModel(m)}>
+                {RUNWAY_MODELS[m].label}
+              </Button>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Coste aproximado: {cost(1)} $ por vídeo.</p>
           {bulk && <p className="mt-1 text-xs font-medium text-primary">{bulk}</p>}
         </div>
         <Button disabled={!!bulk || !missing.length} onClick={() => void generateMissing()}>
@@ -150,7 +161,7 @@ function ExercisesPage() {
       ) : (
         <ol className="space-y-2">
           {list.map((e, i) => (
-            <ExerciseRow key={e.id} e={e} n={i + 1} generateFilm={generateFilm} busy={!!bulk} onUp={() => void move(i, -1)} onDown={() => void move(i, 1)} onDelete={() => void remove(e)} onSaved={() => void reload()} />
+            <ExerciseRow key={e.id} e={e} n={i + 1} generateFilm={generateFilm} model={model} busy={!!bulk} onUp={() => void move(i, -1)} onDown={() => void move(i, 1)} onDelete={() => void remove(e)} onSaved={() => void reload()} />
           ))}
         </ol>
       )}
@@ -158,7 +169,7 @@ function ExercisesPage() {
   );
 }
 
-function ExerciseRow({ e, n, generateFilm, busy, onUp, onDown, onDelete, onSaved }: { e: Exercise; n: number; generateFilm: ReturnType<typeof useRunwayFilm>; busy: boolean; onUp: () => void; onDown: () => void; onDelete: () => void; onSaved: () => void }) {
+function ExerciseRow({ e, n, generateFilm, model, busy, onUp, onDown, onDelete, onSaved }: { e: Exercise; n: number; generateFilm: ReturnType<typeof useRunwayFilm>; model: RunwayModel; busy: boolean; onUp: () => void; onDown: () => void; onDelete: () => void; onSaved: () => void }) {
   const [edit, setEdit] = useState(false);
   const [f, setF] = useState({ title: e.title, description: e.description, videoUrl: e.videoUrl, diagramType: e.diagramType });
   const [filmStatus, setFilmStatus] = useState<string | null>(null);
@@ -167,7 +178,7 @@ function ExerciseRow({ e, n, generateFilm, busy, onUp, onDown, onDelete, onSaved
     if (e.filmPath && !confirm(isRunway ? "¿Generar un vídeo nuevo con Runway y sustituir el actual?" : "Este ejercicio tiene un vídeo grabado por vosotros. ¿Sustituirlo por uno de Runway?")) return;
     setFilmStatus("Preparando…");
     try {
-      await generateFilm(e.id, setFilmStatus);
+      await generateFilm(e.id, model, setFilmStatus);
       toast.success("Vídeo de Runway listo");
       onSaved();
     } catch (err) {
@@ -229,7 +240,7 @@ function ExerciseRow({ e, n, generateFilm, busy, onUp, onDown, onDelete, onSaved
             </button>
           )}
           {!edit && e.filmUrl && (
-            <video src={e.filmUrl} className="aspect-video w-full max-w-sm rounded-lg border border-border bg-background object-contain" controls playsInline preload="metadata" />
+            <video src={e.filmUrl} loop className="aspect-video w-full max-w-sm rounded-lg border border-border bg-background object-contain" controls playsInline preload="metadata" />
           )}
           {!e.id.startsWith("default-") && (
             <Button size="sm" variant="secondary" disabled={!!filmStatus || busy} onClick={() => void runway()}>
